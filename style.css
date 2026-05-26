@@ -1,5 +1,6 @@
 /* =========================================
-ROUTIFY PREMIUM - CSS COMPLETO FINAL
+ROUTIFY PREMIUM
+CSS COMPLETO RESPONSIVO
 ========================================= */
 
 /* =========================================
@@ -13,39 +14,39 @@ RESET
     font-family:'Inter',sans-serif;
 }
 
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#0f172a;
+    color:#fff;
+}
+
+/* =========================================
+ROOT
+========================================= */
+
 :root{
 
     --bg:#0f172a;
     --sidebar:#111827;
     --card:#1e293b;
-    --border:#334155;
 
     --primary:#2563eb;
-    --primary-hover:#1d4ed8;
+    --primaryHover:#1d4ed8;
 
-    --green:#16a34a;
-    --red:#dc2626;
-    --gray:#475569;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --warning:#f59e0b;
 
     --text:#ffffff;
     --muted:#94a3b8;
 
+    --border:#334155;
+
     --shadow:
     0 10px 30px rgba(0,0,0,.25);
-
-}
-
-/* =========================================
-BODY
-========================================= */
-
-body{
-
-    background:var(--bg);
-
-    color:var(--text);
-
-    overflow:hidden;
 
 }
 
@@ -67,22 +68,14 @@ SCROLLBAR
     border-radius:999px;
 }
 
-::-webkit-scrollbar-thumb:hover{
-    background:#475569;
-}
-
 /* =========================================
 LAYOUT
 ========================================= */
 
 .container{
-
     display:flex;
-
     width:100%;
-
     height:100vh;
-
 }
 
 /* =========================================
@@ -91,7 +84,7 @@ SIDEBAR
 
 .sidebar{
 
-    width:430px;
+    width:420px;
 
     background:var(--sidebar);
 
@@ -115,19 +108,15 @@ LOGO
 
     border-bottom:1px solid var(--border);
 
-    background:rgba(255,255,255,.02);
-
 }
 
 .logo h1{
 
-    font-size:34px;
-
-    font-weight:800;
+    font-size:32px;
 
     color:#3b82f6;
 
-    letter-spacing:-1px;
+    font-weight:700;
 
 }
 
@@ -135,11 +124,9 @@ LOGO
 
     margin-top:8px;
 
-    font-size:14px;
-
-    line-height:1.6;
-
     color:var(--muted);
+
+    font-size:14px;
 
 }
 
@@ -153,9 +140,9 @@ DASHBOARD
 
     grid-template-columns:1fr 1fr;
 
-    gap:12px;
+    gap:10px;
 
-    padding:16px;
+    padding:15px;
 
 }
 
@@ -167,27 +154,29 @@ DASHBOARD
 
     border-radius:18px;
 
-    padding:18px;
+    padding:14px;
 
-    transition:.3s;
+    min-height:90px;
 
     box-shadow:var(--shadow);
+
+    transition:.3s;
 
 }
 
 .card:hover{
 
-    border-color:#3b82f6;
-
     transform:translateY(-2px);
+
+    border-color:#3b82f6;
 
 }
 
 .card span{
 
-    color:var(--muted);
-
     font-size:12px;
+
+    color:var(--muted);
 
 }
 
@@ -195,9 +184,7 @@ DASHBOARD
 
     margin-top:10px;
 
-    font-size:28px;
-
-    font-weight:700;
+    font-size:24px;
 
 }
 
@@ -207,7 +194,7 @@ UPLOAD
 
 .upload-area{
 
-    padding:0 16px 16px;
+    padding:0 15px 15px;
 
 }
 
@@ -215,9 +202,7 @@ UPLOAD
 
     width:100%;
 
-    height:56px;
-
-    border-radius:16px;
+    height:55px;
 
     display:flex;
 
@@ -225,15 +210,17 @@ UPLOAD
 
     align-items:center;
 
+    border-radius:16px;
+
     background:linear-gradient(
         135deg,
         #2563eb,
         #3b82f6
     );
 
-    font-weight:700;
-
     cursor:pointer;
+
+    font-weight:600;
 
     transition:.3s;
 
@@ -243,21 +230,25 @@ UPLOAD
 
 .upload-btn:hover{
 
+    background:linear-gradient(
+        135deg,
+        #1d4ed8,
+        #2563eb
+    );
+
     transform:translateY(-2px);
 
 }
 
 #excelFile{
-
     display:none;
-
 }
 
 /* =========================================
-BUTTONS
+BOTÕES
 ========================================= */
 
-.buttons{
+.route-actions{
 
     display:grid;
 
@@ -265,25 +256,25 @@ BUTTONS
 
     gap:10px;
 
-    margin-top:14px;
+    margin-top:15px;
 
 }
 
 .btn{
 
-    height:50px;
-
     border:none;
+
+    height:48px;
 
     border-radius:14px;
 
-    font-weight:700;
-
-    color:white;
-
     cursor:pointer;
 
+    font-weight:700;
+
     transition:.3s;
+
+    color:white;
 
     box-shadow:var(--shadow);
 
@@ -295,7 +286,7 @@ BUTTONS
 
 }
 
-.blue{
+.primary{
 
     background:linear-gradient(
         135deg,
@@ -305,7 +296,7 @@ BUTTONS
 
 }
 
-.green{
+.success{
 
     background:linear-gradient(
         135deg,
@@ -315,7 +306,7 @@ BUTTONS
 
 }
 
-.red{
+.danger{
 
     background:linear-gradient(
         135deg,
@@ -325,7 +316,7 @@ BUTTONS
 
 }
 
-.gray{
+.secondary{
 
     background:#334155;
 
@@ -335,35 +326,21 @@ BUTTONS
 PROGRESSO
 ========================================= */
 
-.progress-box{
-
-    padding:0 16px 16px;
-
-}
-
-.progress-top{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    margin-bottom:10px;
-
-    font-size:13px;
-
-}
-
-.progress{
+.progress-container{
 
     width:100%;
 
-    height:14px;
+    height:18px;
 
-    background:#0f172a;
+    background:#1e293b;
 
     border-radius:999px;
 
     overflow:hidden;
+
+    margin-top:15px;
+
+    border:1px solid var(--border);
 
 }
 
@@ -375,11 +352,23 @@ PROGRESSO
 
     background:linear-gradient(
         90deg,
-        #22c55e,
-        #4ade80
+        #2563eb,
+        #22c55e
     );
 
     transition:1s;
+
+}
+
+.progress-text{
+
+    text-align:center;
+
+    margin-top:8px;
+
+    font-size:13px;
+
+    color:var(--muted);
 
 }
 
@@ -393,12 +382,12 @@ LISTA
 
     overflow:auto;
 
-    padding:16px;
+    padding:15px;
 
 }
 
 /* =========================================
-ENTREGAS
+CARD ENTREGA
 ========================================= */
 
 .delivery{
@@ -421,9 +410,9 @@ ENTREGAS
 
 .delivery:hover{
 
-    transform:translateY(-2px);
-
     border-color:#3b82f6;
+
+    transform:translateY(-2px);
 
 }
 
@@ -437,9 +426,7 @@ ENTREGAS
 
 .delivery h3{
 
-    font-size:17px;
-
-    font-weight:700;
+    font-size:18px;
 
 }
 
@@ -447,11 +434,9 @@ ENTREGAS
 
     margin-top:6px;
 
-    font-size:13px;
-
-    line-height:1.5;
-
     color:var(--muted);
+
+    font-size:14px;
 
 }
 
@@ -461,25 +446,23 @@ BADGE
 
 .badge{
 
+    margin-top:14px;
+
     display:inline-flex;
 
     align-items:center;
 
     gap:6px;
 
-    margin-top:12px;
-
     padding:8px 12px;
 
-    border-radius:14px;
+    border-radius:999px;
 
-    background:rgba(37,99,235,.2);
+    background:rgba(37,99,235,.15);
 
     color:#60a5fa;
 
-    border:1px solid rgba(59,130,246,.2);
-
-    font-size:11px;
+    font-size:12px;
 
     font-weight:700;
 
@@ -491,19 +474,19 @@ BOTÃO WAZE
 
 .waze-btn{
 
+    margin-top:15px;
+
     width:100%;
 
-    height:46px;
-
-    margin-top:14px;
+    height:45px;
 
     border:none;
 
-    border-radius:14px;
+    border-radius:12px;
 
-    background:#33ccff;
+    background:#05c8f7;
 
-    color:#000;
+    color:#fff;
 
     font-weight:700;
 
@@ -559,11 +542,11 @@ TOPBAR
 
     border-radius:22px;
 
-    background:rgba(15,23,42,.94);
+    background:rgba(15,23,42,.92);
+
+    border:1px solid rgba(255,255,255,.08);
 
     backdrop-filter:blur(12px);
-
-    border:1px solid rgba(255,255,255,.05);
 
     box-shadow:var(--shadow);
 
@@ -573,19 +556,17 @@ TOPBAR
 
     font-size:24px;
 
-    font-weight:700;
-
 }
 
 .topbar p{
 
     margin-top:10px;
 
-    font-size:13px;
+    color:var(--muted);
 
     line-height:1.6;
 
-    color:var(--muted);
+    font-size:14px;
 
 }
 
@@ -599,7 +580,7 @@ LEAFLET
 
     color:white;
 
-    border-radius:16px;
+    border-radius:18px;
 
 }
 
@@ -629,19 +610,40 @@ LEAFLET
 RESPONSIVO TABLET
 ========================================= */
 
-@media(max-width:900px){
-
-body{
-
-    overflow:auto;
-
-}
+@media(max-width:1100px){
 
 .container{
 
     flex-direction:column;
 
-    height:auto;
+}
+
+.sidebar{
+
+    width:100%;
+
+    height:50vh;
+
+}
+
+.map-container{
+
+    height:50vh;
+
+}
+
+}
+
+/* =========================================
+RESPONSIVO MOBILE
+========================================= */
+
+@media(max-width:768px){
+
+html,
+body{
+
+    overflow:auto;
 
 }
 
@@ -651,65 +653,7 @@ body{
 
     height:auto;
 
-    border-right:none;
-
-    border-bottom:1px solid var(--border);
-
 }
-
-.map-container{
-
-    width:100%;
-
-    height:65vh;
-
-    min-height:420px;
-
-}
-
-.buttons{
-
-    grid-template-columns:1fr;
-
-}
-
-.topbar{
-
-    width:92%;
-
-    left:4%;
-
-}
-
-}
-
-/* =========================================
-RESPONSIVO CELULAR
-========================================= */
-
-@media(max-width:600px){
-
-.logo{
-
-    padding:18px;
-
-}
-
-.logo h1{
-
-    font-size:24px;
-
-}
-
-.logo p{
-
-    font-size:12px;
-
-}
-
-/* =========================================
-CARDS MOBILE
-========================================= */
 
 .dashboard{
 
@@ -717,23 +661,13 @@ CARDS MOBILE
 
     gap:8px;
 
-    padding:12px;
-
 }
 
 .card{
 
+    min-height:75px;
+
     padding:12px;
-
-    border-radius:14px;
-
-    min-height:82px;
-
-}
-
-.card span{
-
-    font-size:10px;
 
 }
 
@@ -741,121 +675,33 @@ CARDS MOBILE
 
     font-size:20px;
 
-    margin-top:6px;
+}
+
+.card span{
+
+    font-size:11px;
 
 }
 
-/* =========================================
-UPLOAD
-========================================= */
+.route-actions{
 
-.upload-area{
-
-    padding:0 12px 12px;
-
-}
-
-/* =========================================
-BOTÕES
-========================================= */
-
-.buttons{
-
-    display:flex;
-
-    flex-direction:column;
-
-    gap:10px;
+    grid-template-columns:1fr;
 
 }
 
 .btn{
 
-    width:100%;
-
-    height:50px;
+    height:46px;
 
     font-size:14px;
 
 }
 
-/* =========================================
-PROGRESS
-========================================= */
-
-.progress-box{
-
-    padding:0 12px 12px;
-
-}
-
-/* =========================================
-LISTA
-========================================= */
-
-.list{
-
-    padding:12px;
-
-}
-
-.delivery{
-
-    padding:16px;
-
-}
-
-.delivery h3{
-
-    font-size:15px;
-
-}
-
-.delivery p{
-
-    font-size:12px;
-
-}
-
-/* =========================================
-WAZE
-========================================= */
-
-.waze-btn{
-
-    height:46px;
-
-    font-size:13px;
-
-}
-
-/* =========================================
-MAPA
-========================================= */
-
-.map-container{
-
-    height:60vh;
-
-    min-height:340px;
-
-}
-
-#map{
-
-    height:100%;
-
-}
-
-/* =========================================
-TOPBAR
-========================================= */
-
 .topbar{
 
-    width:94%;
+    width:90%;
 
-    left:3%;
+    left:5%;
 
     top:10px;
 
@@ -871,7 +717,13 @@ TOPBAR
 
 .topbar p{
 
-    font-size:12px;
+    font-size:13px;
+
+}
+
+.map-container{
+
+    height:55vh;
 
 }
 
@@ -881,13 +733,29 @@ TOPBAR
 CELULAR PEQUENO
 ========================================= */
 
-@media(max-width:420px){
+@media(max-width:480px){
+
+.logo{
+
+    padding:18px;
+
+}
+
+.logo h1{
+
+    font-size:26px;
+
+}
+
+.logo p{
+
+    font-size:12px;
+
+}
 
 .dashboard{
 
     grid-template-columns:1fr 1fr;
-
-    gap:6px;
 
 }
 
@@ -895,7 +763,7 @@ CELULAR PEQUENO
 
     padding:10px;
 
-    min-height:74px;
+    border-radius:14px;
 
 }
 
@@ -905,21 +773,61 @@ CELULAR PEQUENO
 
 }
 
-.card span{
+.route-actions{
 
-    font-size:9px;
-
-}
-
-.logo h1{
-
-    font-size:22px;
+    gap:8px;
 
 }
 
 .btn{
 
     font-size:13px;
+
+    height:44px;
+
+}
+
+.upload-btn{
+
+    height:50px;
+
+    font-size:14px;
+
+}
+
+.delivery{
+
+    padding:15px;
+
+}
+
+.delivery h3{
+
+    font-size:16px;
+
+}
+
+.delivery p{
+
+    font-size:13px;
+
+}
+
+.badge{
+
+    width:100%;
+
+    justify-content:center;
+
+}
+
+.topbar{
+
+    width:92%;
+
+    left:4%;
+
+    padding:14px;
 
 }
 
@@ -931,28 +839,14 @@ CELULAR PEQUENO
 
 .topbar p{
 
-    font-size:11px;
+    font-size:12px;
 
 }
 
 }
 
 /* =========================================
-TOUCH MOBILE
-========================================= */
-
-button,
-.upload-btn,
-.waze-btn{
-
-    touch-action:manipulation;
-
-    -webkit-tap-highlight-color:transparent;
-
-}
-
-/* =========================================
-ANIMAÇÃO
+ANIMAÇÕES
 ========================================= */
 
 @keyframes pulse{
@@ -962,7 +856,7 @@ ANIMAÇÃO
     }
 
     50%{
-        transform:scale(1.02);
+        transform:scale(1.03);
     }
 
     100%{
@@ -974,5 +868,68 @@ ANIMAÇÃO
 .card:hover h2{
 
     animation:pulse 1s infinite;
+
+}
+
+/* =========================================
+FLOAT BUTTON
+========================================= */
+
+.floating-btn{
+
+    position:absolute;
+
+    bottom:20px;
+
+    right:20px;
+
+    width:60px;
+
+    height:60px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color:white;
+
+    font-size:24px;
+
+    cursor:pointer;
+
+    z-index:999;
+
+    box-shadow:
+    0 15px 35px rgba(37,99,235,.35);
+
+}
+
+.floating-btn:hover{
+
+    transform:scale(1.08);
+
+}
+
+/* =========================================
+FOOTER
+========================================= */
+
+.footer{
+
+    padding:15px;
+
+    text-align:center;
+
+    font-size:12px;
+
+    color:var(--muted);
+
+    border-top:1px solid var(--border);
 
 }
