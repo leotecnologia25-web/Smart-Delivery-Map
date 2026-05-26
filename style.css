@@ -1,5 +1,9 @@
 /* =========================================
-   ROUTIFY - CSS COMPLETO
+ROUTIFY - CSS COMPLETO RESPONSIVO
+========================================= */
+
+/* =========================================
+RESET
 ========================================= */
 
 *{
@@ -20,14 +24,14 @@
     --primary:#2563eb;
     --primary-hover:#1d4ed8;
 
-    --text:#ffffff;
-    --text-muted:#94a3b8;
-
     --success:#16a34a;
     --warning:#eab308;
     --danger:#dc2626;
 
-    --shadow:0 10px 25px rgba(0,0,0,.25);
+    --text:#ffffff;
+    --text-muted:#94a3b8;
+
+    --shadow:0 10px 30px rgba(0,0,0,.25);
 
 }
 
@@ -37,12 +41,13 @@ body{
     overflow:hidden;
 }
 
-/* ==============================
-   SCROLLBAR
-============================== */
+/* =========================================
+SCROLLBAR
+========================================= */
 
 ::-webkit-scrollbar{
     width:8px;
+    height:8px;
 }
 
 ::-webkit-scrollbar-track{
@@ -58,9 +63,9 @@ body{
     background:#475569;
 }
 
-/* ==============================
-   LAYOUT
-============================== */
+/* =========================================
+LAYOUT
+========================================= */
 
 .container{
     display:flex;
@@ -68,439 +73,764 @@ body{
     height:100vh;
 }
 
-/* ==============================
-   SIDEBAR
-============================== */
+/* =========================================
+SIDEBAR
+========================================= */
 
 .sidebar{
-    width:390px;
+
+    width:420px;
+
     background:var(--sidebar);
+
     border-right:1px solid var(--border);
+
     display:flex;
+
     flex-direction:column;
+
     overflow:hidden;
+
 }
 
-/* ==============================
-   LOGO
-============================== */
+/* =========================================
+LOGO
+========================================= */
 
 .logo{
+
     padding:28px;
+
     border-bottom:1px solid var(--border);
-    background:rgba(255,255,255,.01);
+
+    background:rgba(255,255,255,.02);
+
 }
 
 .logo h1{
+
     font-size:34px;
-    font-weight:700;
+
     color:#3b82f6;
+
+    font-weight:700;
+
     letter-spacing:-1px;
+
 }
 
 .logo p{
-    margin-top:10px;
+
+    margin-top:8px;
+
     color:var(--text-muted);
+
     font-size:14px;
+
     line-height:1.5;
+
 }
 
-/* ==============================
-   DASHBOARD
-============================== */
+/* =========================================
+DASHBOARD
+========================================= */
 
 .dashboard{
+
     display:grid;
+
     grid-template-columns:1fr 1fr;
+
     gap:14px;
-    padding:22px;
+
+    padding:20px;
+
 }
 
 .card{
+
     background:var(--card);
+
     padding:20px;
+
     border-radius:22px;
+
     border:1px solid var(--border);
+
     transition:.3s;
+
     box-shadow:var(--shadow);
+
 }
 
 .card:hover{
-    transform:translateY(-2px);
+
+    transform:translateY(-3px);
+
     border-color:#3b82f6;
+
 }
 
 .card span{
-    font-size:13px;
+
     color:var(--text-muted);
+
+    font-size:13px;
+
 }
 
 .card h2{
+
     margin-top:12px;
+
     font-size:32px;
+
     font-weight:700;
+
 }
 
-/* ==============================
-   UPLOAD
-============================== */
+/* =========================================
+UPLOAD AREA
+========================================= */
 
-.upload{
-    padding:0 22px 22px;
+.upload-area{
+
+    padding:0 20px 20px;
+
 }
 
-.upload label{
+.upload-btn{
+
     display:flex;
+
     justify-content:center;
+
     align-items:center;
+
     width:100%;
+
     height:58px;
+
     border-radius:18px;
-    background:linear-gradient(135deg,#2563eb,#3b82f6);
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
     cursor:pointer;
+
     font-weight:600;
-    font-size:15px;
+
     transition:.3s;
+
     box-shadow:var(--shadow);
+
 }
 
-.upload label:hover{
+.upload-btn:hover{
+
     transform:translateY(-2px);
-    background:linear-gradient(135deg,#1d4ed8,#2563eb);
+
+    background:linear-gradient(
+        135deg,
+        #1d4ed8,
+        #2563eb
+    );
+
 }
 
-.upload input{
+#excelFile{
     display:none;
 }
 
-/* ==============================
-   DELIVERY LIST
-============================== */
+/* =========================================
+BUTTONS
+========================================= */
+
+.route-actions{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:15px;
+
+}
+
+.action-btn{
+
+    flex:1;
+
+    height:50px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.3s;
+
+    box-shadow:var(--shadow);
+
+}
+
+.action-btn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.secondary{
+
+    background:#334155;
+
+}
+
+.secondary:hover{
+
+    background:#475569;
+
+}
+
+/* =========================================
+PREVIEW EXCEL
+========================================= */
+
+.excel-preview{
+
+    padding:0 20px 20px;
+
+    overflow:auto;
+
+}
+
+.excel-preview h3{
+
+    margin-bottom:15px;
+
+    font-size:18px;
+
+}
+
+/* =========================================
+TABLE
+========================================= */
+
+.table-container{
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    overflow:auto;
+
+    background:var(--card);
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    min-width:950px;
+
+}
+
+thead{
+
+    background:#0f172a;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:2;
+
+}
+
+th{
+
+    padding:15px;
+
+    text-align:left;
+
+    color:var(--text-muted);
+
+    font-size:13px;
+
+    border-bottom:1px solid var(--border);
+
+    white-space:nowrap;
+
+}
+
+td{
+
+    padding:14px;
+
+    border-top:1px solid rgba(255,255,255,.03);
+
+    font-size:13px;
+
+    white-space:nowrap;
+
+}
+
+tbody tr{
+
+    transition:.2s;
+
+}
+
+tbody tr:hover{
+
+    background:#1e293b;
+
+}
+
+/* =========================================
+LISTA
+========================================= */
 
 .list{
+
     flex:1;
+
     overflow:auto;
-    padding:22px;
+
+    padding:20px;
+
 }
 
 .delivery{
+
     background:var(--card);
+
     border:1px solid var(--border);
-    border-radius:24px;
+
+    border-radius:22px;
+
     padding:20px;
+
     margin-bottom:16px;
+
     transition:.3s;
+
     box-shadow:var(--shadow);
+
 }
 
 .delivery:hover{
+
     border-color:#3b82f6;
+
     transform:translateY(-2px);
+
 }
 
 .delivery h3{
+
     font-size:18px;
+
     font-weight:700;
+
 }
 
 .delivery p{
-    margin-top:6px;
-    color:var(--text-muted);
-    font-size:14px;
-}
 
-/* ==============================
-   STREET BADGE
-============================== */
+    margin-top:6px;
+
+    color:var(--text-muted);
+
+    font-size:14px;
+
+}
 
 .street-badge{
-    margin-top:18px;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    background:rgba(37,99,235,.15);
-    border:1px solid rgba(59,130,246,.25);
+
+    margin-top:15px;
+
+    display:inline-block;
+
+    background:rgba(37,99,235,.2);
+
     color:#60a5fa;
-    padding:10px 14px;
+
+    padding:9px 14px;
+
     border-radius:14px;
+
     font-size:12px;
+
     font-weight:700;
+
+    border:1px solid rgba(59,130,246,.2);
+
 }
 
-/* ==============================
-   STATUS
-============================== */
-
-.status{
-    margin-top:18px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-}
-
-.tag{
-    padding:8px 15px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.5px;
-}
-
-.pending{
-    background:rgba(220,38,38,.2);
-    color:#f87171;
-    border:1px solid rgba(248,113,113,.2);
-}
-
-.route{
-    background:rgba(234,179,8,.2);
-    color:#fde047;
-    border:1px solid rgba(253,224,71,.2);
-}
-
-.done{
-    background:rgba(22,163,74,.2);
-    color:#4ade80;
-    border:1px solid rgba(74,222,128,.2);
-}
-
-/* ==============================
-   BUTTON
-============================== */
-
-.route-btn{
-    border:none;
-    background:linear-gradient(135deg,#2563eb,#3b82f6);
-    color:white;
-    padding:11px 16px;
-    border-radius:14px;
-    cursor:pointer;
-    font-weight:600;
-    transition:.3s;
-}
-
-.route-btn:hover{
-    transform:translateY(-2px);
-    background:linear-gradient(135deg,#1d4ed8,#2563eb);
-}
-
-/* ==============================
-   MAP AREA
-============================== */
+/* =========================================
+MAPA
+========================================= */
 
 .map-container{
+
     flex:1;
+
     position:relative;
+
 }
 
 #map{
+
     width:100%;
+
     height:100%;
-    z-index:1;
+
 }
 
-/* ==============================
-   TOPBAR
-============================== */
+/* =========================================
+TOPBAR
+========================================= */
 
 .topbar{
+
     position:absolute;
+
     top:20px;
+
     left:20px;
+
     z-index:999;
+
     width:340px;
-
-    background:rgba(15,23,42,.95);
-    backdrop-filter:blur(15px);
-
-    border:1px solid rgba(255,255,255,.05);
-
-    border-radius:24px;
 
     padding:22px;
 
+    border-radius:24px;
+
+    background:rgba(15,23,42,.95);
+
+    backdrop-filter:blur(14px);
+
+    border:1px solid rgba(255,255,255,.05);
+
     box-shadow:var(--shadow);
+
 }
 
 .topbar h2{
+
     font-size:26px;
+
     font-weight:700;
+
 }
 
 .topbar p{
+
     margin-top:12px;
-    color:var(--text-muted);
+
     line-height:1.7;
+
+    color:var(--text-muted);
+
     font-size:14px;
+
 }
 
-/* ==============================
-   LEAFLET
-============================== */
+/* =========================================
+LEAFLET
+========================================= */
 
 .leaflet-popup-content-wrapper{
+
     background:#111827;
+
     color:white;
-    border-radius:16px;
+
+    border-radius:18px;
+
 }
 
 .leaflet-popup-tip{
+
     background:#111827;
+
 }
 
 .leaflet-control-zoom{
+
     border:none !important;
+
 }
 
 .leaflet-control-zoom a{
+
     background:#111827 !important;
+
     color:white !important;
+
     border:none !important;
+
 }
 
-/* ==============================
-   SEARCH BAR
-============================== */
+/* =========================================
+MOBILE
+========================================= */
 
-.search-box{
-    padding:0 22px 22px;
+@media(max-width:1100px){
+
+.container{
+
+    flex-direction:column;
+
 }
 
-.search-box input{
+.sidebar{
+
     width:100%;
-    height:52px;
-    background:#0f172a;
-    border:1px solid var(--border);
-    border-radius:16px;
-    padding:0 16px;
-    color:white;
-    outline:none;
-    transition:.3s;
+
+    height:55vh;
+
 }
 
-.search-box input:focus{
-    border-color:#3b82f6;
+.map-container{
+
+    height:45vh;
+
 }
 
-/* ==============================
-   FLOAT BUTTON
-============================== */
+}
 
-.floating-button{
-    position:absolute;
-    bottom:30px;
-    right:30px;
-    z-index:999;
+/* =========================================
+TABLET
+========================================= */
 
-    width:65px;
-    height:65px;
+@media(max-width:768px){
 
-    border:none;
+body{
 
-    border-radius:50%;
+    overflow:auto;
 
-    background:linear-gradient(135deg,#2563eb,#3b82f6);
+}
 
-    color:white;
+.dashboard{
+
+    grid-template-columns:1fr 1fr;
+
+}
+
+.route-actions{
+
+    flex-direction:column;
+
+}
+
+.topbar{
+
+    width:90%;
+
+    left:5%;
+
+}
+
+.logo h1{
+
+    font-size:30px;
+
+}
+
+.card h2{
+
+    font-size:26px;
+
+}
+
+}
+
+/* =========================================
+CELULAR
+========================================= */
+
+@media(max-width:600px){
+
+.sidebar{
+
+    height:auto;
+
+}
+
+.dashboard{
+
+    grid-template-columns:1fr;
+
+}
+
+.map-container{
+
+    height:55vh;
+
+}
+
+.card{
+
+    padding:18px;
+
+}
+
+.card h2{
+
+    font-size:24px;
+
+}
+
+.logo{
+
+    padding:22px;
+
+}
+
+.logo h1{
 
     font-size:28px;
 
-    cursor:pointer;
-
-    box-shadow:0 15px 35px rgba(37,99,235,.4);
-
-    transition:.3s;
 }
 
-.floating-button:hover{
-    transform:scale(1.05);
-}
+.upload-area{
 
-/* ==============================
-   MOBILE
-============================== */
-
-@media(max-width:1000px){
-
-    .container{
-        flex-direction:column;
-    }
-
-    .sidebar{
-        width:100%;
-        height:48vh;
-    }
-
-    .map-container{
-        height:52vh;
-    }
+    padding:0 15px 15px;
 
 }
 
-@media(max-width:700px){
+.excel-preview{
 
-    body{
-        overflow:auto;
-    }
-
-    .dashboard{
-        grid-template-columns:1fr;
-    }
-
-    .topbar{
-        width:90%;
-        left:5%;
-    }
-
-    .logo h1{
-        font-size:28px;
-    }
-
-    .card h2{
-        font-size:26px;
-    }
+    padding:0 15px 15px;
 
 }
 
-@media(max-width:500px){
+.list{
 
-    .sidebar{
-        height:55vh;
-    }
-
-    .map-container{
-        height:45vh;
-    }
-
-    .delivery{
-        padding:16px;
-    }
-
-    .status{
-        flex-direction:column;
-        align-items:flex-start;
-    }
-
-    .route-btn{
-        width:100%;
-    }
+    padding:15px;
 
 }
 
-/* ==============================
-   ANIMAÇÕES
-============================== */
+.delivery{
 
-@keyframes pulse {
+    padding:16px;
+
+}
+
+.delivery h3{
+
+    font-size:16px;
+
+}
+
+.delivery p{
+
+    font-size:13px;
+
+}
+
+.street-badge{
+
+    width:100%;
+
+    text-align:center;
+
+}
+
+.topbar{
+
+    top:10px;
+
+    left:5%;
+
+    width:90%;
+
+    padding:18px;
+
+}
+
+.topbar h2{
+
+    font-size:22px;
+
+}
+
+.topbar p{
+
+    font-size:13px;
+
+}
+
+.action-btn{
+
+    height:48px;
+
+}
+
+}
+
+/* =========================================
+CELULAR PEQUENO
+========================================= */
+
+@media(max-width:420px){
+
+.logo h1{
+
+    font-size:24px;
+
+}
+
+.card h2{
+
+    font-size:22px;
+
+}
+
+.upload-btn{
+
+    font-size:14px;
+
+}
+
+.action-btn{
+
+    font-size:13px;
+
+}
+
+}
+
+/* =========================================
+ANIMAÇÕES
+========================================= */
+
+@keyframes pulse{
 
     0%{
         transform:scale(1);
     }
 
     50%{
-        transform:scale(1.05);
+        transform:scale(1.03);
     }
 
     100%{
@@ -510,93 +840,185 @@ body{
 }
 
 .card:hover h2{
+
     animation:pulse 1s infinite;
+
 }
 
-/* ==============================
-   GLASS EFFECT
-============================== */
-
-.glass{
-    background:rgba(255,255,255,.04);
-    backdrop-filter:blur(12px);
-    border:1px solid rgba(255,255,255,.08);
-}
-
-/* ==============================
-   BADGES COLORS
-============================== */
-
-.blue{
-    color:#60a5fa;
-}
-
-.green{
-    color:#4ade80;
-}
-
-.yellow{
-    color:#fde047;
-}
-
-.red{
-    color:#f87171;
-}
-
-/* ==============================
-   MAP MARKERS
-============================== */
-
-.marker-cluster{
-    background:#2563eb;
-    border-radius:50%;
-    color:white;
-    font-weight:700;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-/* ==============================
-   FOOTER
-============================== */
-
-.footer{
-    padding:18px;
-    text-align:center;
-    font-size:12px;
-    color:var(--text-muted);
-    border-top:1px solid var(--border);
-}
-
-/* ==============================
-   HOVER EFFECTS
-============================== */
+/* =========================================
+EFEITOS
+========================================= */
 
 button,
 .card,
 .delivery,
-.upload label{
+.upload-btn{
+
     transition:all .3s ease;
+
 }
 
 button:active{
+
     transform:scale(.98);
+
 }
 
-/* ==============================
-   DARK MAP OVERLAY
-============================== */
+/* =========================================
+FLOAT BUTTON
+========================================= */
 
-.map-overlay{
+.floating-btn{
+
     position:absolute;
-    inset:0;
+
+    bottom:25px;
+
+    right:25px;
+
+    width:65px;
+
+    height:65px;
+
+    border:none;
+
+    border-radius:50%;
+
     background:linear-gradient(
-        to bottom,
-        rgba(15,23,42,.2),
-        rgba(15,23,42,.05)
+        135deg,
+        #2563eb,
+        #3b82f6
     );
-    pointer-events:none;
-    z-index:2;
+
+    color:white;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+    z-index:999;
+
+    box-shadow:
+        0 15px 35px rgba(37,99,235,.35);
+
 }
 
+.floating-btn:hover{
+
+    transform:scale(1.05);
+
+}
+
+/* =========================================
+BADGES
+========================================= */
+
+.badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    padding:8px 12px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+}
+
+.badge-blue{
+
+    background:rgba(37,99,235,.2);
+
+    color:#60a5fa;
+
+}
+
+.badge-green{
+
+    background:rgba(22,163,74,.2);
+
+    color:#4ade80;
+
+}
+
+.badge-red{
+
+    background:rgba(220,38,38,.2);
+
+    color:#f87171;
+
+}
+
+/* =========================================
+LOADING
+========================================= */
+
+.loading{
+
+    width:40px;
+
+    height:40px;
+
+    border-radius:50%;
+
+    border:4px solid rgba(255,255,255,.1);
+
+    border-top:4px solid #3b82f6;
+
+    animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+    100%{
+        transform:rotate(360deg);
+    }
+
+}
+
+/* =========================================
+FOOTER
+========================================= */
+
+.footer{
+
+    padding:18px;
+
+    text-align:center;
+
+    font-size:12px;
+
+    color:var(--text-muted);
+
+    border-top:1px solid var(--border);
+
+}
+
+/* =========================================
+MAP CLUSTER
+========================================= */
+
+.marker-cluster{
+
+    background:#2563eb;
+
+    border-radius:50%;
+
+    color:white;
+
+    font-weight:700;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
