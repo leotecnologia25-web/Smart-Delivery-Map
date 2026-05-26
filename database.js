@@ -1,662 +1,105 @@
 /* =========================================
-ROUTIFY PREMIUM
-DATABASE.JS
-BANCO LOCAL COMPLETO
-========================================= */
+   ROUTIFY PREMIUM - DATABASE.JS
+   GERENCIAMENTO DE PERSISTÊNCIA LOCAL (IndexedDB)
+   ========================================= */
 
-/* =========================================
-CONFIG
-========================================= */
-
-const DB_NAME =
-"routify_database";
-
+const DB_NAME = "RoutifyDB";
 const DB_VERSION = 1;
+const STORE_NAME = "entregas";
+let dbInstance = null;
 
-const STORE_ROUTES =
-"routes";
+/**
+ * Inicializa o banco de dados IndexedDB
+ * @return {Promise} Garante que o banco está pronto antes de usar
+ */
+function initDatabase() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-const STORE_SETTINGS =
-"settings";
-
-let db = null;
-
-/* =========================================
-INICIAR DATABASE
-========================================= */
-
-function initDatabase(){
-
-    return new Promise((resolve,reject)=>{
-
-        const request =
-        indexedDB.open(
-            DB_NAME,
-            DB_VERSION
-        );
-
-        /* =====================================
-        ERRO
-        ===================================== */
-
-        request.onerror = function(event){
-
-            console.error(
-                "Erro ao abrir database",
-                event
-            );
-
-            reject(event);
-
-        };
-
-        /* =====================================
-        SUCESSO
-        ===================================== */
-
-        request.onsuccess = function(event){
-
-            db = event.target.result;
-
-            console.log(
-                "Database conectado."
-            );
-
-            resolve(db);
-
-        };
-
-        /* =====================================
-        CRIAR STORES
-        ===================================== */
-
-        request.onupgradeneeded =
-        function(event){
-
-            db =
-            event.target.result;
-
-            /* =================================
-            ROTAS
-            ================================= */
-
-            if(
-                !db.objectStoreNames.contains(
-                    STORE_ROUTES
-                )
-            ){
-
-                const routesStore =
-                db.createObjectStore(
-                    STORE_ROUTES,
-                    {
-                        keyPath:"id",
-                        autoIncrement:true
-                    }
-                );
-
-                routesStore.createIndex(
-                    "bairro",
-                    "bairro",
-                    {unique:false}
-                );
-
-                routesStore.createIndex(
-                    "city",
-                    "city",
-                    {unique:false}
-                );
-
-                routesStore.createIndex(
-                    "sequence",
-                    "sequence",
-                    {unique:false}
-                );
-
+        request.onupgradeneeded = function(event) {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: "data" });
+                console.log(`Tabela '${STORE_NAME}' criada com sucesso.`);
             }
-
-            /* =================================
-            SETTINGS
-            ================================= */
-
-            if(
-                !db.objectStoreNames.contains(
-                    STORE_SETTINGS
-                )
-            ){
-
-                db.createObjectStore(
-                    STORE_SETTINGS,
-                    {
-                        keyPath:"key"
-                    }
-                );
-
-            }
-
-            console.log(
-                "Stores criadas."
-            );
-
         };
 
+        request.onsuccess = function(event) {
+            dbInstance = event.target.result;
+            console.log("Banco de dados IndexedDB conectado via database.js!");
+            resolve(dbInstance);
+        };
+
+        request.onerror = function(event) {
+            console.error("Erro ao abrir IndexedDB:", event.target.error);
+            reject(event.target.error);
+        };
     });
-
 }
 
-/* =========================================
-SALVAR ROTA
-========================================= */
-
-function saveRoute(route){
-
-    return new Promise((resolve,reject)=>{
-
-        const transaction =
-        db.transaction(
-            [STORE_ROUTES],
-            "readwrite"
-        );
-
-        const store =
-        transaction.objectStore(
-            STORE_ROUTES
-        );
-
-        const request =
-        store.add(route);
-
-        request.onsuccess =
-        function(){
-
-            console.log(
-                "Rota salva."
-            );
-
-            resolve();
-
-        };
-
-        request.onerror =
-        function(error){
-
-            console.error(
-                "Erro salvar rota",
-                error
-            );
-
-            reject(error);
-
-        };
-
-    });
-
+/**
+ * Retorna a data de hoje formatada em AAAA-MM-DD
+ */
+function getTodayDateString() {
+    const today = new Date();
+    const offset = today.getTimezoneOffset();
+    const localDate = new Date(today.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().split('T')[0];
 }
 
-/* =========================================
-SALVAR MÚLTIPLAS ROTAS
-========================================= */
-
-async function saveMultipleRoutes(routes){
-
-    for(const route of routes){
-
-        await saveRoute(route);
-
+/**
+ * Salva ou atualiza a lista de rotas do dia atual
+ * @param {Array} routesList - Lista de objetos de entregas
+ */
+function saveRoutesToDB(routesList) {
+    if (!dbInstance) {
+        console.warn("Banco de dados não inicializado ainda.");
+        return;
     }
 
-    console.log(
-        routes.length +
-        " rotas salvas."
-    );
-
-}
-
-/* =========================================
-BUSCAR TODAS ROTAS
-========================================= */
-
-function getAllRoutes(){
-
-    return new Promise((resolve,reject)=>{
-
-        const transaction =
-        db.transaction(
-            [STORE_ROUTES],
-            "readonly"
-        );
-
-        const store =
-        transaction.objectStore(
-            STORE_ROUTES
-        );
-
-        const request =
-        store.getAll();
-
-        request.onsuccess =
-        function(){
-
-            resolve(
-                request.result
-            );
-
-        };
-
-        request.onerror =
-        function(error){
-
-            reject(error);
-
-        };
-
-    });
-
-}
-
-/* =========================================
-BUSCAR POR BAIRRO
-========================================= */
-
-function getRoutesByBairro(bairro){
-
-    return new Promise((resolve,reject)=>{
-
-        const transaction =
-        db.transaction(
-            [STORE_ROUTES],
-            "readonly"
-        );
-
-        const store =
-        transaction.objectStore(
-            STORE_ROUTES
-        );
-
-        const index =
-        store.index("bairro");
-
-        const request =
-        index.getAll(bairro);
-
-        request.onsuccess =
-        function(){
-
-            resolve(
-                request.result
-            );
-
-        };
-
-        request.onerror =
-        function(error){
-
-            reject(error);
-
-        };
-
-    });
-
-}
-
-/* =========================================
-ATUALIZAR ROTA
-========================================= */
-
-function updateRoute(route){
-
-    return new Promise((resolve,reject)=>{
-
-        const transaction =
-        db.transaction(
-            [STORE_ROUTES],
-            "readwrite"
-        );
-
-        const store =
-        transaction.objectStore(
-            STORE_ROUTES
-        );
-
-        const request =
-        store.put(route);
-
-        request.onsuccess =
-        function(){
-
-            resolve();
-
-        };
-
-        request.onerror =
-        function(error){
-
-            reject(error);
-
-        };
-
-    });
-
-}
-
-/* =========================================
-REMOVER ROTA
-========================================= */
-
-function deleteRoute(id){
-
-    return new Promise((resolve,reject)=>{
-
-        const transaction =
-        db.transaction(
-            [STORE_ROUTES],
-            "readwrite"
-        );
-
-        const store =
-        transaction.objectStore(
-            STORE_ROUTES
-        );
-
-        const request =
-        store.delete(id);
-
-        request.onsuccess =
-        function(){
-
-            resolve();
-
-        };
-
-        request.onerror =
-        function(error){
-
-            reject(error);
-
-        };
-
-    });
-
-}
-
-/* =========================================
-LIMPAR DATABASE
-========================================= */
-
-function clearRoutes(){
-
-    return new Promise((resolve,reject)=>{
-
-        const transaction =
-        db.transaction(
-            [STORE_ROUTES],
-            "readwrite"
-        );
-
-        const store =
-        transaction.objectStore(
-            STORE_ROUTES
-        );
-
-        const request =
-        store.clear();
-
-        request.onsuccess =
-        function(){
-
-            console.log(
-                "Database limpa."
-            );
-
-            resolve();
-
-        };
-
-        request.onerror =
-        function(error){
-
-            reject(error);
-
-        };
-
-    });
-
-}
-
-/* =========================================
-SALVAR CONFIGURAÇÃO
-========================================= */
-
-function saveSetting(key,value){
-
-    return new Promise((resolve,reject)=>{
-
-        const transaction =
-        db.transaction(
-            [STORE_SETTINGS],
-            "readwrite"
-        );
-
-        const store =
-        transaction.objectStore(
-            STORE_SETTINGS
-        );
-
-        const request =
-        store.put({
-            key:key,
-            value:value
-        });
-
-        request.onsuccess =
-        function(){
-
-            resolve();
-
-        };
-
-        request.onerror =
-        function(error){
-
-            reject(error);
-
-        };
-
-    });
-
-}
-
-/* =========================================
-BUSCAR CONFIGURAÇÃO
-========================================= */
-
-function getSetting(key){
-
-    return new Promise((resolve,reject)=>{
-
-        const transaction =
-        db.transaction(
-            [STORE_SETTINGS],
-            "readonly"
-        );
-
-        const store =
-        transaction.objectStore(
-            STORE_SETTINGS
-        );
-
-        const request =
-        store.get(key);
-
-        request.onsuccess =
-        function(){
-
-            if(request.result){
-
-                resolve(
-                    request.result.value
-                );
-
-            }else{
-
-                resolve(null);
-
-            }
-
-        };
-
-        request.onerror =
-        function(error){
-
-            reject(error);
-
-        };
-
-    });
-
-}
-
-/* =========================================
-EXPORTAR DATABASE JSON
-========================================= */
-
-async function exportDatabase(){
-
-    const routes =
-    await getAllRoutes();
-
-    const data =
-    JSON.stringify(
-        routes,
-        null,
-        2
-    );
-
-    const blob =
-    new Blob([data],{
-        type:'application/json'
-    });
-
-    const url =
-    URL.createObjectURL(blob);
-
-    const a =
-    document.createElement("a");
-
-    a.href = url;
-
-    a.download =
-    "routify_backup.json";
-
-    a.click();
-
-}
-
-/* =========================================
-IMPORTAR DATABASE JSON
-========================================= */
-
-async function importDatabase(file){
-
-    const reader =
-    new FileReader();
-
-    reader.onload =
-    async function(event){
-
-        const routes =
-        JSON.parse(
-            event.target.result
-        );
-
-        await clearRoutes();
-
-        await saveMultipleRoutes(
-            routes
-        );
-
-        console.log(
-            "Backup importado."
-        );
-
+    const todayStr = getTodayDateString();
+    const transaction = dbInstance.transaction([STORE_NAME], "readwrite");
+    const store = transaction.objectStore(STORE_NAME);
+
+    const dataToSave = {
+        data: todayStr,
+        routes: routesList,
+        updatedAt: new Date().toISOString()
     };
 
-    reader.readAsText(file);
+    const request = store.put(dataToSave);
 
-}
-
-/* =========================================
-ESTATÍSTICAS
-========================================= */
-
-async function getDatabaseStats(){
-
-    const routes =
-    await getAllRoutes();
-
-    const bairros = {};
-
-    routes.forEach(route => {
-
-        bairros[
-            route.bairro
-        ] = true;
-
-    });
-
-    return {
-
-        totalRoutes:
-        routes.length,
-
-        totalBairros:
-        Object.keys(
-            bairros
-        ).length
-
+    request.onsuccess = function() {
+        console.log(`Dados salvos/atualizados para o dia: ${todayStr}`);
     };
 
+    request.onerror = function() {
+        console.error("Erro ao salvar rotas no banco:", request.error);
+    };
 }
 
-/* =========================================
-AUTO SAVE
-========================================= */
+/**
+ * Busca as rotas salvas do dia atual
+ * @param {Function} callback - Função para processar os dados encontrados
+ */
+function loadRoutesFromDB(callback) {
+    if (!dbInstance) return;
 
-async function autoSave(routes){
+    const todayStr = getTodayDateString();
+    const transaction = dbInstance.transaction([STORE_NAME], "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.get(todayStr);
 
-    await clearRoutes();
+    request.onsuccess = function(event) {
+        const result = event.target.result;
+        if (result && result.routes) {
+            callback(result.routes);
+        } else {
+            console.log(`Nenhuma rota encontrada no banco para o dia ${todayStr}.`);
+        }
+    };
 
-    await saveMultipleRoutes(
-        routes
-    );
-
-    console.log(
-        "Auto save executado."
-    );
-
+    request.onerror = function() {
+        console.error("Erro ao buscar rotas no banco:", request.error);
+    };
 }
-
-/* =========================================
-INICIALIZAR
-========================================= */
-
-initDatabase()
-.then(()=>{
-
-    console.log(`
-
-=================================
-ROUTIFY DATABASE ONLINE
-=================================
-
-    `);
-
-})
-.catch(error=>{
-
-    console.error(
-        "Erro database",
-        error
-    );
-
-});
