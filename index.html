@@ -1,31 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Routify Premium</title>
 
+    <!-- CONFIGURAÇÕES DE ENQUADRAMENTO E INSTALAÇÃO (PWA / ANDROID / MAC) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#111827">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <!-- GOOGLE FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- LEAFLET CSS (Mapas confiáveis e leves) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
+    <!-- SEU CSS CUSTOMIZADO (Otimizado para Celular e Computador) -->
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div class="container">
 
+    <!-- =====================================
+    SIDEBAR (PAINEL DE CONTROLE)
+    ====================================== -->
     <aside class="sidebar">
 
+        <!-- LOGO -->
         <div class="logo">
             <h1>ROUTIFY</h1>
             <p>Sistema inteligente de entregas em tempo real</p>
         </div>
 
+        <!-- =====================================
+        DASHBOARD (MÉTRICAS DIÁRIAS)
+        ====================================== -->
         <div class="dashboard">
             <div class="card">
                 <span>Total Entregas</span>
@@ -48,17 +62,28 @@
             </div>
         </div>
 
+        <!-- =====================================
+        BUSCA / FILTRO DE ENTREGAS
+        ====================================== -->
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Buscar bairro ou entrega...">
         </div>
 
+        <!-- =====================================
+        IMPORTAÇÃO DE PLANILHAS (EXCEL / CSV)
+        ====================================== -->
         <div class="upload-area">
+            <!-- O label atua como o botão visual moderno -->
             <label for="excelFile" class="upload-btn">
                 📂 Importar Excel
             </label>
+            <!-- Input oculto para preservar a estética limpa no mobile -->
             <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="display: none;">
         </div>
 
+        <!-- =====================================
+        AÇÕES DA ROTA
+        ====================================== -->
         <div class="route-actions">
             <button id="loadRoutesBtn" class="action-btn">📍 Carregar Rotas</button>
             <button id="groupRoutesBtn" class="action-btn secondary">🧠 Agrupar Bairros</button>
@@ -66,6 +91,9 @@
             <button id="stopRouteBtn" class="action-btn danger">⛔ Parar Rotas</button>
         </div>
 
+        <!-- =====================================
+        BARRA DE PROGRESSO EM TEMPO REAL
+        ====================================== -->
         <div class="progress-container">
             <div class="progress-bar">
                 <div id="progressFill" style="width: 0%;"></div>
@@ -73,23 +101,33 @@
             <span id="progressText">0%</span>
         </div>
 
+        <!-- =====================================
+        LISTA DE CARDS DINÂMICOS (ALIMENTADA PELO JS)
+        ====================================== -->
         <div class="delivery-list" id="deliveryList"></div>
 
+        <!-- FOOTER -->
         <footer class="footer">
             Routify Premium © 2026
         </footer>
 
     </aside>
 
+    <!-- =====================================
+    MAPA CONTAINER
+    ====================================== -->
     <main class="map-container">
 
+        <!-- OVERLAY DE INFORMAÇÕES NO TOPO DO MAPA -->
         <div class="topbar">
             <h2>📍 Mapa Inteligente</h2>
             <p>Agrupamento automático de bairros semelhantes, otimização de entregas e integração com Waze.</p>
         </div>
 
+        <!-- DIV ALVO ONDE O LEAFLET CONSTRÓI O MAPA -->
         <div id="map"></div>
 
+        <!-- BOTÃO FLUTUANTE DO GPS (LOCALIZAÇÃO DO MOTORISTA) -->
         <button class="floating-btn" onclick="locateUser()">
             📡
         </button>
@@ -98,11 +136,30 @@
 
 </div>
 
+<!-- =====================================
+DEPENDÊNCIAS E SCRIPTS (ORDEM CRÍTICA)
+===================================== -->
+
+<!-- 1. Motor de Mapas Leaflet -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<!-- 2. Parser de Planilhas SheetJS -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+<!-- 3. Banco de Dados Local (Carrega primeiro para preparar as funções de persistência) -->
+<script src="database.js"></script>
+
+<!-- 4. Lógica de Negócios e Interface Mapas (Carrega por último consumindo as funções acima) -->
 <script src="script.js"></script>
+
+<!-- 5. Registro do Service Worker (Ativa o funcionamento PWA Offline / Instalação) -->
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log("Service Worker do Routify registrado com sucesso!"))
+            .catch(err => console.error("Falha ao registrar Service Worker:", err));
+    }
+</script>
 
 </body>
 </html>
