@@ -1,10 +1,6 @@
 /* =========================================
 ROUTIFY PREMIUM
-SCRIPT.JS COMPLETO
-AGRUPAMENTO POR BAIRRO
-ROTA EM TEMPO REAL
-WAZE
-IMPORTAÇÃO EXCEL
+SCRIPT.JS COMPLETO FINAL
 ========================================= */
 
 /* =========================================
@@ -65,15 +61,18 @@ document.getElementById("progressFill");
 const progressText =
 document.getElementById("progressText");
 
+const searchInput =
+document.getElementById("searchInput");
+
 /* =========================================
 DADOS
 ========================================= */
 
 let importedRoutes = [];
 
-let routeMarkers = [];
-
 let groupedRoutes = {};
+
+let routeMarkers = [];
 
 let currentRouteIndex = 0;
 
@@ -154,7 +153,7 @@ function processExcelData(data){
         const item = {
 
             atId:
-                row["AT ID"] || "Sem ID",
+                row["AT ID"] || "SEM ID",
 
             sequence:
                 row["Sequence"] || "",
@@ -189,6 +188,9 @@ function processExcelData(data){
 
     });
 
+    /* ORDENAR */
+    sortRoutesAlphabetically();
+
     updateDashboard();
 
     renderDeliveryList();
@@ -201,7 +203,67 @@ function processExcelData(data){
 }
 
 /* =========================================
-LISTA ENTREGAS
+ORDENAR ALFABÉTICO
+========================================= */
+
+function sortRoutesAlphabetically(){
+
+    importedRoutes.sort((a,b)=>{
+
+        const bairroA =
+        (a.bairro || "")
+        .toLowerCase();
+
+        const bairroB =
+        (b.bairro || "")
+        .toLowerCase();
+
+        if(bairroA < bairroB) return -1;
+        if(bairroA > bairroB) return 1;
+
+        const stopA =
+        (a.stop || "")
+        .toLowerCase();
+
+        const stopB =
+        (b.stop || "")
+        .toLowerCase();
+
+        if(stopA < stopB) return -1;
+        if(stopA > stopB) return 1;
+
+        return 0;
+
+    });
+
+}
+
+/* =========================================
+ATUALIZAR DASHBOARD
+========================================= */
+
+function updateDashboard(){
+
+    totalDeliveries.innerHTML =
+    importedRoutes.length;
+
+    const bairros = {};
+
+    importedRoutes.forEach(route => {
+
+        bairros[
+            route.bairro
+        ] = true;
+
+    });
+
+    groupedStreets.innerHTML =
+    Object.keys(bairros).length;
+
+}
+
+/* =========================================
+LISTA
 ========================================= */
 
 function renderDeliveryList(){
@@ -225,35 +287,41 @@ function renderDeliveryList(){
             </h3>
 
             <p>
-                Bairro:
+                📍 Bairro:
                 ${route.bairro}
             </p>
 
             <p>
-                Cidade:
+                🏙 Cidade:
                 ${route.city}
             </p>
 
             <p>
-                CEP:
+                📦 Stop:
+                ${route.stop}
+            </p>
+
+            <p>
+                📮 CEP:
                 ${route.zipcode}
             </p>
 
             <div class="badge">
 
-                📍 Stop:
-                ${route.stop}
+                Sequence:
+                ${route.sequence}
 
             </div>
 
             <button
                 class="waze-btn"
-                onclick="openWaze(
+                onclick="
+                openWaze(
                     ${route.latitude},
                     ${route.longitude}
                 )"
             >
-                📍 Abrir no Waze
+                📍 Abrir Waze
             </button>
 
         `;
@@ -299,11 +367,18 @@ function loadRoutes(){
                     </h3>
 
                     <p>
+                        Bairro:
                         ${route.bairro}
                     </p>
 
                     <p>
+                        Cidade:
                         ${route.city}
+                    </p>
+
+                    <p>
+                        Stop:
+                        ${route.stop}
                     </p>
 
                 </div>
@@ -338,8 +413,6 @@ function normalizeBairro(text){
     .normalize("NFD")
 
     .replace(/[\u0300-\u036f]/g,"")
-
-    .replace(/\./g,"")
 
     .replace(/\s+/g," ")
 
@@ -381,23 +454,21 @@ function groupRoutesByBairro(){
 
     });
 
-    createBairroMarkers();
+    createGroupedMarkers();
 
 }
 
 /* =========================================
-CRIAR MARCADORES BAIRRO
+CRIAR MARCADORES
 ========================================= */
 
-function createBairroMarkers(){
+function createGroupedMarkers(){
 
     Object.keys(groupedRoutes)
     .forEach(bairro => {
 
         const routes =
         groupedRoutes[bairro];
-
-        if(routes.length === 0) return;
 
         const lat =
         routes[0].latitude;
@@ -422,7 +493,7 @@ function createBairroMarkers(){
 
         marker.bindPopup(`
 
-            <div style="width:260px">
+            <div style="width:250px">
 
                 <h3>
                     📍 ${bairro.toUpperCase()}
@@ -452,9 +523,6 @@ function createBairroMarkers(){
         routeMarkers.push(marker);
 
     });
-
-    groupedStreets.innerHTML =
-    Object.keys(groupedRoutes).length;
 
     showAlert(
         "Bairros agrupados."
@@ -530,7 +598,7 @@ function startRoute(){
 }
 
 /* =========================================
-ATUALIZAR ROTA
+ATUALIZAR ENTREGA
 ========================================= */
 
 function updateCurrentRoute(index){
@@ -614,7 +682,7 @@ function updateCurrentRoute(index){
 }
 
 /* =========================================
-ENCERRAR ROTA
+PARAR ROTA
 ========================================= */
 
 stopRouteBtn.addEventListener(
@@ -667,7 +735,7 @@ function focusRoutes(){
 }
 
 /* =========================================
-LIMPAR MARKERS
+LIMPAR MAPA
 ========================================= */
 
 function clearMarkers(){
@@ -683,18 +751,45 @@ function clearMarkers(){
 }
 
 /* =========================================
-ATUALIZAR DASHBOARD
+BUSCA
 ========================================= */
 
-function updateDashboard(){
+searchInput.addEventListener(
+    "keyup",
+    function(){
 
-    totalDeliveries.innerHTML =
-    importedRoutes.length;
+        const term =
+        this.value.toLowerCase();
 
-}
+        const cards =
+        document.querySelectorAll(
+            ".delivery"
+        );
+
+        cards.forEach(card => {
+
+            const text =
+            card.innerText.toLowerCase();
+
+            if(text.includes(term)){
+
+                card.style.display =
+                "block";
+
+            }else{
+
+                card.style.display =
+                "none";
+
+            }
+
+        });
+
+    }
+);
 
 /* =========================================
-ABRIR WAZE
+WAZE
 ========================================= */
 
 function openWaze(lat,lng){
@@ -740,7 +835,7 @@ function showAlert(message){
 }
 
 /* =========================================
-LOCALIZAÇÃO USUÁRIO
+LOCALIZAÇÃO
 ========================================= */
 
 function locateUser(){
@@ -756,9 +851,11 @@ function locateUser(){
             const lng =
             position.coords.longitude;
 
+            const marker =
             L.marker([lat,lng])
-            .addTo(map)
-            .bindPopup(
+            .addTo(map);
+
+            marker.bindPopup(
                 "📍 Sua localização"
             );
 
@@ -768,16 +865,16 @@ function locateUser(){
 
 }
 
-locateUser();
-
 /* =========================================
-ONLINE
+INICIAR
 ========================================= */
+
+locateUser();
 
 console.log(`
 
-=================================
+=========================================
 ROUTIFY PREMIUM ONLINE
-=================================
+=========================================
 
 `);
