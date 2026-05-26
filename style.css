@@ -18,21 +18,19 @@ RESET
     --bg:#0f172a;
     --sidebar:#111827;
     --card:#1e293b;
-
     --border:#334155;
 
     --primary:#2563eb;
     --primary-hover:#1d4ed8;
 
     --success:#16a34a;
-    --warning:#eab308;
     --danger:#dc2626;
 
     --text:#ffffff;
-    --text-muted:#94a3b8;
+    --muted:#94a3b8;
 
     --shadow:
-    0 10px 30px rgba(0,0,0,.25);
+    0 15px 35px rgba(0,0,0,.25);
 
 }
 
@@ -47,7 +45,7 @@ body{
 }
 
 /* =========================================
-SCROLLBAR
+SCROLL
 ========================================= */
 
 ::-webkit-scrollbar{
@@ -71,12 +69,6 @@ SCROLLBAR
 
 }
 
-::-webkit-scrollbar-thumb:hover{
-
-    background:#475569;
-
-}
-
 /* =========================================
 LAYOUT
 ========================================= */
@@ -97,7 +89,7 @@ SIDEBAR
 
 .sidebar{
 
-    width:430px;
+    width:420px;
 
     background:var(--sidebar);
 
@@ -141,11 +133,11 @@ LOGO
 
     margin-top:8px;
 
-    color:var(--text-muted);
-
-    line-height:1.6;
+    color:var(--muted);
 
     font-size:14px;
+
+    line-height:1.5;
 
 }
 
@@ -169,11 +161,11 @@ DASHBOARD
 
     background:var(--card);
 
-    border:1px solid var(--border);
+    padding:20px;
 
     border-radius:22px;
 
-    padding:20px;
+    border:1px solid var(--border);
 
     transition:.3s;
 
@@ -191,7 +183,7 @@ DASHBOARD
 
 .card span{
 
-    color:var(--text-muted);
+    color:var(--muted);
 
     font-size:13px;
 
@@ -201,7 +193,7 @@ DASHBOARD
 
     margin-top:12px;
 
-    font-size:32px;
+    font-size:30px;
 
     font-weight:700;
 
@@ -219,27 +211,27 @@ UPLOAD
 
 .upload-btn{
 
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
     width:100%;
 
     height:58px;
 
     border-radius:18px;
 
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    cursor:pointer;
-
-    font-weight:600;
-
     background:linear-gradient(
         135deg,
         #2563eb,
         #3b82f6
     );
+
+    cursor:pointer;
+
+    font-weight:700;
 
     transition:.3s;
 
@@ -266,12 +258,14 @@ UPLOAD
 }
 
 /* =========================================
-BUTTONS
+BOTÕES
 ========================================= */
 
 .route-actions{
 
     display:flex;
+
+    flex-direction:column;
 
     gap:10px;
 
@@ -281,25 +275,25 @@ BUTTONS
 
 .action-btn{
 
-    flex:1;
+    width:100%;
 
-    height:50px;
+    height:52px;
 
     border:none;
 
     border-radius:16px;
-
-    cursor:pointer;
-
-    font-weight:700;
-
-    color:white;
 
     background:linear-gradient(
         135deg,
         #2563eb,
         #3b82f6
     );
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:700;
 
     transition:.3s;
 
@@ -325,113 +319,7 @@ BUTTONS
 
 }
 
-/* =========================================
-PAINEL TEMPO REAL
-========================================= */
-
-.route-live-panel{
-
-    margin:0 20px 20px;
-
-    background:var(--card);
-
-    border:1px solid var(--border);
-
-    border-radius:24px;
-
-    padding:20px;
-
-    box-shadow:var(--shadow);
-
-}
-
-.route-live-header{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:20px;
-
-}
-
-.route-live-header h3{
-
-    font-size:18px;
-
-}
-
-.route-live-status{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-}
-
-#liveDot{
-
-    width:12px;
-
-    height:12px;
-
-    border-radius:50%;
-
-    background:#64748b;
-
-}
-
-.live-active{
-
-    background:#22c55e !important;
-
-    animation:pulse 1s infinite;
-
-}
-
-.route-live-status p{
-
-    font-size:13px;
-
-    color:var(--text-muted);
-
-}
-
-.route-live-buttons{
-
-    display:flex;
-
-    gap:10px;
-
-}
-
-.start-route-btn,
-.pause-route-btn,
-.stop-route-btn{
-
-    flex:1;
-
-    height:50px;
-
-    border:none;
-
-    border-radius:16px;
-
-    color:white;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.3s;
-
-}
-
-.start-route-btn{
+.start-btn{
 
     background:linear-gradient(
         135deg,
@@ -441,17 +329,17 @@ PAINEL TEMPO REAL
 
 }
 
-.pause-route-btn{
+.start-btn:hover{
 
     background:linear-gradient(
         135deg,
-        #ca8a04,
-        #eab308
+        #15803d,
+        #16a34a
     );
 
 }
 
-.stop-route-btn{
+.stop-btn{
 
     background:linear-gradient(
         135deg,
@@ -461,11 +349,13 @@ PAINEL TEMPO REAL
 
 }
 
-.start-route-btn:hover,
-.pause-route-btn:hover,
-.stop-route-btn:hover{
+.stop-btn:hover{
 
-    transform:translateY(-2px);
+    background:linear-gradient(
+        135deg,
+        #b91c1c,
+        #dc2626
+    );
 
 }
 
@@ -473,13 +363,13 @@ PAINEL TEMPO REAL
 PROGRESSO
 ========================================= */
 
-.route-progress-box{
+.progress-box{
 
-    margin-top:20px;
+    padding:0 20px 20px;
 
 }
 
-.route-progress-top{
+.progress-header{
 
     display:flex;
 
@@ -487,13 +377,11 @@ PROGRESSO
 
     margin-bottom:10px;
 
-    color:var(--text-muted);
-
-    font-size:13px;
+    font-size:14px;
 
 }
 
-.route-progress-bar{
+.progress-bar{
 
     width:100%;
 
@@ -505,13 +393,17 @@ PROGRESSO
 
     overflow:hidden;
 
+    border:1px solid #1e293b;
+
 }
 
-.route-progress-fill{
+.progress-fill{
 
     width:0%;
 
     height:100%;
+
+    border-radius:999px;
 
     background:linear-gradient(
         90deg,
@@ -520,142 +412,6 @@ PROGRESSO
     );
 
     transition:1s;
-
-}
-
-/* =========================================
-INFO
-========================================= */
-
-.route-info{
-
-    display:grid;
-
-    grid-template-columns:1fr;
-
-    gap:12px;
-
-    margin-top:20px;
-
-}
-
-.route-info-card{
-
-    background:#0f172a;
-
-    border:1px solid var(--border);
-
-    border-radius:18px;
-
-    padding:16px;
-
-}
-
-.route-info-card span{
-
-    color:var(--text-muted);
-
-    font-size:12px;
-
-}
-
-.route-info-card h4{
-
-    margin-top:8px;
-
-    font-size:16px;
-
-}
-
-/* =========================================
-PLANILHA
-========================================= */
-
-.excel-preview{
-
-    padding:0 20px 20px;
-
-    overflow:auto;
-
-}
-
-.excel-preview h3{
-
-    margin-bottom:15px;
-
-    font-size:18px;
-
-}
-
-.table-container{
-
-    background:var(--card);
-
-    border:1px solid var(--border);
-
-    border-radius:18px;
-
-    overflow:auto;
-
-}
-
-table{
-
-    width:100%;
-
-    border-collapse:collapse;
-
-    min-width:950px;
-
-}
-
-thead{
-
-    background:#0f172a;
-
-    position:sticky;
-
-    top:0;
-
-}
-
-th{
-
-    padding:15px;
-
-    text-align:left;
-
-    color:var(--text-muted);
-
-    font-size:13px;
-
-    border-bottom:1px solid var(--border);
-
-    white-space:nowrap;
-
-}
-
-td{
-
-    padding:14px;
-
-    font-size:13px;
-
-    border-top:1px solid rgba(255,255,255,.03);
-
-    white-space:nowrap;
-
-}
-
-tbody tr{
-
-    transition:.2s;
-
-}
-
-tbody tr:hover{
-
-    background:#1e293b;
 
 }
 
@@ -693,9 +449,9 @@ LISTA
 
 .delivery:hover{
 
-    transform:translateY(-2px);
-
     border-color:#3b82f6;
+
+    transform:translateY(-2px);
 
 }
 
@@ -703,35 +459,83 @@ LISTA
 
     font-size:18px;
 
+    font-weight:700;
+
 }
 
 .delivery p{
 
     margin-top:6px;
 
-    color:var(--text-muted);
+    color:var(--muted);
 
     font-size:14px;
 
 }
 
-.street-badge{
+/* =========================================
+BADGES
+========================================= */
+
+.badge{
 
     margin-top:15px;
 
-    display:inline-block;
+    display:inline-flex;
 
-    padding:9px 14px;
+    align-items:center;
 
-    border-radius:14px;
+    gap:6px;
 
     background:rgba(37,99,235,.2);
 
     color:#60a5fa;
 
+    padding:8px 12px;
+
+    border-radius:14px;
+
     font-size:12px;
 
     font-weight:700;
+
+    border:1px solid rgba(59,130,246,.2);
+
+}
+
+/* =========================================
+BOTÃO WAZE
+========================================= */
+
+.waze-btn{
+
+    width:100%;
+
+    height:48px;
+
+    margin-top:15px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#33ccff;
+
+    color:#000;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.waze-btn:hover{
+
+    transform:translateY(-2px);
+
+    opacity:.9;
 
 }
 
@@ -789,6 +593,8 @@ TOPBAR
 
     font-size:26px;
 
+    font-weight:700;
+
 }
 
 .topbar p{
@@ -797,74 +603,9 @@ TOPBAR
 
     line-height:1.7;
 
-    color:var(--text-muted);
+    color:var(--muted);
 
     font-size:14px;
-
-}
-
-/* =========================================
-FLOAT BUTTON
-========================================= */
-
-.floating-btn{
-
-    position:absolute;
-
-    bottom:25px;
-
-    right:25px;
-
-    width:65px;
-
-    height:65px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #3b82f6
-    );
-
-    color:white;
-
-    font-size:28px;
-
-    cursor:pointer;
-
-    z-index:999;
-
-    box-shadow:
-    0 15px 35px rgba(37,99,235,.35);
-
-    transition:.3s;
-
-}
-
-.floating-btn:hover{
-
-    transform:scale(1.05);
-
-}
-
-/* =========================================
-FOOTER
-========================================= */
-
-.footer{
-
-    padding:18px;
-
-    text-align:center;
-
-    color:var(--text-muted);
-
-    font-size:12px;
-
-    border-top:1px solid var(--border);
 
 }
 
@@ -915,12 +656,109 @@ ANIMAÇÕES
     }
 
     50%{
-        transform:scale(1.05);
+        transform:scale(1.03);
     }
 
     100%{
         transform:scale(1);
     }
+
+}
+
+.card:hover h2{
+
+    animation:pulse 1s infinite;
+
+}
+
+/* =========================================
+LOADING
+========================================= */
+
+.loading{
+
+    width:40px;
+
+    height:40px;
+
+    border-radius:50%;
+
+    border:4px solid rgba(255,255,255,.1);
+
+    border-top:4px solid #3b82f6;
+
+    animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+    100%{
+        transform:rotate(360deg);
+    }
+
+}
+
+/* =========================================
+FLOAT BUTTON
+========================================= */
+
+.floating-btn{
+
+    position:absolute;
+
+    bottom:25px;
+
+    right:25px;
+
+    width:65px;
+
+    height:65px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color:white;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+    z-index:999;
+
+    box-shadow:
+    0 15px 35px rgba(37,99,235,.35);
+
+}
+
+.floating-btn:hover{
+
+    transform:scale(1.05);
+
+}
+
+/* =========================================
+FOOTER
+========================================= */
+
+.footer{
+
+    padding:18px;
+
+    text-align:center;
+
+    font-size:12px;
+
+    color:var(--muted);
+
+    border-top:1px solid var(--border);
 
 }
 
@@ -952,6 +790,10 @@ RESPONSIVO
 
 }
 
+/* =========================================
+TABLET
+========================================= */
+
 @media(max-width:768px){
 
 body{
@@ -967,12 +809,6 @@ body{
 }
 
 .route-actions{
-
-    flex-direction:column;
-
-}
-
-.route-live-buttons{
 
     flex-direction:column;
 
@@ -1000,6 +836,10 @@ body{
 
 }
 
+/* =========================================
+CELULAR
+========================================= */
+
 @media(max-width:600px){
 
 .sidebar{
@@ -1020,18 +860,6 @@ body{
 
 }
 
-.logo{
-
-    padding:22px;
-
-}
-
-.logo h1{
-
-    font-size:28px;
-
-}
-
 .card{
 
     padding:18px;
@@ -1044,19 +872,19 @@ body{
 
 }
 
+.logo{
+
+    padding:22px;
+
+}
+
+.logo h1{
+
+    font-size:28px;
+
+}
+
 .upload-area{
-
-    padding:0 15px 15px;
-
-}
-
-.route-live-panel{
-
-    margin:0 15px 15px;
-
-}
-
-.excel-preview{
 
     padding:0 15px 15px;
 
@@ -1086,21 +914,13 @@ body{
 
 }
 
-.street-badge{
-
-    width:100%;
-
-    text-align:center;
-
-}
-
 .topbar{
 
-    width:90%;
+    top:10px;
 
     left:5%;
 
-    top:10px;
+    width:90%;
 
     padding:18px;
 
@@ -1118,7 +938,17 @@ body{
 
 }
 
+.action-btn{
+
+    height:48px;
+
 }
+
+}
+
+/* =========================================
+CELULAR PEQUENO
+========================================= */
 
 @media(max-width:420px){
 
