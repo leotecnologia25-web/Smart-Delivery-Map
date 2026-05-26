@@ -8,11 +8,12 @@
 
 <title>Routify Premium</title>
 
-<!-- Fonte -->
+<!-- FONT -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<!-- Leaflet -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- LEAFLET -->
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
@@ -25,71 +26,87 @@ href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <div class="container">
 
-    <!-- =========================================
+    <!-- =====================================
     SIDEBAR
-    ========================================= -->
+    ===================================== -->
+
     <aside class="sidebar">
 
         <!-- LOGO -->
+
         <div class="logo">
 
             <h1>Routify</h1>
 
             <p>
-                Sistema inteligente de entregas,
-                agrupamento de ruas e rotas em tempo real.
+                Sistema inteligente de entregas
             </p>
 
         </div>
 
-        <!-- =========================================
-        DASHBOARD
-        ========================================= -->
-        <section class="dashboard">
+        <!-- DASHBOARD -->
+
+        <div class="dashboard">
 
             <div class="card">
 
-                <span>Total de Entregas</span>
+                <span>
+                    Total Entregas
+                </span>
 
-                <h2 id="totalDeliveries">0</h2>
+                <h2 id="totalDeliveries">
+                    0
+                </h2>
 
             </div>
 
             <div class="card">
 
-                <span>Ruas Agrupadas</span>
+                <span>
+                    Bairros
+                </span>
 
-                <h2 id="groupedStreets">0</h2>
-
-            </div>
-
-            <div class="card">
-
-                <span>Em Rota</span>
-
-                <h2 id="inRoute">0</h2>
+                <h2 id="groupedStreets">
+                    0
+                </h2>
 
             </div>
 
             <div class="card">
 
-                <span>Concluídas</span>
+                <span>
+                    Em Rota
+                </span>
 
-                <h2 id="completedRoutes">0</h2>
+                <h2 id="inRoute">
+                    0
+                </h2>
 
             </div>
 
-        </section>
+            <div class="card">
 
-        <!-- =========================================
-        IMPORTAÇÃO
-        ========================================= -->
-        <section class="upload-area">
+                <span>
+                    Concluídas
+                </span>
 
-            <label for="excelFile" class="upload-btn">
+                <h2 id="completedRoutes">
+                    0
+                </h2>
 
-                📂 Importar Planilha Excel
+            </div>
 
+        </div>
+
+        <!-- IMPORTAÇÃO -->
+
+        <div class="upload-area">
+
+            <label
+                for="excelFile"
+                class="upload-btn"
+            >
+                📂 Importar Excel
             </label>
 
             <input
@@ -99,54 +116,42 @@ href="https://unpkg.com/leaflet/dist/leaflet.css"/>
             >
 
             <!-- BOTÕES -->
-            <div class="buttons">
+
+            <div class="route-actions">
 
                 <button
                     id="loadRoutesBtn"
-                    class="btn blue"
+                    class="btn primary"
                 >
-                    🚚 Carregar Rotas
+                    🚚 Carregar
                 </button>
 
                 <button
                     id="groupRoutesBtn"
-                    class="btn gray"
+                    class="btn secondary"
                 >
-                    📍 Agrupar Rotas
+                    📍 Agrupar
                 </button>
 
                 <button
                     id="startRouteBtn"
-                    class="btn green"
+                    class="btn success"
                 >
-                    ▶️ Iniciar Rota
+                    ▶ Iniciar
                 </button>
 
                 <button
                     id="stopRouteBtn"
-                    class="btn red"
+                    class="btn danger"
                 >
                     ⏹ Encerrar
                 </button>
 
             </div>
 
-        </section>
+            <!-- PROGRESSO -->
 
-        <!-- =========================================
-        PROGRESSO
-        ========================================= -->
-        <section class="progress-box">
-
-            <div class="progress-top">
-
-                <span>Progresso da Rota</span>
-
-                <span id="progressText">0%</span>
-
-            </div>
-
-            <div class="progress">
+            <div class="progress-container">
 
                 <div
                     class="progress-fill"
@@ -155,26 +160,54 @@ href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
             </div>
 
-        </section>
+            <div
+                class="progress-text"
+                id="progressText"
+            >
+                0%
+            </div>
 
-        <!-- =========================================
-        LISTA DE ENTREGAS
-        ========================================= -->
-        <section
+        </div>
+
+        <!-- BUSCA -->
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Buscar bairro ou entrega..."
+            >
+
+        </div>
+
+        <!-- LISTA -->
+
+        <div
             class="list"
             id="deliveryList"
         >
 
-        </section>
+        </div>
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            Routify Premium © 2026
+
+        </div>
 
     </aside>
 
-    <!-- =========================================
+    <!-- =====================================
     MAPA
-    ========================================= -->
+    ===================================== -->
+
     <main class="map-container">
 
         <!-- TOPBAR -->
+
         <div class="topbar">
 
             <h2>
@@ -183,31 +216,52 @@ href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
             <p>
 
-                O Routify identifica automaticamente
-                entregas na mesma rua e cria agrupamentos
-                inteligentes para otimizar as rotas.
+                Agrupamento automático
+                por bairros com abertura
+                rápida no Waze e acompanhamento
+                em tempo real.
 
             </p>
 
         </div>
 
         <!-- MAPA -->
+
         <div id="map"></div>
+
+        <!-- FLOAT BUTTON -->
+
+        <button
+            class="floating-btn"
+            onclick="locateUser()"
+        >
+            📍
+        </button>
 
     </main>
 
 </div>
 
-<!-- =========================================
+<!-- =====================================
 LEAFLET
-========================================= -->
+===================================== -->
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script
+src="https://unpkg.com/leaflet/dist/leaflet.js">
+</script>
 
-<!-- XLSX -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<!-- =====================================
+XLSX
+===================================== -->
 
-<!-- SCRIPT -->
+<script
+src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js">
+</script>
+
+<!-- =====================================
+SCRIPT
+===================================== -->
+
 <script src="script.js"></script>
 
 </body>
