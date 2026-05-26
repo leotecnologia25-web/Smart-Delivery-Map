@@ -17,7 +17,7 @@ CAMADA MAPA
 L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
-    attribution:'&copy; OpenStreetMap'
+    attribution: '&copy; OpenStreetMap'
 }).addTo(map);
 
 /* =========================================
@@ -27,8 +27,8 @@ ELEMENTOS
 const excelInput =
 document.getElementById("excelFile");
 
-const tableBody =
-document.querySelector("#excelTable tbody");
+const deliveryList =
+document.getElementById("deliveryList");
 
 const totalDeliveries =
 document.getElementById("totalDeliveries");
@@ -42,48 +42,23 @@ document.getElementById("routeRunningCount");
 const completedRoutes =
 document.getElementById("completedRoutes");
 
-const loadRoutesBtn =
-document.getElementById("loadRoutesBtn");
-
-const optimizeBtn =
-document.getElementById("optimizeBtn");
-
-const deliveryList =
-document.getElementById("deliveryList");
-
-/* =========================================
-ROTA TEMPO REAL
-========================================= */
-
-const startRouteBtn =
-document.getElementById("startRouteBtn");
-
-const pauseRouteBtn =
-document.getElementById("pauseRouteBtn");
-
-const stopRouteBtn =
-document.getElementById("stopRouteBtn");
-
-const liveDot =
-document.getElementById("liveDot");
-
-const liveStatusText =
-document.getElementById("liveStatusText");
-
 const progressFill =
 document.getElementById("progressFill");
 
 const progressPercent =
 document.getElementById("progressPercent");
 
-const nextDelivery =
-document.getElementById("nextDelivery");
+const loadRoutesBtn =
+document.getElementById("loadRoutesBtn");
 
-const currentDistrict =
-document.getElementById("currentDistrict");
+const optimizeBtn =
+document.getElementById("optimizeBtn");
 
-const estimatedTime =
-document.getElementById("estimatedTime");
+const startRouteBtn =
+document.getElementById("startRouteBtn");
+
+const stopRouteBtn =
+document.getElementById("stopRouteBtn");
 
 /* =========================================
 DADOS
@@ -91,19 +66,15 @@ DADOS
 
 let importedRoutes = [];
 
-let routeMarkers = [];
+let markers = [];
 
 let groupedRoutes = {};
 
-let liveRouteRunning = false;
+let currentRouteIndex = 0;
 
-let liveRoutePaused = false;
+let routeInterval = null;
 
-let currentDelivery = 0;
-
-let liveInterval;
-
-let movingMarker = null;
+let currentMarker = null;
 
 /* =========================================
 UPLOAD EXCEL
@@ -125,7 +96,7 @@ function handleExcelUpload(event){
     if(!file){
 
         showAlert(
-            "Selecione uma planilha."
+            "Selecione uma planilha Excel."
         );
 
         return;
@@ -162,18 +133,18 @@ function handleExcelUpload(event){
 }
 
 /* =========================================
-PROCESSAR PLANILHA
+PROCESSAR DADOS
 ========================================= */
 
 function processExcelData(data){
 
     importedRoutes = [];
 
-    tableBody.innerHTML = "";
+    deliveryList.innerHTML = "";
 
     clearMarkers();
 
-    data.forEach(row => {
+    data.forEach((row,index)=>{
 
         const item = {
 
@@ -185,9 +156,6 @@ function processExcelData(data){
 
             stop:
                 row["Stop"] || "",
-
-            spx:
-                row["SPX TN"] || "",
 
             bairro:
                 row["Bairro"] || "",
@@ -206,19 +174,19 @@ function processExcelData(data){
             longitude:
                 parseFloat(
                     row["Longitude"]
-                ) || 0
+                ) || 0,
+
+            completed:false
 
         };
 
         importedRoutes.push(item);
 
-        createTableRow(item);
+        createDeliveryCard(item,index);
 
     });
 
     updateDashboard();
-
-    renderDeliveryList();
 
     showAlert(
         importedRoutes.length +
@@ -228,29 +196,60 @@ function processExcelData(data){
 }
 
 /* =========================================
-CRIAR TABELA
+CRIAR CARD
 ========================================= */
 
-function createTableRow(item){
+function createDeliveryCard(route,index){
 
-    const tr =
-    document.createElement("tr");
+    const card =
+    document.createElement("div");
 
-    tr.innerHTML = `
+    card.classList.add("delivery");
 
-        <td>${item.atId}</td>
-        <td>${item.sequence}</td>
-        <td>${item.stop}</td>
-        <td>${item.spx}</td>
-        <td>${item.bairro}</td>
-        <td>${item.city}</td>
-        <td>${item.zipcode}</td>
-        <td>${item.latitude}</td>
-        <td>${item.longitude}</td>
+    card.id =
+    "delivery-" + index;
+
+    card.innerHTML = `
+
+        <h3>
+            🚚 ${route.atId}
+        </h3>
+
+        <p>
+            Bairro:
+            ${route.bairro}
+        </p>
+
+        <p>
+            Cidade:
+            ${route.city}
+        </p>
+
+        <p>
+            CEP:
+            ${route.zipcode}
+        </p>
+
+        <div class="badge">
+            📍 Stop:
+            ${route.stop}
+        </div>
+
+        <button
+            class="waze-btn"
+            onclick="
+                openWaze(
+                    ${route.latitude},
+                    ${route.longitude}
+                )
+            "
+        >
+            🚗 Abrir no Waze
+        </button>
 
     `;
 
-    tableBody.appendChild(tr);
+    deliveryList.appendChild(card);
 
 }
 
@@ -263,71 +262,21 @@ function updateDashboard(){
     totalDeliveries.innerHTML =
     importedRoutes.length;
 
-    const streets = {};
+    const groups = {};
 
     importedRoutes.forEach(route => {
 
         const key =
-        route.bairro + "-" +
+        route.bairro +
+        "-" +
         route.zipcode;
 
-        streets[key] = true;
+        groups[key] = true;
 
     });
 
     groupedStreets.innerHTML =
-    Object.keys(streets).length;
-
-}
-
-/* =========================================
-LISTA ENTREGAS
-========================================= */
-
-function renderDeliveryList(){
-
-    deliveryList.innerHTML = "";
-
-    importedRoutes.forEach(route => {
-
-        const card =
-        document.createElement("div");
-
-        card.classList.add("delivery");
-
-        card.innerHTML = `
-
-            <h3>
-                🚚 ${route.atId}
-            </h3>
-
-            <p>
-                Bairro:
-                ${route.bairro}
-            </p>
-
-            <p>
-                Cidade:
-                ${route.city}
-            </p>
-
-            <p>
-                CEP:
-                ${route.zipcode}
-            </p>
-
-            <div class="street-badge">
-
-                📍 Stop:
-                ${route.stop}
-
-            </div>
-
-        `;
-
-        deliveryList.appendChild(card);
-
-    });
+    Object.keys(groups).length;
 
 }
 
@@ -392,11 +341,24 @@ function loadRoutes(){
                         ${route.zipcode}
                     </p>
 
+                    <br>
+
+                    <button
+                        onclick="
+                            openWaze(
+                                ${route.latitude},
+                                ${route.longitude}
+                            )
+                        "
+                    >
+                        🚗 Abrir no Waze
+                    </button>
+
                 </div>
 
             `);
 
-            routeMarkers.push(marker);
+            markers.push(marker);
 
         }
 
@@ -405,7 +367,7 @@ function loadRoutes(){
     focusRoutes();
 
     showAlert(
-        "Rotas carregadas."
+        "Rotas carregadas no mapa."
     );
 
 }
@@ -426,7 +388,8 @@ function groupRoutes(){
     importedRoutes.forEach(route => {
 
         const key =
-        route.bairro + "-" +
+        route.bairro +
+        "-" +
         route.zipcode;
 
         if(!groupedRoutes[key]){
@@ -438,20 +401,6 @@ function groupRoutes(){
         groupedRoutes[key].push(route);
 
     });
-
-    createGroupedMarkers();
-
-    showAlert(
-        "Rotas agrupadas."
-    );
-
-}
-
-/* =========================================
-CRIAR AGRUPAMENTOS
-========================================= */
-
-function createGroupedMarkers(){
 
     Object.keys(groupedRoutes)
     .forEach(key => {
@@ -470,7 +419,7 @@ function createGroupedMarkers(){
             const marker =
             L.circleMarker([lat,lng],{
 
-                radius:20,
+                radius:18,
 
                 color:"#2563eb",
 
@@ -492,15 +441,226 @@ function createGroupedMarkers(){
                         entregas agrupadas
                     </h3>
 
+                    <br>
+
+                    ${routes.map(route => `
+
+                        <p>
+                            🚚 ${route.atId}
+                        </p>
+
+                    `).join("")}
+
                 </div>
 
             `);
 
-            routeMarkers.push(marker);
+            markers.push(marker);
 
         }
 
     });
+
+    showAlert(
+        "Rotas agrupadas."
+    );
+
+}
+
+/* =========================================
+INICIAR ROTA
+========================================= */
+
+startRouteBtn.addEventListener(
+    "click",
+    startRoute
+);
+
+function startRoute(){
+
+    if(importedRoutes.length === 0){
+
+        showAlert(
+            "Importe uma planilha."
+        );
+
+        return;
+
+    }
+
+    currentRouteIndex = 0;
+
+    completedRoutes.innerHTML = 0;
+
+    routeRunningCount.innerHTML =
+    importedRoutes.length;
+
+    runNextRoute();
+
+}
+
+/* =========================================
+EXECUTAR ROTA
+========================================= */
+
+function runNextRoute(){
+
+    if(
+        currentRouteIndex >=
+        importedRoutes.length
+    ){
+
+        showAlert(
+            "Todas as entregas concluídas."
+        );
+
+        progressFill.style.width =
+        "100%";
+
+        progressPercent.innerHTML =
+        "100%";
+
+        return;
+
+    }
+
+    const route =
+    importedRoutes[currentRouteIndex];
+
+    if(currentMarker){
+
+        map.removeLayer(currentMarker);
+
+    }
+
+    currentMarker =
+    L.marker([
+        route.latitude,
+        route.longitude
+    ],{
+        draggable:false
+    }).addTo(map);
+
+    currentMarker.bindPopup(`
+
+        <h3>
+            🚚 ${route.atId}
+        </h3>
+
+        <p>
+            Bairro:
+            ${route.bairro}
+        </p>
+
+        <p>
+            Cidade:
+            ${route.city}
+        </p>
+
+    `).openPopup();
+
+    map.flyTo([
+        route.latitude,
+        route.longitude
+    ],16,{
+        animate:true,
+        duration:2
+    });
+
+    highlightCard(currentRouteIndex);
+
+    updateProgress();
+
+    openWaze(
+        route.latitude,
+        route.longitude
+    );
+
+    route.completed = true;
+
+    completedRoutes.innerHTML =
+    currentRouteIndex + 1;
+
+    currentRouteIndex++;
+
+    routeInterval =
+    setTimeout(
+        runNextRoute,
+        6000
+    );
+
+}
+
+/* =========================================
+PARAR ROTAS
+========================================= */
+
+stopRouteBtn.addEventListener(
+    "click",
+    stopRoutes
+);
+
+function stopRoutes(){
+
+    clearTimeout(routeInterval);
+
+    showAlert(
+        "Rotas pausadas."
+    );
+
+}
+
+/* =========================================
+ATUALIZAR PROGRESSO
+========================================= */
+
+function updateProgress(){
+
+    const progress =
+    (
+        currentRouteIndex /
+        importedRoutes.length
+    ) * 100;
+
+    progressFill.style.width =
+    progress + "%";
+
+    progressPercent.innerHTML =
+    Math.round(progress) + "%";
+
+}
+
+/* =========================================
+DESTACAR CARD
+========================================= */
+
+function highlightCard(index){
+
+    document
+    .querySelectorAll(".delivery")
+    .forEach(card => {
+
+        card.style.border =
+        "1px solid #334155";
+
+    });
+
+    const activeCard =
+    document.getElementById(
+        "delivery-" + index
+    );
+
+    if(activeCard){
+
+        activeCard.style.border =
+        "2px solid #22c55e";
+
+        activeCard.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+    }
 
 }
 
@@ -537,18 +697,34 @@ function focusRoutes(){
 }
 
 /* =========================================
+ABRIR WAZE
+========================================= */
+
+function openWaze(lat,lng){
+
+    const url =
+`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+
+    window.open(
+        url,
+        "_blank"
+    );
+
+}
+
+/* =========================================
 LIMPAR MARKERS
 ========================================= */
 
 function clearMarkers(){
 
-    routeMarkers.forEach(marker => {
+    markers.forEach(marker => {
 
         map.removeLayer(marker);
 
     });
 
-    routeMarkers = [];
+    markers = [];
 
 }
 
@@ -569,260 +745,26 @@ function locateUser(){
             const lng =
             position.coords.longitude;
 
-            map.setView([lat,lng],15);
+            const marker =
+            L.circleMarker([lat,lng],{
 
-            L.marker([lat,lng])
-            .addTo(map)
-            .bindPopup(
-                "Sua localização"
-            )
-            .openPopup();
+                radius:10,
+
+                color:"#22c55e",
+
+                fillColor:"#22c55e",
+
+                fillOpacity:1
+
+            }).addTo(map);
+
+            marker.bindPopup(
+                "📍 Sua localização"
+            );
 
         });
 
     }
-
-}
-
-/* =========================================
-ROTA TEMPO REAL
-========================================= */
-
-startRouteBtn.addEventListener(
-    "click",
-    startLiveRoute
-);
-
-pauseRouteBtn.addEventListener(
-    "click",
-    pauseLiveRoute
-);
-
-stopRouteBtn.addEventListener(
-    "click",
-    stopLiveRoute
-);
-
-/* =========================================
-INICIAR ROTA
-========================================= */
-
-function startLiveRoute(){
-
-    if(importedRoutes.length === 0){
-
-        showAlert(
-            "Importe uma planilha primeiro."
-        );
-
-        return;
-
-    }
-
-    if(liveRouteRunning){
-
-        return;
-
-    }
-
-    liveRouteRunning = true;
-
-    liveRoutePaused = false;
-
-    liveDot.classList.add(
-        "live-active"
-    );
-
-    liveStatusText.innerHTML =
-    "Rota em andamento";
-
-    routeRunningCount.innerHTML =
-    importedRoutes.length;
-
-    runLiveTracking();
-
-}
-
-/* =========================================
-EXECUTAR ROTA
-========================================= */
-
-function runLiveTracking(){
-
-    if(liveRoutePaused){
-
-        return;
-
-    }
-
-    if(
-        currentDelivery >=
-        importedRoutes.length
-    ){
-
-        finishLiveRoute();
-
-        return;
-
-    }
-
-    const route =
-    importedRoutes[currentDelivery];
-
-    nextDelivery.innerHTML =
-    route.atId;
-
-    currentDistrict.innerHTML =
-    route.bairro;
-
-    estimatedTime.innerHTML =
-    (
-        (
-            importedRoutes.length -
-            currentDelivery
-        ) * 3
-    ) + " min";
-
-    const progress =
-    (
-        (
-            currentDelivery + 1
-        )
-        /
-        importedRoutes.length
-    ) * 100;
-
-    progressFill.style.width =
-    progress + "%";
-
-    progressPercent.innerHTML =
-    Math.round(progress) + "%";
-
-    map.flyTo([
-        route.latitude,
-        route.longitude
-    ],16);
-
-    if(movingMarker){
-
-        map.removeLayer(movingMarker);
-
-    }
-
-    movingMarker =
-    L.marker([
-        route.latitude,
-        route.longitude
-    ]).addTo(map);
-
-    movingMarker.bindPopup(`
-
-        <b>
-            🚚 ${route.atId}
-        </b>
-
-        <br><br>
-
-        Bairro:
-        ${route.bairro}
-
-        <br>
-
-        Cidade:
-        ${route.city}
-
-    `).openPopup();
-
-    currentDelivery++;
-
-    liveInterval =
-    setTimeout(()=>{
-
-        runLiveTracking();
-
-    },4000);
-
-}
-
-/* =========================================
-PAUSAR
-========================================= */
-
-function pauseLiveRoute(){
-
-    liveRoutePaused = true;
-
-    clearTimeout(liveInterval);
-
-    liveStatusText.innerHTML =
-    "Rota pausada";
-
-}
-
-/* =========================================
-ENCERRAR
-========================================= */
-
-function stopLiveRoute(){
-
-    clearTimeout(liveInterval);
-
-    liveRouteRunning = false;
-
-    liveRoutePaused = false;
-
-    currentDelivery = 0;
-
-    routeRunningCount.innerHTML = 0;
-
-    liveDot.classList.remove(
-        "live-active"
-    );
-
-    liveStatusText.innerHTML =
-    "Rota encerrada";
-
-    progressFill.style.width =
-    "0%";
-
-    progressPercent.innerHTML =
-    "0%";
-
-}
-
-/* =========================================
-FINALIZAR
-========================================= */
-
-function finishLiveRoute(){
-
-    liveRouteRunning = false;
-
-    liveRoutePaused = false;
-
-    currentDelivery = 0;
-
-    routeRunningCount.innerHTML = 0;
-
-    completedRoutes.innerHTML =
-    importedRoutes.length;
-
-    liveDot.classList.remove(
-        "live-active"
-    );
-
-    liveStatusText.innerHTML =
-    "Rota finalizada";
-
-    progressFill.style.width =
-    "100%";
-
-    progressPercent.innerHTML =
-    "100%";
-
-    showAlert(
-        "Todas entregas concluídas."
-    );
 
 }
 
@@ -846,11 +788,13 @@ function searchRoutes(term){
             )
         ){
 
-            card.style.display = "block";
+            card.style.display =
+            "block";
 
         }else{
 
-            card.style.display = "none";
+            card.style.display =
+            "none";
 
         }
 
@@ -898,7 +842,7 @@ EXPORTAR CSV
 function exportCSV(){
 
     let csv =
-    "AT ID,Sequence,Stop,Bairro,City,CEP,Latitude,Longitude\n";
+"AT ID,Sequence,Stop,Bairro,City,CEP,Latitude,Longitude\n";
 
     importedRoutes.forEach(route => {
 
@@ -979,7 +923,7 @@ function showAlert(message){
         alertBox
     );
 
-    setTimeout(()=>{
+    setTimeout(() => {
 
         alertBox.remove();
 
@@ -1000,15 +944,34 @@ setInterval(()=>{
 },30000);
 
 /* =========================================
+ATALHOS
+========================================= */
+
+document.addEventListener(
+    "keydown",
+    function(e){
+
+        if(e.key === "F5"){
+
+            console.log(
+                "Atualizando..."
+            );
+
+        }
+
+    }
+);
+
+/* =========================================
 INICIALIZAÇÃO
 ========================================= */
 
 console.log(`
 
-=========================================
+=================================
 ROUTIFY ONLINE
 Sistema Inteligente de Entregas
-=========================================
+=================================
 
 `);
 
