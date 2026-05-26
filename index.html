@@ -1,79 +1,595 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Routify - Sistema Inteligente de Entregas</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-<!-- Leaflet -->
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<title>Routify - Entregas Inteligentes</title>
 
-<!-- Google Fonts -->
+<!-- GOOGLE FONTS -->
 <link rel="preconnect"
 href="https://fonts.googleapis.com">
 
-<link rel="preconnect"
-href="https://fonts.gstatic.com"
-crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+<link
+href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
 rel="stylesheet">
 
-<!-- CSS -->
-<link rel="stylesheet" href="style.css">
+<!-- LEAFLET -->
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+
+/* =========================================
+RESET
+========================================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
+}
+
+:root{
+
+    --bg:#0f172a;
+    --sidebar:#111827;
+    --card:#1e293b;
+    --border:#334155;
+
+    --primary:#2563eb;
+    --primary-hover:#1d4ed8;
+
+    --success:#16a34a;
+    --warning:#eab308;
+    --danger:#dc2626;
+
+    --text:#ffffff;
+    --muted:#94a3b8;
+
+}
+
+body{
+
+    background:var(--bg);
+
+    color:var(--text);
+
+    overflow:hidden;
+
+}
+
+/* =========================================
+LAYOUT
+========================================= */
+
+.container{
+
+    display:flex;
+
+    width:100%;
+
+    height:100vh;
+
+}
+
+/* =========================================
+SIDEBAR
+========================================= */
+
+.sidebar{
+
+    width:420px;
+
+    background:var(--sidebar);
+
+    border-right:1px solid var(--border);
+
+    overflow:auto;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+/* =========================================
+LOGO
+========================================= */
+
+.logo{
+
+    padding:25px;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.logo h1{
+
+    font-size:34px;
+
+    color:#3b82f6;
+
+}
+
+.logo p{
+
+    margin-top:8px;
+
+    color:var(--muted);
+
+    font-size:14px;
+
+}
+
+/* =========================================
+DASHBOARD
+========================================= */
+
+.dashboard{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:12px;
+
+    padding:20px;
+
+}
+
+.card{
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:20px;
+
+    padding:20px;
+
+}
+
+.card span{
+
+    color:var(--muted);
+
+    font-size:13px;
+
+}
+
+.card h2{
+
+    margin-top:10px;
+
+    font-size:30px;
+
+}
+
+/* =========================================
+UPLOAD
+========================================= */
+
+.upload-area{
+
+    padding:0 20px 20px;
+
+}
+
+.upload-btn{
+
+    width:100%;
+
+    height:55px;
+
+    border-radius:16px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    cursor:pointer;
+
+    font-weight:700;
+
+}
+
+#excelFile{
+
+    display:none;
+
+}
+
+/* =========================================
+BOTÕES
+========================================= */
+
+.route-actions{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+    margin-top:15px;
+
+}
+
+.action-btn{
+
+    width:100%;
+
+    height:50px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color:white;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+.action-btn.secondary{
+
+    background:#334155;
+
+}
+
+.start-btn{
+
+    background:linear-gradient(
+        135deg,
+        #16a34a,
+        #22c55e
+    );
+
+}
+
+.stop-btn{
+
+    background:linear-gradient(
+        135deg,
+        #dc2626,
+        #ef4444
+    );
+
+}
+
+/* =========================================
+PROGRESSO
+========================================= */
+
+.progress-box{
+
+    padding:0 20px 20px;
+
+}
+
+.progress-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:10px;
+
+}
+
+.progress-bar{
+
+    width:100%;
+
+    height:14px;
+
+    background:#0f172a;
+
+    border-radius:999px;
+
+    overflow:hidden;
+
+}
+
+.progress-fill{
+
+    width:0%;
+
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        #22c55e,
+        #4ade80
+    );
+
+    transition:1s;
+
+}
+
+/* =========================================
+LISTA
+========================================= */
+
+.list{
+
+    flex:1;
+
+    overflow:auto;
+
+    padding:20px;
+
+}
+
+.delivery{
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:20px;
+
+    padding:18px;
+
+    margin-bottom:15px;
+
+}
+
+.delivery h3{
+
+    font-size:18px;
+
+}
+
+.delivery p{
+
+    margin-top:6px;
+
+    color:var(--muted);
+
+    font-size:14px;
+
+}
+
+.badge{
+
+    margin-top:12px;
+
+    display:inline-block;
+
+    background:rgba(37,99,235,.2);
+
+    color:#60a5fa;
+
+    padding:8px 12px;
+
+    border-radius:12px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+}
+
+.waze-btn{
+
+    width:100%;
+
+    height:45px;
+
+    margin-top:15px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#33ccff;
+
+    color:#000;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+/* =========================================
+MAPA
+========================================= */
+
+.map-container{
+
+    flex:1;
+
+    position:relative;
+
+}
+
+#map{
+
+    width:100%;
+
+    height:100%;
+
+}
+
+/* =========================================
+TOPBAR
+========================================= */
+
+.topbar{
+
+    position:absolute;
+
+    top:20px;
+
+    left:20px;
+
+    z-index:999;
+
+    width:320px;
+
+    background:rgba(15,23,42,.95);
+
+    backdrop-filter:blur(10px);
+
+    border:1px solid var(--border);
+
+    border-radius:22px;
+
+    padding:20px;
+
+}
+
+.topbar h2{
+
+    font-size:24px;
+
+}
+
+.topbar p{
+
+    margin-top:10px;
+
+    color:var(--muted);
+
+    line-height:1.6;
+
+    font-size:14px;
+
+}
+
+/* =========================================
+RESPONSIVO
+========================================= */
+
+@media(max-width:1000px){
+
+.container{
+
+    flex-direction:column;
+
+}
+
+.sidebar{
+
+    width:100%;
+
+    height:55vh;
+
+}
+
+.map-container{
+
+    height:45vh;
+
+}
+
+}
+
+@media(max-width:600px){
+
+body{
+
+    overflow:auto;
+
+}
+
+.dashboard{
+
+    grid-template-columns:1fr;
+
+}
+
+.sidebar{
+
+    height:auto;
+
+}
+
+.map-container{
+
+    height:60vh;
+
+}
+
+.topbar{
+
+    width:90%;
+
+    left:5%;
+
+}
+
+}
+
+</style>
 
 </head>
 
 <body>
 
-<!-- =========================================
-CONTAINER
-========================================= -->
-
 <div class="container">
 
-    <!-- =========================================
-    SIDEBAR
-    ========================================= -->
-
-    <aside class="sidebar">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
 
         <!-- LOGO -->
-
         <div class="logo">
 
             <h1>Routify</h1>
 
             <p>
-                Sistema inteligente de entregas,
-                agrupamento de rotas e
-                monitoramento em tempo real.
+                Sistema inteligente de entregas
+                com integração Waze
             </p>
 
         </div>
 
-        <!-- =========================================
-        DASHBOARD
-        ========================================= -->
-
+        <!-- DASHBOARD -->
         <div class="dashboard">
 
             <div class="card">
 
-                <span>Entregas Hoje</span>
+                <span>Entregas</span>
 
-                <h2 id="totalDeliveries">0</h2>
+                <h2 id="totalDeliveries">
+                    0
+                </h2>
 
             </div>
 
             <div class="card">
 
-                <span>Ruas Agrupadas</span>
+                <span>Agrupadas</span>
 
-                <h2 id="groupedStreets">0</h2>
+                <h2 id="groupedStreets">
+                    0
+                </h2>
 
             </div>
 
@@ -81,7 +597,9 @@ CONTAINER
 
                 <span>Em Rota</span>
 
-                <h2 id="routeRunningCount">0</h2>
+                <h2 id="routeRunningCount">
+                    0
+                </h2>
 
             </div>
 
@@ -89,238 +607,105 @@ CONTAINER
 
                 <span>Concluídas</span>
 
-                <h2 id="completedRoutes">0</h2>
+                <h2 id="completedRoutes">
+                    0
+                </h2>
 
             </div>
 
         </div>
 
-        <!-- =========================================
-        IMPORTAÇÃO
-        ========================================= -->
-
+        <!-- IMPORTAÇÃO -->
         <div class="upload-area">
 
-            <label for="excelFile"
+            <label
+                for="excelFile"
                 class="upload-btn">
 
-                📂 Importar Planilha Excel
+                📂 Importar Excel
 
             </label>
 
-            <input type="file"
+            <input
+                type="file"
                 id="excelFile"
-                accept=".xlsx,.xls,.csv">
+                accept=".xlsx,.xls,.csv"
+            >
 
             <!-- BOTÕES -->
-
             <div class="route-actions">
 
-                <button id="loadRoutesBtn"
-                    class="action-btn">
+                <button
+                    class="action-btn"
+                    id="loadRoutesBtn">
 
                     🚚 Carregar Rotas
 
                 </button>
 
-                <button id="optimizeBtn"
-                    class="action-btn secondary">
+                <button
+                    class="action-btn secondary"
+                    id="optimizeBtn">
 
                     📍 Agrupar Rotas
 
                 </button>
 
+                <button
+                    class="action-btn start-btn"
+                    id="startRouteBtn">
+
+                    ▶️ Iniciar Rotas
+
+                </button>
+
+                <button
+                    class="action-btn stop-btn"
+                    id="stopRouteBtn">
+
+                    ⛔ Encerrar Rotas
+
+                </button>
+
             </div>
 
         </div>
 
-        <!-- =========================================
-        PAINEL TEMPO REAL
-        ========================================= -->
+        <!-- PROGRESSO -->
+        <div class="progress-box">
 
-        <div class="route-live-panel">
+            <div class="progress-header">
 
-            <div class="route-live-header">
+                <span>Progresso da Rota</span>
 
-                <h3>
-                    🚚 Rota em Tempo Real
-                </h3>
-
-                <div class="route-live-status">
-
-                    <span id="liveDot"></span>
-
-                    <p id="liveStatusText">
-                        Aguardando início
-                    </p>
-
-                </div>
+                <span id="progressPercent">
+                    0%
+                </span>
 
             </div>
 
-            <!-- BOTÕES -->
+            <div class="progress-bar">
 
-            <div class="route-live-buttons">
-
-                <button id="startRouteBtn"
-                    class="start-route-btn">
-
-                    ▶️ Iniciar Rota
-
-                </button>
-
-                <button id="pauseRouteBtn"
-                    class="pause-route-btn">
-
-                    ⏸️ Pausar
-
-                </button>
-
-                <button id="stopRouteBtn"
-                    class="stop-route-btn">
-
-                    ⏹️ Encerrar
-
-                </button>
-
-            </div>
-
-            <!-- PROGRESSO -->
-
-            <div class="route-progress-box">
-
-                <div class="route-progress-top">
-
-                    <span>
-                        Progresso da rota
-                    </span>
-
-                    <span id="progressPercent">
-                        0%
-                    </span>
-
-                </div>
-
-                <div class="route-progress-bar">
-
-                    <div id="progressFill"
-                        class="route-progress-fill">
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- INFO -->
-
-            <div class="route-info">
-
-                <div class="route-info-card">
-
-                    <span>
-                        Próxima Entrega
-                    </span>
-
-                    <h4 id="nextDelivery">
-                        ---
-                    </h4>
-
-                </div>
-
-                <div class="route-info-card">
-
-                    <span>
-                        Bairro Atual
-                    </span>
-
-                    <h4 id="currentDistrict">
-                        ---
-                    </h4>
-
-                </div>
-
-                <div class="route-info-card">
-
-                    <span>
-                        Tempo Restante
-                    </span>
-
-                    <h4 id="estimatedTime">
-                        ---
-                    </h4>
-
+                <div
+                    class="progress-fill"
+                    id="progressFill">
                 </div>
 
             </div>
 
         </div>
 
-        <!-- =========================================
-        TABELA EXCEL
-        ========================================= -->
-
-        <div class="excel-preview">
-
-            <h3>
-                📄 Planilha Importada
-            </h3>
-
-            <div class="table-container">
-
-                <table id="excelTable">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>AT ID</th>
-                            <th>Sequence</th>
-                            <th>Stop</th>
-                            <th>SPX TN</th>
-                            <th>Bairro</th>
-                            <th>City</th>
-                            <th>CEP</th>
-                            <th>Latitude</th>
-                            <th>Longitude</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-        <!-- =========================================
-        LISTA
-        ========================================= -->
-
-        <div class="list"
+        <!-- LISTA -->
+        <div
+            class="list"
             id="deliveryList">
-        </div>
-
-        <!-- FOOTER -->
-
-        <div class="footer">
-
-            Routify © 2026
 
         </div>
 
-    </aside>
+    </div>
 
-    <!-- =========================================
-    MAPA
-    ========================================= -->
-
-    <main class="map-container">
-
-        <!-- TOPBAR -->
+    <!-- MAPA -->
+    <div class="map-container">
 
         <div class="topbar">
 
@@ -329,56 +714,480 @@ CONTAINER
             </h2>
 
             <p>
-                O Routify identifica entregas
-                na mesma rua automaticamente,
-                agrupa rotas e acompanha
-                entregas em tempo real.
+
+                O Routify agrupa automaticamente
+                entregas por região e permite
+                navegação direta pelo Waze.
+
             </p>
 
         </div>
 
-        <!-- MAPA -->
-
         <div id="map"></div>
 
-        <!-- BOTÃO LOCALIZAÇÃO -->
-
-        <button class="floating-btn"
-            onclick="locateUser()">
-
-            📡
-
-        </button>
-
-    </main>
+    </div>
 
 </div>
 
-<!-- =========================================
-SCRIPTS
-========================================= -->
-
-<!-- Leaflet -->
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- LEAFLET -->
+<script
+src="https://unpkg.com/leaflet/dist/leaflet.js">
+</script>
 
 <!-- XLSX -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script
+src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js">
+</script>
 
-<!-- Script principal -->
-<script src="script.js"></script>
+<script>
+
+/* =========================================
+MAPA
+========================================= */
+
+const map =
+L.map('map').setView(
+    [-2.5307,-44.3068],
+    12
+);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+    attribution:'© OpenStreetMap'
+}).addTo(map);
+
+/* =========================================
+ELEMENTOS
+========================================= */
+
+const excelInput =
+document.getElementById("excelFile");
+
+const deliveryList =
+document.getElementById("deliveryList");
+
+const totalDeliveries =
+document.getElementById("totalDeliveries");
+
+const groupedStreets =
+document.getElementById("groupedStreets");
+
+const progressFill =
+document.getElementById("progressFill");
+
+const progressPercent =
+document.getElementById("progressPercent");
+
+const routeRunningCount =
+document.getElementById("routeRunningCount");
+
+const completedRoutes =
+document.getElementById("completedRoutes");
+
+/* =========================================
+DADOS
+========================================= */
+
+let importedRoutes = [];
+
+let markers = [];
+
+let currentRoute = 0;
+
+let routeInterval;
+
+/* =========================================
+UPLOAD
+========================================= */
+
+excelInput.addEventListener(
+    "change",
+    handleExcelUpload
+);
+
+/* =========================================
+LER EXCEL
+========================================= */
+
+function handleExcelUpload(event){
+
+    const file =
+    event.target.files[0];
+
+    if(!file){
+
+        return;
+
+    }
+
+    const reader =
+    new FileReader();
+
+    reader.onload = function(e){
+
+        const data =
+        new Uint8Array(e.target.result);
+
+        const workbook =
+        XLSX.read(data,{
+            type:'array'
+        });
+
+        const sheetName =
+        workbook.SheetNames[0];
+
+        const sheet =
+        workbook.Sheets[sheetName];
+
+        const json =
+        XLSX.utils.sheet_to_json(sheet);
+
+        processData(json);
+
+    };
+
+    reader.readAsArrayBuffer(file);
+
+}
+
+/* =========================================
+PROCESSAR
+========================================= */
+
+function processData(data){
+
+    importedRoutes = [];
+
+    deliveryList.innerHTML = "";
+
+    clearMarkers();
+
+    data.forEach(row => {
+
+        const item = {
+
+            atId:
+            row["AT ID"] || "",
+
+            bairro:
+            row["Bairro"] || "",
+
+            city:
+            row["City"] || "",
+
+            zipcode:
+            row["Zipcode/Postal code"] || "",
+
+            latitude:
+            parseFloat(
+                row["Latitude"]
+            ) || 0,
+
+            longitude:
+            parseFloat(
+                row["Longitude"]
+            ) || 0
+
+        };
+
+        importedRoutes.push(item);
+
+        createCard(item);
+
+    });
+
+    totalDeliveries.innerHTML =
+    importedRoutes.length;
+
+}
+
+/* =========================================
+CRIAR CARD
+========================================= */
+
+function createCard(route){
+
+    const div =
+    document.createElement("div");
+
+    div.classList.add("delivery");
+
+    div.innerHTML = `
+
+        <h3>
+            🚚 ${route.atId}
+        </h3>
+
+        <p>
+            Bairro:
+            ${route.bairro}
+        </p>
+
+        <p>
+            Cidade:
+            ${route.city}
+        </p>
+
+        <p>
+            CEP:
+            ${route.zipcode}
+        </p>
+
+        <div class="badge">
+
+            📍 Entrega ativa
+
+        </div>
+
+        <button
+            class="waze-btn"
+
+            onclick="
+                openWaze(
+                    ${route.latitude},
+                    ${route.longitude}
+                )
+            "
+        >
+
+            🚗 Abrir no Waze
+
+        </button>
+
+    `;
+
+    deliveryList.appendChild(div);
+
+}
+
+/* =========================================
+CARREGAR ROTAS
+========================================= */
+
+document
+.getElementById("loadRoutesBtn")
+.addEventListener(
+    "click",
+    loadRoutes
+);
+
+function loadRoutes(){
+
+    clearMarkers();
+
+    importedRoutes.forEach(route => {
+
+        const marker =
+        L.marker([
+            route.latitude,
+            route.longitude
+        ]).addTo(map);
+
+        marker.bindPopup(`
+
+            <h3>
+                🚚 ${route.atId}
+            </h3>
+
+            <br>
+
+            Bairro:
+            ${route.bairro}
+
+            <br><br>
+
+            <button
+                onclick="
+                    openWaze(
+                        ${route.latitude},
+                        ${route.longitude}
+                    )
+                "
+            >
+
+                Abrir no Waze
+
+            </button>
+
+        `);
+
+        markers.push(marker);
+
+    });
+
+}
+
+/* =========================================
+AGRUPAR
+========================================= */
+
+document
+.getElementById("optimizeBtn")
+.addEventListener(
+    "click",
+    groupRoutes
+);
+
+function groupRoutes(){
+
+    const groups = {};
+
+    importedRoutes.forEach(route => {
+
+        const key =
+        route.bairro +
+        route.zipcode;
+
+        if(!groups[key]){
+
+            groups[key] = [];
+
+        }
+
+        groups[key].push(route);
+
+    });
+
+    groupedStreets.innerHTML =
+    Object.keys(groups).length;
+
+}
+
+/* =========================================
+INICIAR ROTA
+========================================= */
+
+document
+.getElementById("startRouteBtn")
+.addEventListener(
+    "click",
+    startRoute
+);
+
+function startRoute(){
+
+    currentRoute = 0;
+
+    routeRunningCount.innerHTML =
+    importedRoutes.length;
+
+    runRoute();
+
+}
+
+/* =========================================
+EXECUTAR
+========================================= */
+
+function runRoute(){
+
+    if(
+        currentRoute >=
+        importedRoutes.length
+    ){
+
+        completedRoutes.innerHTML =
+        importedRoutes.length;
+
+        return;
+
+    }
+
+    const route =
+    importedRoutes[currentRoute];
+
+    map.flyTo([
+        route.latitude,
+        route.longitude
+    ],16);
+
+    const progress =
+    (
+        (
+            currentRoute + 1
+        )
+        /
+        importedRoutes.length
+    ) * 100;
+
+    progressFill.style.width =
+    progress + "%";
+
+    progressPercent.innerHTML =
+    Math.round(progress) + "%";
+
+    openWaze(
+        route.latitude,
+        route.longitude
+    );
+
+    currentRoute++;
+
+    routeInterval =
+    setTimeout(
+        runRoute,
+        6000
+    );
+
+}
+
+/* =========================================
+ENCERRAR
+========================================= */
+
+document
+.getElementById("stopRouteBtn")
+.addEventListener(
+    "click",
+    stopRoute
+);
+
+function stopRoute(){
+
+    clearTimeout(routeInterval);
+
+    progressFill.style.width =
+    "0%";
+
+    progressPercent.innerHTML =
+    "0%";
+
+}
+
+/* =========================================
+WAZE
+========================================= */
+
+function openWaze(lat,lng){
+
+    const url =
+`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+
+    window.open(
+        url,
+        "_blank"
+    );
+
+}
+
+/* =========================================
+LIMPAR
+========================================= */
+
+function clearMarkers(){
+
+    markers.forEach(marker => {
+
+        map.removeLayer(marker);
+
+    });
+
+    markers = [];
+
+}
+
+</script>
 
 </body>
 </html>
-```
-
-## Correções realizadas
-
-* Estrutura HTML reorganizada.
-* Fechamento correto das tags.
-* IDs padronizados para funcionar com o script.js.
-* Compatibilidade com mobile.
-* Separação correta entre sidebar e mapa.
-* Botões de rota em tempo real adicionados.
-* Compatibilidade com Leaflet e XLSX.
-* Correção do carregamento do CSS e JavaScript.
-* Estrutura pronta para GitHub Pages.
