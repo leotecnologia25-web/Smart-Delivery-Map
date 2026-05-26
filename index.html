@@ -1,6 +1,8 @@
+# HTML Corrigido — Routify
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
 
 <meta charset="UTF-8">
@@ -9,425 +11,261 @@
 <title>Routify - Sistema Inteligente de Entregas</title>
 
 <!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
-<!-- Fonte -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Google Fonts -->
+<link rel="preconnect"
+href="https://fonts.googleapis.com">
 
-<style>
+<link rel="preconnect"
+href="https://fonts.gstatic.com"
+crossorigin>
 
-/* =========================================
-RESET
-========================================= */
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+rel="stylesheet">
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Inter',sans-serif;
-}
-
-body{
-    background:#0f172a;
-    color:white;
-    overflow:hidden;
-}
-
-/* =========================================
-LAYOUT
-========================================= */
-
-.container{
-    display:flex;
-    width:100%;
-    height:100vh;
-}
-
-/* =========================================
-SIDEBAR
-========================================= */
-
-.sidebar{
-    width:400px;
-    background:#111827;
-    border-right:1px solid #1f2937;
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-}
-
-/* =========================================
-LOGO
-========================================= */
-
-.logo{
-    padding:25px;
-    border-bottom:1px solid #1f2937;
-}
-
-.logo h1{
-    font-size:34px;
-    color:#3b82f6;
-    font-weight:700;
-}
-
-.logo p{
-    color:#94a3b8;
-    margin-top:8px;
-    font-size:14px;
-}
-
-/* =========================================
-DASHBOARD
-========================================= */
-
-.dashboard{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    padding:20px;
-}
-
-.card{
-    background:#1e293b;
-    padding:18px;
-    border-radius:18px;
-    border:1px solid #334155;
-}
-
-.card span{
-    color:#94a3b8;
-    font-size:13px;
-}
-
-.card h2{
-    margin-top:10px;
-    font-size:28px;
-}
-
-/* =========================================
-UPLOAD
-========================================= */
-
-.upload-area{
-    padding:0 20px 20px;
-}
-
-.upload-btn{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:#2563eb;
-    height:55px;
-    border-radius:16px;
-    cursor:pointer;
-    font-weight:600;
-    transition:.3s;
-}
-
-.upload-btn:hover{
-    background:#1d4ed8;
-}
-
-#excelFile{
-    display:none;
-}
-
-/* =========================================
-BUTTONS
-========================================= */
-
-.route-actions{
-    display:flex;
-    gap:10px;
-    margin-top:15px;
-}
-
-.action-btn{
-    flex:1;
-    border:none;
-    background:#2563eb;
-    color:white;
-    height:48px;
-    border-radius:14px;
-    cursor:pointer;
-    font-weight:600;
-    transition:.3s;
-}
-
-.action-btn:hover{
-    background:#1d4ed8;
-}
-
-.secondary{
-    background:#334155;
-}
-
-.secondary:hover{
-    background:#475569;
-}
-
-/* =========================================
-TABLE
-========================================= */
-
-.excel-preview{
-    padding:0 20px 20px;
-    overflow:auto;
-}
-
-.excel-preview h3{
-    margin-bottom:15px;
-}
-
-.table-container{
-    overflow:auto;
-    border-radius:16px;
-    border:1px solid #334155;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:900px;
-}
-
-thead{
-    background:#1e293b;
-}
-
-th{
-    padding:14px;
-    text-align:left;
-    font-size:13px;
-    color:#94a3b8;
-}
-
-td{
-    padding:14px;
-    border-top:1px solid #334155;
-    font-size:13px;
-}
-
-tbody tr:hover{
-    background:#1e293b;
-}
-
-/* =========================================
-LISTA
-========================================= */
-
-.list{
-    flex:1;
-    overflow:auto;
-    padding:20px;
-}
-
-.delivery{
-    background:#1e293b;
-    border:1px solid #334155;
-    border-radius:18px;
-    padding:18px;
-    margin-bottom:15px;
-}
-
-.delivery h3{
-    font-size:18px;
-}
-
-.delivery p{
-    margin-top:6px;
-    color:#94a3b8;
-    font-size:14px;
-}
-
-.street-badge{
-    margin-top:15px;
-    background:#1e40af;
-    display:inline-block;
-    padding:8px 12px;
-    border-radius:12px;
-    font-size:12px;
-}
-
-/* =========================================
-MAPA
-========================================= */
-
-.map-container{
-    flex:1;
-    position:relative;
-}
-
-#map{
-    width:100%;
-    height:100%;
-}
-
-/* =========================================
-TOPBAR
-========================================= */
-
-.topbar{
-    position:absolute;
-    top:20px;
-    left:20px;
-    z-index:999;
-    background:rgba(15,23,42,.95);
-    backdrop-filter:blur(10px);
-    border:1px solid #334155;
-    padding:20px;
-    border-radius:18px;
-    width:320px;
-}
-
-.topbar h2{
-    font-size:24px;
-}
-
-.topbar p{
-    margin-top:10px;
-    color:#94a3b8;
-    line-height:1.6;
-}
-
-/* =========================================
-RESPONSIVO
-========================================= */
-
-@media(max-width:1100px){
-
-.container{
-    flex-direction:column;
-}
-
-.sidebar{
-    width:100%;
-    height:50vh;
-}
-
-.map-container{
-    height:50vh;
-}
-
-}
-
-@media(max-width:700px){
-
-body{
-    overflow:auto;
-}
-
-.dashboard{
-    grid-template-columns:1fr;
-}
-
-.route-actions{
-    flex-direction:column;
-}
-
-.topbar{
-    width:90%;
-    left:5%;
-}
-
-.logo h1{
-    font-size:28px;
-}
-
-.card h2{
-    font-size:24px;
-}
-
-.sidebar{
-    height:auto;
-}
-
-.map-container{
-    height:55vh;
-}
-
-}
-
-</style>
+<!-- CSS -->
+<link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
+<!-- =========================================
+CONTAINER
+========================================= -->
+
 <div class="container">
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
+    <!-- =========================================
+    SIDEBAR
+    ========================================= -->
+
+    <aside class="sidebar">
 
         <!-- LOGO -->
+
         <div class="logo">
+
             <h1>Routify</h1>
+
             <p>
-                Entregas inteligentes em tempo real
+                Sistema inteligente de entregas,
+                agrupamento de rotas e
+                monitoramento em tempo real.
             </p>
+
         </div>
 
-        <!-- DASHBOARD -->
+        <!-- =========================================
+        DASHBOARD
+        ========================================= -->
+
         <div class="dashboard">
 
             <div class="card">
+
                 <span>Entregas Hoje</span>
+
                 <h2 id="totalDeliveries">0</h2>
+
             </div>
 
             <div class="card">
+
                 <span>Ruas Agrupadas</span>
+
                 <h2 id="groupedStreets">0</h2>
+
             </div>
 
             <div class="card">
+
                 <span>Em Rota</span>
-                <h2>12</h2>
+
+                <h2 id="routeRunningCount">0</h2>
+
             </div>
 
             <div class="card">
+
                 <span>Concluídas</span>
-                <h2>28</h2>
+
+                <h2 id="completedRoutes">0</h2>
+
             </div>
 
         </div>
 
-        <!-- IMPORTAÇÃO -->
+        <!-- =========================================
+        IMPORTAÇÃO
+        ========================================= -->
+
         <div class="upload-area">
 
-            <label for="excelFile" class="upload-btn">
+            <label for="excelFile"
+                class="upload-btn">
+
                 📂 Importar Planilha Excel
+
             </label>
 
-            <input
-                type="file"
+            <input type="file"
                 id="excelFile"
-                accept=".xlsx,.xls,.csv"
-            >
+                accept=".xlsx,.xls,.csv">
 
             <!-- BOTÕES -->
+
             <div class="route-actions">
 
-                <button id="loadRoutesBtn" class="action-btn">
+                <button id="loadRoutesBtn"
+                    class="action-btn">
+
                     🚚 Carregar Rotas
+
                 </button>
 
                 <button id="optimizeBtn"
                     class="action-btn secondary">
+
                     📍 Agrupar Rotas
+
                 </button>
 
             </div>
 
         </div>
 
-        <!-- TABELA -->
+        <!-- =========================================
+        PAINEL TEMPO REAL
+        ========================================= -->
+
+        <div class="route-live-panel">
+
+            <div class="route-live-header">
+
+                <h3>
+                    🚚 Rota em Tempo Real
+                </h3>
+
+                <div class="route-live-status">
+
+                    <span id="liveDot"></span>
+
+                    <p id="liveStatusText">
+                        Aguardando início
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- BOTÕES -->
+
+            <div class="route-live-buttons">
+
+                <button id="startRouteBtn"
+                    class="start-route-btn">
+
+                    ▶️ Iniciar Rota
+
+                </button>
+
+                <button id="pauseRouteBtn"
+                    class="pause-route-btn">
+
+                    ⏸️ Pausar
+
+                </button>
+
+                <button id="stopRouteBtn"
+                    class="stop-route-btn">
+
+                    ⏹️ Encerrar
+
+                </button>
+
+            </div>
+
+            <!-- PROGRESSO -->
+
+            <div class="route-progress-box">
+
+                <div class="route-progress-top">
+
+                    <span>
+                        Progresso da rota
+                    </span>
+
+                    <span id="progressPercent">
+                        0%
+                    </span>
+
+                </div>
+
+                <div class="route-progress-bar">
+
+                    <div id="progressFill"
+                        class="route-progress-fill">
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- INFO -->
+
+            <div class="route-info">
+
+                <div class="route-info-card">
+
+                    <span>
+                        Próxima Entrega
+                    </span>
+
+                    <h4 id="nextDelivery">
+                        ---
+                    </h4>
+
+                </div>
+
+                <div class="route-info-card">
+
+                    <span>
+                        Bairro Atual
+                    </span>
+
+                    <h4 id="currentDistrict">
+                        ---
+                    </h4>
+
+                </div>
+
+                <div class="route-info-card">
+
+                    <span>
+                        Tempo Restante
+                    </span>
+
+                    <h4 id="estimatedTime">
+                        ---
+                    </h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =========================================
+        TABELA EXCEL
+        ========================================= -->
+
         <div class="excel-preview">
 
             <h3>
-                Planilha Importada
+                📄 Planilha Importada
             </h3>
 
             <div class="table-container">
@@ -453,7 +291,6 @@ body{
                     </thead>
 
                     <tbody>
-
                     </tbody>
 
                 </table>
@@ -462,15 +299,31 @@ body{
 
         </div>
 
-        <!-- LISTA -->
-        <div class="list" id="deliveryList">
+        <!-- =========================================
+        LISTA
+        ========================================= -->
+
+        <div class="list"
+            id="deliveryList">
+        </div>
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            Routify © 2026
 
         </div>
 
-    </div>
+    </aside>
 
-    <!-- MAPA -->
-    <div class="map-container">
+    <!-- =========================================
+    MAPA
+    ========================================= -->
+
+    <main class="map-container">
+
+        <!-- TOPBAR -->
 
         <div class="topbar">
 
@@ -479,378 +332,56 @@ body{
             </h2>
 
             <p>
-                O Routify detecta automaticamente
-                entregas na mesma rua e cria agrupamentos
-                inteligentes para otimizar rotas.
+                O Routify identifica entregas
+                na mesma rua automaticamente,
+                agrupa rotas e acompanha
+                entregas em tempo real.
             </p>
 
         </div>
 
+        <!-- MAPA -->
+
         <div id="map"></div>
 
-    </div>
+        <!-- BOTÃO LOCALIZAÇÃO -->
+
+        <button class="floating-btn"
+            onclick="locateUser()">
+
+            📡
+
+        </button>
+
+    </main>
 
 </div>
 
-<!-- LEAFLET -->
+<!-- =========================================
+SCRIPTS
+========================================= -->
+
+<!-- Leaflet -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <!-- XLSX -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-<!-- SCRIPT -->
-
-<script>
-
-/* =========================================
-MAPA
-========================================= */
-
-const map = L.map('map').setView(
-    [-2.5307, -44.3068],
-    12
-);
-
-/* =========================================
-CAMADA MAPA
-========================================= */
-
-L.tileLayer(
-'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-{
-    attribution:'© OpenStreetMap'
-}).addTo(map);
-
-/* =========================================
-ELEMENTOS
-========================================= */
-
-const excelInput =
-document.getElementById("excelFile");
-
-const tableBody =
-document.querySelector("#excelTable tbody");
-
-const totalDeliveries =
-document.getElementById("totalDeliveries");
-
-const groupedStreets =
-document.getElementById("groupedStreets");
-
-const loadRoutesBtn =
-document.getElementById("loadRoutesBtn");
-
-const optimizeBtn =
-document.getElementById("optimizeBtn");
-
-/* =========================================
-ROTAS
-========================================= */
-
-let importedRoutes = [];
-
-let routeMarkers = [];
-
-/* =========================================
-UPLOAD
-========================================= */
-
-excelInput.addEventListener(
-    "change",
-    handleExcelUpload
-);
-
-/* =========================================
-LER EXCEL
-========================================= */
-
-function handleExcelUpload(event){
-
-    const file = event.target.files[0];
-
-    if(!file){
-
-        alert("Selecione um arquivo.");
-
-        return;
-
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = function(e){
-
-        const data =
-        new Uint8Array(e.target.result);
-
-        const workbook =
-        XLSX.read(data,{type:'array'});
-
-        const sheetName =
-        workbook.SheetNames[0];
-
-        const sheet =
-        workbook.Sheets[sheetName];
-
-        const json =
-        XLSX.utils.sheet_to_json(sheet);
-
-        processExcelData(json);
-
-    };
-
-    reader.readAsArrayBuffer(file);
-
-}
-
-/* =========================================
-PROCESSAR
-========================================= */
-
-function processExcelData(data){
-
-    importedRoutes = [];
-
-    tableBody.innerHTML = "";
-
-    data.forEach(row => {
-
-        const item = {
-
-            atId:
-                row["AT ID"] || "",
-
-            sequence:
-                row["Sequence"] || "",
-
-            stop:
-                row["Stop"] || "",
-
-            spx:
-                row["SPX TN"] || "",
-
-            bairro:
-                row["Bairro"] || "",
-
-            city:
-                row["City"] || "",
-
-            zipcode:
-                row["Zipcode/Postal code"] || "",
-
-            latitude:
-                parseFloat(row["Latitude"]) || 0,
-
-            longitude:
-                parseFloat(row["Longitude"]) || 0
-
-        };
-
-        importedRoutes.push(item);
-
-        createTableRow(item);
-
-    });
-
-    totalDeliveries.innerHTML =
-    importedRoutes.length;
-
-    alert(
-        importedRoutes.length +
-        " entregas carregadas."
-    );
-
-}
-
-/* =========================================
-CRIAR TABELA
-========================================= */
-
-function createTableRow(item){
-
-    const tr =
-    document.createElement("tr");
-
-    tr.innerHTML = `
-
-        <td>${item.atId}</td>
-        <td>${item.sequence}</td>
-        <td>${item.stop}</td>
-        <td>${item.spx}</td>
-        <td>${item.bairro}</td>
-        <td>${item.city}</td>
-        <td>${item.zipcode}</td>
-        <td>${item.latitude}</td>
-        <td>${item.longitude}</td>
-
-    `;
-
-    tableBody.appendChild(tr);
-
-}
-
-/* =========================================
-CARREGAR ROTAS
-========================================= */
-
-loadRoutesBtn.addEventListener(
-    "click",
-    loadRoutes
-);
-
-function loadRoutes(){
-
-    clearMarkers();
-
-    importedRoutes.forEach(route => {
-
-        if(route.latitude &&
-           route.longitude){
-
-            const marker = L.marker([
-                route.latitude,
-                route.longitude
-            ]).addTo(map);
-
-            marker.bindPopup(`
-
-                <b>${route.atId}</b><br>
-                Bairro: ${route.bairro}<br>
-                Cidade: ${route.city}<br>
-                CEP: ${route.zipcode}
-
-            `);
-
-            routeMarkers.push(marker);
-
-        }
-
-    });
-
-    focusRoutes();
-
-}
-
-/* =========================================
-AGRUPAR ROTAS
-========================================= */
-
-optimizeBtn.addEventListener(
-    "click",
-    groupRoutes
-);
-
-function groupRoutes(){
-
-    const groups = {};
-
-    importedRoutes.forEach(route => {
-
-        const key =
-        route.bairro + "-" +
-        route.zipcode;
-
-        if(!groups[key]){
-
-            groups[key] = [];
-
-        }
-
-        groups[key].push(route);
-
-    });
-
-    groupedStreets.innerHTML =
-    Object.keys(groups).length;
-
-    Object.keys(groups).forEach(key => {
-
-        const routes = groups[key];
-
-        if(routes.length > 1){
-
-            const lat =
-            routes[0].latitude;
-
-            const lng =
-            routes[0].longitude;
-
-            const marker =
-            L.circleMarker([lat,lng],{
-
-                radius:18,
-                color:"#2563eb",
-                fillColor:"#2563eb",
-                fillOpacity:0.8
-
-            }).addTo(map);
-
-            marker.bindPopup(`
-
-                <b>
-                    ${routes.length}
-                    entregas agrupadas
-                </b>
-
-            `);
-
-            routeMarkers.push(marker);
-
-        }
-
-    });
-
-    alert("Rotas agrupadas.");
-
-}
-
-/* =========================================
-FOCAR
-========================================= */
-
-function focusRoutes(){
-
-    const bounds = [];
-
-    importedRoutes.forEach(route => {
-
-        if(route.latitude &&
-           route.longitude){
-
-            bounds.push([
-                route.latitude,
-                route.longitude
-            ]);
-
-        }
-
-    });
-
-    if(bounds.length > 0){
-
-        map.fitBounds(bounds);
-
-    }
-
-}
-
-/* =========================================
-LIMPAR
-========================================= */
-
-function clearMarkers(){
-
-    routeMarkers.forEach(marker => {
-
-        map.removeLayer(marker);
-
-    });
-
-    routeMarkers = [];
-
-}
-
-</script>
+<!-- Script principal -->
+<script src="script.js"></script>
 
 </body>
 </html>
+```
+
+## Correções realizadas
+
+* Estrutura HTML reorganizada.
+* Fechamento correto das tags.
+* IDs padronizados para funcionar com o script.js.
+* Compatibilidade com mobile.
+* Separação correta entre sidebar e mapa.
+* Botões de rota em tempo real adicionados.
+* Compatibilidade com Leaflet e XLSX.
+* Correção do carregamento do CSS e JavaScript.
+* Estrutura pronta para GitHub Pages.
