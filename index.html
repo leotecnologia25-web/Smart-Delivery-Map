@@ -2,298 +2,105 @@
 <html lang="pt-BR">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Routify Premium</title>
 
-<meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
-/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-<title>Routify Premium</title>
-
-<!-- GOOGLE FONT -->
-<link rel="preconnect"
-href="https://fonts.googleapis.com">
-
-<link rel="preconnect"
-href="https://fonts.gstatic.com"
-crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-rel="stylesheet">
-
-<!-- LEAFLET -->
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<!-- CSS -->
-<link rel="stylesheet"
-href="style.css">
-
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="container">
 
-    <!-- =====================================
-    SIDEBAR
-    ====================================== -->
-
     <aside class="sidebar">
 
-        <!-- LOGO -->
-
         <div class="logo">
-
-            <h1>
-                ROUTIFY
-            </h1>
-
-            <p>
-                Sistema inteligente
-                de entregas em tempo real
-            </p>
-
+            <h1>ROUTIFY</h1>
+            <p>Sistema inteligente de entregas em tempo real</p>
         </div>
-
-        <!-- =====================================
-        DASHBOARD
-        ====================================== -->
 
         <div class="dashboard">
-
             <div class="card">
-
-                <span>
-                    Total Entregas
-                </span>
-
-                <h2 id="totalDeliveries">
-                    0
-                </h2>
-
+                <span>Total Entregas</span>
+                <h2 id="totalDeliveries">0</h2>
             </div>
 
             <div class="card">
-
-                <span>
-                    Bairros Agrupados
-                </span>
-
-                <h2 id="groupedStreets">
-                    0
-                </h2>
-
+                <span>Bairros Agrupados</span>
+                <h2 id="groupedStreets">0</h2>
             </div>
 
             <div class="card">
-
-                <span>
-                    Em Rota
-                </span>
-
-                <h2 id="inRoute">
-                    0
-                </h2>
-
+                <span>Em Rota</span>
+                <h2 id="inRoute">0</h2>
             </div>
 
             <div class="card">
-
-                <span>
-                    Concluídas
-                </span>
-
-                <h2 id="completedRoutes">
-                    0
-                </h2>
-
+                <span>Concluídas</span>
+                <h2 id="completedRoutes">0</h2>
             </div>
-
         </div>
-
-        <!-- =====================================
-        BUSCA
-        ====================================== -->
 
         <div class="search-box">
-
-            <input
-            type="text"
-            id="searchInput"
-            placeholder="Buscar bairro ou entrega..."
-            >
-
+            <input type="text" id="searchInput" placeholder="Buscar bairro ou entrega...">
         </div>
-
-        <!-- =====================================
-        IMPORTAÇÃO
-        ====================================== -->
 
         <div class="upload-area">
-
-            <label
-            for="excelFile"
-            class="upload-btn">
-
+            <label for="excelFile" class="upload-btn">
                 📂 Importar Excel
-
             </label>
-
-            <input
-            type="file"
-            id="excelFile"
-            accept=".xlsx,.xls,.csv"
-            >
-
+            <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="display: none;">
         </div>
-
-        <!-- =====================================
-        BOTÕES
-        ====================================== -->
 
         <div class="route-actions">
-
-            <button
-            id="loadRoutesBtn"
-            class="action-btn">
-
-                📍 Carregar Rotas
-
-            </button>
-
-            <button
-            id="groupRoutesBtn"
-            class="action-btn secondary">
-
-                🧠 Agrupar Bairros
-
-            </button>
-
-            <button
-            id="startRouteBtn"
-            class="action-btn success">
-
-                ▶ Iniciar Rotas
-
-            </button>
-
-            <button
-            id="stopRouteBtn"
-            class="action-btn danger">
-
-                ⛔ Parar Rotas
-
-            </button>
-
+            <button id="loadRoutesBtn" class="action-btn">📍 Carregar Rotas</button>
+            <button id="groupRoutesBtn" class="action-btn secondary">🧠 Agrupar Bairros</button>
+            <button id="startRouteBtn" class="action-btn success">▶ Iniciar Rotas</button>
+            <button id="stopRouteBtn" class="action-btn danger">⛔ Parar Rotas</button>
         </div>
-
-        <!-- =====================================
-        PROGRESSO
-        ====================================== -->
 
         <div class="progress-container">
-
             <div class="progress-bar">
-
-                <div id="progressFill">
-
-                </div>
-
+                <div id="progressFill" style="width: 0%;"></div>
             </div>
-
-            <span id="progressText">
-
-                0%
-
-            </span>
-
+            <span id="progressText">0%</span>
         </div>
 
-        <!-- =====================================
-        LISTA ENTREGAS
-        ====================================== -->
-
-        <div
-        class="delivery-list"
-        id="deliveryList">
-
-        </div>
-
-        <!-- =====================================
-        FOOTER
-        ====================================== -->
+        <div class="delivery-list" id="deliveryList"></div>
 
         <footer class="footer">
-
             Routify Premium © 2026
-
         </footer>
 
     </aside>
 
-    <!-- =====================================
-    MAPA
-    ====================================== -->
-
     <main class="map-container">
 
-        <!-- TOPO MAPA -->
-
         <div class="topbar">
-
-            <h2>
-
-                📍 Mapa Inteligente
-
-            </h2>
-
-            <p>
-
-                Agrupamento automático
-                de bairros semelhantes,
-                otimização de entregas
-                e integração com Waze.
-
-            </p>
-
+            <h2>📍 Mapa Inteligente</h2>
+            <p>Agrupamento automático de bairros semelhantes, otimização de entregas e integração com Waze.</p>
         </div>
-
-        <!-- MAPA -->
 
         <div id="map"></div>
 
-        <!-- FLOAT BUTTON -->
-
-        <button
-        class="floating-btn"
-        onclick="locateUser()">
-
+        <button class="floating-btn" onclick="locateUser()">
             📡
-
         </button>
 
     </main>
 
 </div>
 
-<!-- =====================================
-LEAFLET
-===================================== -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-<!-- =====================================
-XLSX
-===================================== -->
-
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
-<!-- =====================================
-SCRIPT
-===================================== -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script src="script.js"></script>
 
