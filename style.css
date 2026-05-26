@@ -1,442 +1,1024 @@
 /* =========================================
-   ROUTIFY - CSS LIMPO E OTIMIZADO
+ROUTIFY - CSS COMPLETO RESPONSIVO
+========================================= */
+
+/* =========================================
+RESET
 ========================================= */
 
 *{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
 }
 
-:root {
-    --bg: #0f172a;
-    --sidebar: #111827;
-    --card: #1e293b;
-    --border: #334155;
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --text: #ffffff;
-    --text-muted: #94a3b8;
-    --shadow: 0 10px 25px rgba(0,0,0,.25);
+:root{
+
+    --bg:#0f172a;
+    --sidebar:#111827;
+    --card:#1e293b;
+
+    --border:#334155;
+
+    --primary:#2563eb;
+    --primary-hover:#1d4ed8;
+
+    --success:#16a34a;
+    --warning:#eab308;
+    --danger:#dc2626;
+
+    --text:#ffffff;
+    --text-muted:#94a3b8;
+
+    --shadow:0 10px 30px rgba(0,0,0,.25);
+
 }
 
-body {
-    background: var(--bg);
-    color: var(--text);
-    overflow: hidden;
+body{
+    background:var(--bg);
+    color:var(--text);
+    overflow:hidden;
 }
 
-/* ==============================
-   SCROLLBAR
-============================== */
+/* =========================================
+SCROLLBAR
+========================================= */
 
-::-webkit-scrollbar {
-    width: 8px;
+::-webkit-scrollbar{
+    width:8px;
+    height:8px;
 }
 
-::-webkit-scrollbar-track {
-    background: #0f172a;
+::-webkit-scrollbar-track{
+    background:#0f172a;
 }
 
-::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 999px;
+::-webkit-scrollbar-thumb{
+    background:#334155;
+    border-radius:999px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+::-webkit-scrollbar-thumb:hover{
+    background:#475569;
 }
 
-/* ==============================
-   LAYOUT
-============================== */
+/* =========================================
+LAYOUT
+========================================= */
 
-.container {
-    display: flex;
-    width: 100%;
-    height: 100vh;
+.container{
+    display:flex;
+    width:100%;
+    height:100vh;
 }
 
-/* ==============================
-   SIDEBAR
-============================== */
+/* =========================================
+SIDEBAR
+========================================= */
 
-.sidebar {
-    width: 400px;
-    background: var(--sidebar);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+.sidebar{
+
+    width:420px;
+
+    background:var(--sidebar);
+
+    border-right:1px solid var(--border);
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+
 }
 
-/* ==============================
-   LOGO
-============================== */
+/* =========================================
+LOGO
+========================================= */
 
-.logo {
-    padding: 28px;
-    border-bottom: 1px solid var(--border);
+.logo{
+
+    padding:28px;
+
+    border-bottom:1px solid var(--border);
+
+    background:rgba(255,255,255,.02);
+
 }
 
-.logo h1 {
-    font-size: 34px;
-    font-weight: 700;
-    color: #3b82f6;
-    letter-spacing: -1px;
+.logo h1{
+
+    font-size:34px;
+
+    color:#3b82f6;
+
+    font-weight:700;
+
+    letter-spacing:-1px;
+
 }
 
-.logo p {
-    margin-top: 10px;
-    color: var(--text-muted);
-    font-size: 14px;
-    line-height: 1.5;
+.logo p{
+
+    margin-top:8px;
+
+    color:var(--text-muted);
+
+    font-size:14px;
+
+    line-height:1.5;
+
 }
 
-/* ==============================
-   DASHBOARD
-============================== */
+/* =========================================
+DASHBOARD
+========================================= */
 
-.dashboard {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    padding: 22px;
+.dashboard{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:14px;
+
+    padding:20px;
+
 }
 
-.card {
-    background: var(--card);
-    padding: 20px;
-    border-radius: 22px;
-    border: 1px solid var(--border);
-    transition: .3s;
-    box-shadow: var(--shadow);
+.card{
+
+    background:var(--card);
+
+    padding:20px;
+
+    border-radius:22px;
+
+    border:1px solid var(--border);
+
+    transition:.3s;
+
+    box-shadow:var(--shadow);
+
 }
 
-.card:hover {
-    transform: translateY(-2px);
-    border-color: #3b82f6;
+.card:hover{
+
+    transform:translateY(-3px);
+
+    border-color:#3b82f6;
+
 }
 
-.card span {
-    font-size: 13px;
-    color: var(--text-muted);
+.card span{
+
+    color:var(--text-muted);
+
+    font-size:13px;
+
 }
 
-.card h2 {
-    margin-top: 12px;
-    font-size: 32px;
-    font-weight: 700;
+.card h2{
+
+    margin-top:12px;
+
+    font-size:32px;
+
+    font-weight:700;
+
 }
 
-/* ==============================
-   UPLOAD
-============================== */
+/* =========================================
+UPLOAD AREA
+========================================= */
 
-.upload-area {
-    padding: 0 22px 22px;
+.upload-area{
+
+    padding:0 20px 20px;
+
 }
 
-.upload-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 58px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 15px;
-    transition: .3s;
-    box-shadow: var(--shadow);
-    border: none;
-    color: white;
+.upload-btn{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    width:100%;
+
+    height:58px;
+
+    border-radius:18px;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.3s;
+
+    box-shadow:var(--shadow);
+
 }
 
-.upload-btn:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+.upload-btn:hover{
+
+    transform:translateY(-2px);
+
+    background:linear-gradient(
+        135deg,
+        #1d4ed8,
+        #2563eb
+    );
+
 }
 
-#excelFile {
-    display: none;
+#excelFile{
+    display:none;
 }
 
-/* ==============================
-   BUTTONS
-============================== */
+/* =========================================
+BUTTONS
+========================================= */
 
-.route-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
+.route-actions{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:15px;
+
 }
 
-.action-btn {
-    flex: 1;
-    border: none;
-    background: linear-gradient(135deg, #2563eb, #3b82f6);
-    color: white;
-    height: 48px;
-    border-radius: 14px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: .3s;
+.action-btn{
+
+    flex:1;
+
+    height:50px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.3s;
+
+    box-shadow:var(--shadow);
+
 }
 
-.action-btn:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+.action-btn:hover{
+
+    transform:translateY(-2px);
+
 }
 
-.action-btn:active {
-    transform: scale(.98);
+.secondary{
+
+    background:#334155;
+
 }
 
-.action-btn.secondary {
-    background: linear-gradient(135deg, #334155, #475569);
+.secondary:hover{
+
+    background:#475569;
+
 }
 
-.action-btn.secondary:hover {
-    background: linear-gradient(135deg, #475569, #64748b);
+/* =========================================
+PREVIEW EXCEL
+========================================= */
+
+.excel-preview{
+
+    padding:0 20px 20px;
+
+    overflow:auto;
+
 }
 
-/* ==============================
-   TABLE
-============================== */
+.excel-preview h3{
 
-.excel-preview {
-    padding: 0 22px 22px;
-    overflow: auto;
+    margin-bottom:15px;
+
+    font-size:18px;
+
 }
 
-.excel-preview h3 {
-    margin-bottom: 15px;
-    font-size: 16px;
+/* =========================================
+TABLE
+========================================= */
+
+.table-container{
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    overflow:auto;
+
+    background:var(--card);
+
 }
 
-.table-container {
-    overflow: auto;
-    border-radius: 16px;
-    border: 1px solid var(--border);
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    min-width:950px;
+
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 900px;
+thead{
+
+    background:#0f172a;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:2;
+
 }
 
-thead {
-    background: var(--card);
+th{
+
+    padding:15px;
+
+    text-align:left;
+
+    color:var(--text-muted);
+
+    font-size:13px;
+
+    border-bottom:1px solid var(--border);
+
+    white-space:nowrap;
+
 }
 
-th {
-    padding: 14px;
-    text-align: left;
-    font-size: 13px;
-    color: var(--text-muted);
-    font-weight: 600;
+td{
+
+    padding:14px;
+
+    border-top:1px solid rgba(255,255,255,.03);
+
+    font-size:13px;
+
+    white-space:nowrap;
+
 }
 
-td {
-    padding: 14px;
-    border-top: 1px solid var(--border);
-    font-size: 13px;
+tbody tr{
+
+    transition:.2s;
+
 }
 
-tbody tr:hover {
-    background: var(--card);
+tbody tr:hover{
+
+    background:#1e293b;
+
 }
 
-/* ==============================
-   DELIVERY LIST
-============================== */
+/* =========================================
+LISTA
+========================================= */
 
-.list {
-    flex: 1;
-    overflow: auto;
-    padding: 22px;
+.list{
+
+    flex:1;
+
+    overflow:auto;
+
+    padding:20px;
+
 }
 
-.delivery {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 18px;
-    margin-bottom: 15px;
-    transition: .3s;
-    box-shadow: var(--shadow);
+.delivery{
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:22px;
+
+    padding:20px;
+
+    margin-bottom:16px;
+
+    transition:.3s;
+
+    box-shadow:var(--shadow);
+
 }
 
-.delivery:hover {
-    border-color: #3b82f6;
-    transform: translateY(-2px);
+.delivery:hover{
+
+    border-color:#3b82f6;
+
+    transform:translateY(-2px);
+
 }
 
-.delivery h3 {
-    font-size: 18px;
-    font-weight: 700;
+.delivery h3{
+
+    font-size:18px;
+
+    font-weight:700;
+
 }
 
-.delivery p {
-    margin-top: 6px;
-    color: var(--text-muted);
-    font-size: 14px;
+.delivery p{
+
+    margin-top:6px;
+
+    color:var(--text-muted);
+
+    font-size:14px;
+
 }
 
-.street-badge {
-    margin-top: 15px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(37, 99, 235, .15);
-    border: 1px solid rgba(59, 130, 246, .25);
-    color: #60a5fa;
-    padding: 10px 14px;
-    border-radius: 14px;
-    font-size: 12px;
-    font-weight: 700;
+.street-badge{
+
+    margin-top:15px;
+
+    display:inline-block;
+
+    background:rgba(37,99,235,.2);
+
+    color:#60a5fa;
+
+    padding:9px 14px;
+
+    border-radius:14px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    border:1px solid rgba(59,130,246,.2);
+
 }
 
-/* ==============================
-   MAP AREA
-============================== */
+/* =========================================
+MAPA
+========================================= */
 
-.map-container {
-    flex: 1;
-    position: relative;
+.map-container{
+
+    flex:1;
+
+    position:relative;
+
 }
 
-#map {
-    width: 100%;
-    height: 100%;
-    z-index: 1;
+#map{
+
+    width:100%;
+
+    height:100%;
+
 }
 
-/* ==============================
-   TOPBAR
-============================== */
+/* =========================================
+TOPBAR
+========================================= */
 
-.topbar {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 999;
-    width: 340px;
-    background: rgba(15, 23, 42, .95);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, .05);
-    border-radius: 24px;
-    padding: 22px;
-    box-shadow: var(--shadow);
+.topbar{
+
+    position:absolute;
+
+    top:20px;
+
+    left:20px;
+
+    z-index:999;
+
+    width:340px;
+
+    padding:22px;
+
+    border-radius:24px;
+
+    background:rgba(15,23,42,.95);
+
+    backdrop-filter:blur(14px);
+
+    border:1px solid rgba(255,255,255,.05);
+
+    box-shadow:var(--shadow);
+
 }
 
-.topbar h2 {
-    font-size: 26px;
-    font-weight: 700;
+.topbar h2{
+
+    font-size:26px;
+
+    font-weight:700;
+
 }
 
-.topbar p {
-    margin-top: 12px;
-    color: var(--text-muted);
-    line-height: 1.7;
-    font-size: 14px;
+.topbar p{
+
+    margin-top:12px;
+
+    line-height:1.7;
+
+    color:var(--text-muted);
+
+    font-size:14px;
+
 }
 
-/* ==============================
-   LEAFLET CUSTOMIZATION
-============================== */
+/* =========================================
+LEAFLET
+========================================= */
 
-.leaflet-popup-content-wrapper {
-    background: #111827;
-    color: white;
-    border-radius: 16px;
+.leaflet-popup-content-wrapper{
+
+    background:#111827;
+
+    color:white;
+
+    border-radius:18px;
+
 }
 
-.leaflet-popup-tip {
-    background: #111827;
+.leaflet-popup-tip{
+
+    background:#111827;
+
 }
 
-.leaflet-control-zoom {
-    border: none !important;
+.leaflet-control-zoom{
+
+    border:none !important;
+
 }
 
-.leaflet-control-zoom a {
-    background: #111827 !important;
-    color: white !important;
-    border: none !important;
-    box-shadow: var(--shadow) !important;
+.leaflet-control-zoom a{
+
+    background:#111827 !important;
+
+    color:white !important;
+
+    border:none !important;
+
 }
 
-.leaflet-control-zoom a:hover {
-    background: #1e293b !important;
+/* =========================================
+MOBILE
+========================================= */
+
+@media(max-width:1100px){
+
+.container{
+
+    flex-direction:column;
+
 }
 
-/* ==============================
-   RESPONSIVE - TABLET
-============================== */
+.sidebar{
 
-@media (max-width: 1100px) {
+    width:100%;
 
-    .container {
-        flex-direction: column;
+    height:55vh;
+
+}
+
+.map-container{
+
+    height:45vh;
+
+}
+
+}
+
+/* =========================================
+TABLET
+========================================= */
+
+@media(max-width:768px){
+
+body{
+
+    overflow:auto;
+
+}
+
+.dashboard{
+
+    grid-template-columns:1fr 1fr;
+
+}
+
+.route-actions{
+
+    flex-direction:column;
+
+}
+
+.topbar{
+
+    width:90%;
+
+    left:5%;
+
+}
+
+.logo h1{
+
+    font-size:30px;
+
+}
+
+.card h2{
+
+    font-size:26px;
+
+}
+
+}
+
+/* =========================================
+CELULAR
+========================================= */
+
+@media(max-width:600px){
+
+.sidebar{
+
+    height:auto;
+
+}
+
+.dashboard{
+
+    grid-template-columns:1fr;
+
+}
+
+.map-container{
+
+    height:55vh;
+
+}
+
+.card{
+
+    padding:18px;
+
+}
+
+.card h2{
+
+    font-size:24px;
+
+}
+
+.logo{
+
+    padding:22px;
+
+}
+
+.logo h1{
+
+    font-size:28px;
+
+}
+
+.upload-area{
+
+    padding:0 15px 15px;
+
+}
+
+.excel-preview{
+
+    padding:0 15px 15px;
+
+}
+
+.list{
+
+    padding:15px;
+
+}
+
+.delivery{
+
+    padding:16px;
+
+}
+
+.delivery h3{
+
+    font-size:16px;
+
+}
+
+.delivery p{
+
+    font-size:13px;
+
+}
+
+.street-badge{
+
+    width:100%;
+
+    text-align:center;
+
+}
+
+.topbar{
+
+    top:10px;
+
+    left:5%;
+
+    width:90%;
+
+    padding:18px;
+
+}
+
+.topbar h2{
+
+    font-size:22px;
+
+}
+
+.topbar p{
+
+    font-size:13px;
+
+}
+
+.action-btn{
+
+    height:48px;
+
+}
+
+}
+
+/* =========================================
+CELULAR PEQUENO
+========================================= */
+
+@media(max-width:420px){
+
+.logo h1{
+
+    font-size:24px;
+
+}
+
+.card h2{
+
+    font-size:22px;
+
+}
+
+.upload-btn{
+
+    font-size:14px;
+
+}
+
+.action-btn{
+
+    font-size:13px;
+
+}
+
+}
+
+/* =========================================
+ANIMAÇÕES
+========================================= */
+
+@keyframes pulse{
+
+    0%{
+        transform:scale(1);
     }
 
-    .sidebar {
-        width: 100%;
-        height: 50vh;
+    50%{
+        transform:scale(1.03);
     }
 
-    .map-container {
-        height: 50vh;
+    100%{
+        transform:scale(1);
     }
 
 }
 
-/* ==============================
-   RESPONSIVE - MOBILE
-============================== */
+.card:hover h2{
 
-@media (max-width: 700px) {
+    animation:pulse 1s infinite;
 
-    body {
-        overflow: auto;
+}
+
+/* =========================================
+EFEITOS
+========================================= */
+
+button,
+.card,
+.delivery,
+.upload-btn{
+
+    transition:all .3s ease;
+
+}
+
+button:active{
+
+    transform:scale(.98);
+
+}
+
+/* =========================================
+FLOAT BUTTON
+========================================= */
+
+.floating-btn{
+
+    position:absolute;
+
+    bottom:25px;
+
+    right:25px;
+
+    width:65px;
+
+    height:65px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color:white;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+    z-index:999;
+
+    box-shadow:
+        0 15px 35px rgba(37,99,235,.35);
+
+}
+
+.floating-btn:hover{
+
+    transform:scale(1.05);
+
+}
+
+/* =========================================
+BADGES
+========================================= */
+
+.badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    padding:8px 12px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+}
+
+.badge-blue{
+
+    background:rgba(37,99,235,.2);
+
+    color:#60a5fa;
+
+}
+
+.badge-green{
+
+    background:rgba(22,163,74,.2);
+
+    color:#4ade80;
+
+}
+
+.badge-red{
+
+    background:rgba(220,38,38,.2);
+
+    color:#f87171;
+
+}
+
+/* =========================================
+LOADING
+========================================= */
+
+.loading{
+
+    width:40px;
+
+    height:40px;
+
+    border-radius:50%;
+
+    border:4px solid rgba(255,255,255,.1);
+
+    border-top:4px solid #3b82f6;
+
+    animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+    100%{
+        transform:rotate(360deg);
     }
 
-    .dashboard {
-        grid-template-columns: 1fr;
-    }
+}
 
-    .route-actions {
-        flex-direction: column;
-    }
+/* =========================================
+FOOTER
+========================================= */
 
-    .action-btn {
-        width: 100%;
-    }
+.footer{
 
-    .topbar {
-        width: 90%;
-        left: 5%;
-    }
+    padding:18px;
 
-    .logo h1 {
-        font-size: 28px;
-    }
+    text-align:center;
 
-    .card h2 {
-        font-size: 24px;
-    }
+    font-size:12px;
 
-    .sidebar {
-        height: auto;
-    }
+    color:var(--text-muted);
 
-    .map-container {
-        height: 55vh;
-    }
+    border-top:1px solid var(--border);
+
+}
+
+/* =========================================
+MAP CLUSTER
+========================================= */
+
+.marker-cluster{
+
+    background:#2563eb;
+
+    border-radius:50%;
+
+    color:white;
+
+    font-weight:700;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
 
 }
