@@ -4,563 +4,20 @@
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0">
+<title>Routify Premium</title>
 
-<title>Smart Maps</title>
+<!-- Fonte -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-<!-- FONT -->
-<link rel="preconnect"
-href="https://fonts.googleapis.com">
-
-<link
-href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-rel="stylesheet">
-
-<!-- LEAFLET -->
-<link
-rel="stylesheet"
+<!-- Leaflet -->
+<link rel="stylesheet"
 href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
-<style>
-
-/* =========================================
-RESET
-========================================= */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Inter',sans-serif;
-}
-
-:root{
-
-    --bg:#0f172a;
-    --sidebar:#111827;
-    --card:#1e293b;
-    --border:#334155;
-
-    --primary:#2563eb;
-    --primary-hover:#1d4ed8;
-
-    --green:#16a34a;
-    --red:#dc2626;
-    --yellow:#eab308;
-
-    --text:#ffffff;
-    --muted:#94a3b8;
-
-}
-
-body{
-
-    background:var(--bg);
-
-    color:var(--text);
-
-    overflow:hidden;
-
-}
-
-/* =========================================
-LAYOUT
-========================================= */
-
-.container{
-
-    display:flex;
-
-    width:100%;
-
-    height:100vh;
-
-}
-
-/* =========================================
-SIDEBAR
-========================================= */
-
-.sidebar{
-
-    width:430px;
-
-    background:var(--sidebar);
-
-    border-right:1px solid var(--border);
-
-    overflow:hidden;
-
-    display:flex;
-
-    flex-direction:column;
-
-}
-
-/* =========================================
-LOGO
-========================================= */
-
-.logo{
-
-    padding:25px;
-
-    border-bottom:1px solid var(--border);
-
-}
-
-.logo h1{
-
-    font-size:34px;
-
-    color:#3b82f6;
-
-    font-weight:800;
-
-}
-
-.logo p{
-
-    margin-top:8px;
-
-    color:var(--muted);
-
-    font-size:14px;
-
-}
-
-/* =========================================
-DASHBOARD
-========================================= */
-
-.dashboard{
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:12px;
-
-    padding:20px;
-
-}
-
-.card{
-
-    background:var(--card);
-
-    border:1px solid var(--border);
-
-    border-radius:20px;
-
-    padding:20px;
-
-}
-
-.card span{
-
-    color:var(--muted);
-
-    font-size:13px;
-
-}
-
-.card h2{
-
-    margin-top:10px;
-
-    font-size:30px;
-
-}
-
-/* =========================================
-UPLOAD
-========================================= */
-
-.upload-area{
-
-    padding:0 20px 20px;
-
-}
-
-.upload-btn{
-
-    width:100%;
-
-    height:55px;
-
-    border-radius:16px;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #3b82f6
-    );
-
-    cursor:pointer;
-
-    font-weight:700;
-
-}
-
-#excelFile{
-
-    display:none;
-
-}
-
-/* =========================================
-BUTTONS
-========================================= */
-
-.buttons{
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:10px;
-
-    margin-top:15px;
-
-}
-
-.btn{
-
-    height:50px;
-
-    border:none;
-
-    border-radius:16px;
-
-    font-weight:700;
-
-    color:white;
-
-    cursor:pointer;
-
-}
-
-.blue{
-
-    background:#2563eb;
-
-}
-
-.green{
-
-    background:#16a34a;
-
-}
-
-.red{
-
-    background:#dc2626;
-
-}
-
-.gray{
-
-    background:#334155;
-
-}
-
-/* =========================================
-PROGRESS
-========================================= */
-
-.progress-box{
-
-    padding:0 20px 20px;
-
-}
-
-.progress-top{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    margin-bottom:10px;
-
-}
-
-.progress{
-
-    width:100%;
-
-    height:14px;
-
-    background:#1e293b;
-
-    border-radius:999px;
-
-    overflow:hidden;
-
-}
-
-.progress-fill{
-
-    width:0%;
-
-    height:100%;
-
-    background:linear-gradient(
-        90deg,
-        #22c55e,
-        #4ade80
-    );
-
-    transition:1s;
-
-}
-
-/* =========================================
-LIST
-========================================= */
-
-.list{
-
-    flex:1;
-
-    overflow:auto;
-
-    padding:20px;
-
-}
-
-.delivery{
-
-    background:var(--card);
-
-    border:1px solid var(--border);
-
-    border-radius:20px;
-
-    padding:18px;
-
-    margin-bottom:15px;
-
-}
-
-.delivery.active{
-
-    border:2px solid #22c55e;
-
-}
-
-.delivery.done{
-
-    border:2px solid #2563eb;
-
-    opacity:.7;
-
-}
-
-.delivery h3{
-
-    font-size:18px;
-
-}
-
-.delivery p{
-
-    margin-top:6px;
-
-    color:var(--muted);
-
-    font-size:14px;
-
-}
-
-.badge{
-
-    display:inline-block;
-
-    margin-top:12px;
-
-    padding:8px 12px;
-
-    border-radius:12px;
-
-    background:rgba(37,99,235,.2);
-
-    color:#60a5fa;
-
-    font-size:12px;
-
-    font-weight:700;
-
-}
-
-.waze-btn{
-
-    width:100%;
-
-    height:45px;
-
-    margin-top:15px;
-
-    border:none;
-
-    border-radius:14px;
-
-    background:#33ccff;
-
-    color:#000;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-}
-
-/* =========================================
-MAPA
-========================================= */
-
-.map-container{
-
-    flex:1;
-
-    position:relative;
-
-}
-
-#map{
-
-    width:100%;
-
-    height:100%;
-
-}
-
-/* =========================================
-TOPBAR
-========================================= */
-
-.topbar{
-
-    position:absolute;
-
-    top:20px;
-
-    left:20px;
-
-    z-index:999;
-
-    width:340px;
-
-    padding:20px;
-
-    border-radius:22px;
-
-    background:rgba(15,23,42,.95);
-
-    backdrop-filter:blur(12px);
-
-    border:1px solid var(--border);
-
-}
-
-.topbar h2{
-
-    font-size:24px;
-
-}
-
-.topbar p{
-
-    margin-top:10px;
-
-    color:var(--muted);
-
-    line-height:1.6;
-
-    font-size:14px;
-
-}
-
-/* =========================================
-RESPONSIVO
-========================================= */
-
-@media(max-width:1000px){
-
-.container{
-
-    flex-direction:column;
-
-}
-
-.sidebar{
-
-    width:100%;
-
-    height:55vh;
-
-}
-
-.map-container{
-
-    height:45vh;
-
-}
-
-}
-
-@media(max-width:600px){
-
-body{
-
-    overflow:auto;
-
-}
-
-.dashboard{
-
-    grid-template-columns:1fr;
-
-}
-
-.buttons{
-
-    grid-template-columns:1fr;
-
-}
-
-.sidebar{
-
-    height:auto;
-
-}
-
-.map-container{
-
-    height:60vh;
-
-}
-
-.topbar{
-
-    width:90%;
-
-    left:5%;
-
-}
-
-}
-
-</style>
+<!-- CSS -->
+<link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -568,8 +25,10 @@ body{
 
 <div class="container">
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
+    <!-- =========================================
+    SIDEBAR
+    ========================================= -->
+    <aside class="sidebar">
 
         <!-- LOGO -->
         <div class="logo">
@@ -577,25 +36,22 @@ body{
             <h1>Routify</h1>
 
             <p>
-
-                Plataforma inteligente de entregas
-                com agrupamento por ruas
-                e integração em tempo real com Waze
-
+                Sistema inteligente de entregas,
+                agrupamento de ruas e rotas em tempo real.
             </p>
 
         </div>
 
-        <!-- DASHBOARD -->
-        <div class="dashboard">
+        <!-- =========================================
+        DASHBOARD
+        ========================================= -->
+        <section class="dashboard">
 
             <div class="card">
 
-                <span>Total Entregas</span>
+                <span>Total de Entregas</span>
 
-                <h2 id="totalDeliveries">
-                    0
-                </h2>
+                <h2 id="totalDeliveries">0</h2>
 
             </div>
 
@@ -603,9 +59,7 @@ body{
 
                 <span>Ruas Agrupadas</span>
 
-                <h2 id="groupedStreets">
-                    0
-                </h2>
+                <h2 id="groupedStreets">0</h2>
 
             </div>
 
@@ -613,9 +67,7 @@ body{
 
                 <span>Em Rota</span>
 
-                <h2 id="routeRunningCount">
-                    0
-                </h2>
+                <h2 id="inRoute">0</h2>
 
             </div>
 
@@ -623,22 +75,20 @@ body{
 
                 <span>Concluídas</span>
 
-                <h2 id="completedRoutes">
-                    0
-                </h2>
+                <h2 id="completedRoutes">0</h2>
 
             </div>
 
-        </div>
+        </section>
 
-        <!-- IMPORTAÇÃO -->
-        <div class="upload-area">
+        <!-- =========================================
+        IMPORTAÇÃO
+        ========================================= -->
+        <section class="upload-area">
 
-            <label
-                for="excelFile"
-                class="upload-btn">
+            <label for="excelFile" class="upload-btn">
 
-                📂 Importar Excel
+                📂 Importar Planilha Excel
 
             </label>
 
@@ -652,51 +102,47 @@ body{
             <div class="buttons">
 
                 <button
+                    id="loadRoutesBtn"
                     class="btn blue"
-                    id="loadRoutesBtn">
-
-                    🚚 Carregar
-
+                >
+                    🚚 Carregar Rotas
                 </button>
 
                 <button
+                    id="groupRoutesBtn"
                     class="btn gray"
-                    id="groupRoutesBtn">
-
-                    📍 Agrupar
-
+                >
+                    📍 Agrupar Rotas
                 </button>
 
                 <button
+                    id="startRouteBtn"
                     class="btn green"
-                    id="startRouteBtn">
-
-                    ▶️ Iniciar
-
+                >
+                    ▶️ Iniciar Rota
                 </button>
 
                 <button
+                    id="stopRouteBtn"
                     class="btn red"
-                    id="stopRouteBtn">
-
-                    ⛔ Parar
-
+                >
+                    ⏹ Encerrar
                 </button>
 
             </div>
 
-        </div>
+        </section>
 
-        <!-- PROGRESS -->
-        <div class="progress-box">
+        <!-- =========================================
+        PROGRESSO
+        ========================================= -->
+        <section class="progress-box">
 
             <div class="progress-top">
 
-                <span>Progresso</span>
+                <span>Progresso da Rota</span>
 
-                <span id="progressText">
-                    0%
-                </span>
+                <span id="progressText">0%</span>
 
             </div>
 
@@ -704,25 +150,31 @@ body{
 
                 <div
                     class="progress-fill"
-                    id="progressFill">
-                </div>
+                    id="progressFill"
+                ></div>
 
             </div>
 
-        </div>
+        </section>
 
-        <!-- LIST -->
-        <div
+        <!-- =========================================
+        LISTA DE ENTREGAS
+        ========================================= -->
+        <section
             class="list"
-            id="deliveryList">
+            id="deliveryList"
+        >
 
-        </div>
+        </section>
 
-    </div>
+    </aside>
 
-    <!-- MAPA -->
-    <div class="map-container">
+    <!-- =========================================
+    MAPA
+    ========================================= -->
+    <main class="map-container">
 
+        <!-- TOPBAR -->
         <div class="topbar">
 
             <h2>
@@ -731,499 +183,32 @@ body{
 
             <p>
 
-                O sistema detecta automaticamente
-                múltiplas entregas na mesma rua,
-                acompanha em tempo real
-                e abre a navegação no Waze.
+                O Routify identifica automaticamente
+                entregas na mesma rua e cria agrupamentos
+                inteligentes para otimizar as rotas.
 
             </p>
 
         </div>
 
+        <!-- MAPA -->
         <div id="map"></div>
 
-    </div>
+    </main>
 
 </div>
 
-<!-- LEAFLET -->
-<script
-src="https://unpkg.com/leaflet/dist/leaflet.js">
-</script>
+<!-- =========================================
+LEAFLET
+========================================= -->
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <!-- XLSX -->
-<script
-src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-<script>
-
-/* =========================================
-MAPA
-========================================= */
-
-const map = L.map('map')
-.setView([-2.5307,-44.3068],12);
-
-L.tileLayer(
-'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-{
-    attribution:'© OpenStreetMap'
-}).addTo(map);
-
-/* =========================================
-ELEMENTOS
-========================================= */
-
-const excelFile =
-document.getElementById("excelFile");
-
-const deliveryList =
-document.getElementById("deliveryList");
-
-const totalDeliveries =
-document.getElementById("totalDeliveries");
-
-const groupedStreets =
-document.getElementById("groupedStreets");
-
-const completedRoutes =
-document.getElementById("completedRoutes");
-
-const routeRunningCount =
-document.getElementById("routeRunningCount");
-
-const progressFill =
-document.getElementById("progressFill");
-
-const progressText =
-document.getElementById("progressText");
-
-/* =========================================
-DADOS
-========================================= */
-
-let routes = [];
-
-let markers = [];
-
-let routeIndex = 0;
-
-let routeTimer = null;
-
-/* =========================================
-UPLOAD
-========================================= */
-
-excelFile.addEventListener(
-    "change",
-    uploadExcel
-);
-
-function uploadExcel(event){
-
-    const file =
-    event.target.files[0];
-
-    if(!file){
-
-        return;
-
-    }
-
-    const reader =
-    new FileReader();
-
-    reader.onload = function(e){
-
-        const data =
-        new Uint8Array(e.target.result);
-
-        const workbook =
-        XLSX.read(data,{
-            type:'array'
-        });
-
-        const sheet =
-        workbook.Sheets[
-            workbook.SheetNames[0]
-        ];
-
-        const json =
-        XLSX.utils.sheet_to_json(sheet);
-
-        processRoutes(json);
-
-    };
-
-    reader.readAsArrayBuffer(file);
-
-}
-
-/* =========================================
-PROCESSAR
-========================================= */
-
-function processRoutes(data){
-
-    routes = [];
-
-    deliveryList.innerHTML = "";
-
-    clearMarkers();
-
-    data.forEach((row,index)=>{
-
-        const route = {
-
-            atId:
-            row["AT ID"] || "",
-
-            bairro:
-            row["Bairro"] || "",
-
-            city:
-            row["City"] || "",
-
-            zipcode:
-            row["Zipcode/Postal code"] || "",
-
-            latitude:
-            parseFloat(
-                row["Latitude"]
-            ) || 0,
-
-            longitude:
-            parseFloat(
-                row["Longitude"]
-            ) || 0,
-
-            completed:false
-
-        };
-
-        routes.push(route);
-
-    });
-
-    totalDeliveries.innerHTML =
-    routes.length;
-
-    renderGroupedRoutes();
-
-}
-
-/* =========================================
-AGRUPAR RUAS
-========================================= */
-
-function renderGroupedRoutes(){
-
-    deliveryList.innerHTML = "";
-
-    const grouped = {};
-
-    routes.forEach(route => {
-
-        const key =
-        route.bairro +
-        "-" +
-        route.zipcode;
-
-        if(!grouped[key]){
-
-            grouped[key] = [];
-
-        }
-
-        grouped[key].push(route);
-
-    });
-
-    groupedStreets.innerHTML =
-    Object.keys(grouped).length;
-
-    Object.keys(grouped)
-    .forEach((key,index)=>{
-
-        const group =
-        grouped[key];
-
-        const card =
-        document.createElement("div");
-
-        card.classList.add("delivery");
-
-        card.id =
-        "route-" + index;
-
-        card.innerHTML = `
-
-            <h3>
-                📍 ${group[0].bairro}
-            </h3>
-
-            <p>
-                ${group.length}
-                entregas agrupadas
-            </p>
-
-            <div class="badge">
-
-                CEP:
-                ${group[0].zipcode}
-
-            </div>
-
-            <button
-                class="waze-btn"
-                onclick="
-                    openGroupWaze(${index})
-                "
-            >
-
-                🚗 Abrir Grupo no Waze
-
-            </button>
-
-        `;
-
-        deliveryList.appendChild(card);
-
-    });
-
-}
-
-/* =========================================
-CARREGAR MAPA
-========================================= */
-
-document
-.getElementById("loadRoutesBtn")
-.addEventListener(
-    "click",
-    loadRoutes
-);
-
-function loadRoutes(){
-
-    clearMarkers();
-
-    routes.forEach(route => {
-
-        const marker =
-        L.marker([
-            route.latitude,
-            route.longitude
-        ]).addTo(map);
-
-        marker.bindPopup(`
-
-            <h3>
-                🚚 ${route.atId}
-            </h3>
-
-            <br>
-
-            Bairro:
-            ${route.bairro}
-
-        `);
-
-        markers.push(marker);
-
-    });
-
-}
-
-/* =========================================
-AGRUPAR
-========================================= */
-
-document
-.getElementById("groupRoutesBtn")
-.addEventListener(
-    "click",
-    renderGroupedRoutes
-);
-
-/* =========================================
-INICIAR ROTA
-========================================= */
-
-document
-.getElementById("startRouteBtn")
-.addEventListener(
-    "click",
-    startRoutes
-);
-
-function startRoutes(){
-
-    routeIndex = 0;
-
-    completedRoutes.innerHTML = 0;
-
-    routeRunningCount.innerHTML =
-    routes.length;
-
-    runRoutes();
-
-}
-
-/* =========================================
-EXECUTAR
-========================================= */
-
-function runRoutes(){
-
-    if(routeIndex >= routes.length){
-
-        progressFill.style.width =
-        "100%";
-
-        progressText.innerHTML =
-        "100%";
-
-        return;
-
-    }
-
-    const route =
-    routes[routeIndex];
-
-    map.flyTo([
-        route.latitude,
-        route.longitude
-    ],17);
-
-    const progress =
-    (
-        (
-            routeIndex + 1
-        ) / routes.length
-    ) * 100;
-
-    progressFill.style.width =
-    progress + "%";
-
-    progressText.innerHTML =
-    Math.round(progress) + "%";
-
-    completedRoutes.innerHTML =
-    routeIndex + 1;
-
-    openWaze(
-        route.latitude,
-        route.longitude
-    );
-
-    highlightRoute(routeIndex);
-
-    routeIndex++;
-
-    routeTimer =
-    setTimeout(
-        runRoutes,
-        5000
-    );
-
-}
-
-/* =========================================
-PARAR
-========================================= */
-
-document
-.getElementById("stopRouteBtn")
-.addEventListener(
-    "click",
-    stopRoutes
-);
-
-function stopRoutes(){
-
-    clearTimeout(routeTimer);
-
-}
-
-/* =========================================
-ABRIR WAZE
-========================================= */
-
-function openWaze(lat,lng){
-
-    window.open(
-`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`,
-        "_blank"
-    );
-
-}
-
-/* =========================================
-ABRIR GRUPO
-========================================= */
-
-function openGroupWaze(index){
-
-    const route =
-    routes[index];
-
-    openWaze(
-        route.latitude,
-        route.longitude
-    );
-
-}
-
-/* =========================================
-DESTAQUE
-========================================= */
-
-function highlightRoute(index){
-
-    document
-    .querySelectorAll(".delivery")
-    .forEach(card => {
-
-        card.classList.remove(
-            "active"
-        );
-
-    });
-
-    const active =
-    document.getElementById(
-        "route-" + index
-    );
-
-    if(active){
-
-        active.classList.add(
-            "active"
-        );
-
-    }
-
-}
-
-/* =========================================
-LIMPAR
-========================================= */
-
-function clearMarkers(){
-
-    markers.forEach(marker => {
-
-        map.removeLayer(marker);
-
-    });
-
-    markers = [];
-
-}
-
-</script>
+<!-- SCRIPT -->
+<script src="script.js"></script>
 
 </body>
 </html>
