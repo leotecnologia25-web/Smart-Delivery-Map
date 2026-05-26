@@ -1,5 +1,5 @@
 /* =========================================
-ROUTIFY - CSS COMPLETO RESPONSIVO
+ROUTIFY - CSS CORRIGIDO E OTIMIZADO
 ========================================= */
 
 /* =========================================
@@ -35,10 +35,13 @@ RESET
 
 }
 
+html,
 body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
     background:var(--bg);
     color:var(--text);
-    overflow:hidden;
 }
 
 /* =========================================
@@ -68,9 +71,15 @@ LAYOUT
 ========================================= */
 
 .container{
+
     display:flex;
+
     width:100%;
+
     height:100vh;
+
+    overflow:hidden;
+
 }
 
 /* =========================================
@@ -80,6 +89,8 @@ SIDEBAR
 .sidebar{
 
     width:420px;
+
+    min-width:420px;
 
     background:var(--sidebar);
 
@@ -157,7 +168,7 @@ DASHBOARD
 
     border:1px solid var(--border);
 
-    transition:.3s;
+    transition:.3s ease;
 
     box-shadow:var(--shadow);
 
@@ -183,14 +194,14 @@ DASHBOARD
 
     margin-top:12px;
 
-    font-size:32px;
+    font-size:30px;
 
     font-weight:700;
 
 }
 
 /* =========================================
-UPLOAD AREA
+UPLOAD
 ========================================= */
 
 .upload-area{
@@ -201,15 +212,15 @@ UPLOAD AREA
 
 .upload-btn{
 
+    width:100%;
+
+    height:58px;
+
     display:flex;
 
     justify-content:center;
 
     align-items:center;
-
-    width:100%;
-
-    height:58px;
 
     border-radius:18px;
 
@@ -223,7 +234,7 @@ UPLOAD AREA
 
     font-weight:600;
 
-    transition:.3s;
+    transition:.3s ease;
 
     box-shadow:var(--shadow);
 
@@ -246,7 +257,7 @@ UPLOAD AREA
 }
 
 /* =========================================
-BUTTONS
+BOTÕES
 ========================================= */
 
 .route-actions{
@@ -281,7 +292,7 @@ BUTTONS
 
     font-weight:600;
 
-    transition:.3s;
+    transition:.3s ease;
 
     box-shadow:var(--shadow);
 
@@ -306,7 +317,7 @@ BUTTONS
 }
 
 /* =========================================
-PREVIEW EXCEL
+TABELA
 ========================================= */
 
 .excel-preview{
@@ -324,10 +335,6 @@ PREVIEW EXCEL
     font-size:18px;
 
 }
-
-/* =========================================
-TABLE
-========================================= */
 
 .table-container{
 
@@ -359,7 +366,7 @@ thead{
 
     top:0;
 
-    z-index:2;
+    z-index:5;
 
 }
 
@@ -393,7 +400,7 @@ td{
 
 tbody tr{
 
-    transition:.2s;
+    transition:.2s ease;
 
 }
 
@@ -411,7 +418,9 @@ LISTA
 
     flex:1;
 
-    overflow:auto;
+    overflow-y:auto;
+
+    overflow-x:hidden;
 
     padding:20px;
 
@@ -429,7 +438,7 @@ LISTA
 
     margin-bottom:16px;
 
-    transition:.3s;
+    transition:.3s ease;
 
     box-shadow:var(--shadow);
 
@@ -493,6 +502,8 @@ MAPA
 
     position:relative;
 
+    overflow:hidden;
+
 }
 
 #map{
@@ -500,6 +511,8 @@ MAPA
     width:100%;
 
     height:100%;
+
+    z-index:1;
 
 }
 
@@ -557,6 +570,12 @@ TOPBAR
 LEAFLET
 ========================================= */
 
+.leaflet-container{
+
+    background:#0f172a;
+
+}
+
 .leaflet-popup-content-wrapper{
 
     background:#111827;
@@ -590,282 +609,7 @@ LEAFLET
 }
 
 /* =========================================
-MOBILE
-========================================= */
-
-@media(max-width:1100px){
-
-.container{
-
-    flex-direction:column;
-
-}
-
-.sidebar{
-
-    width:100%;
-
-    height:55vh;
-
-}
-
-.map-container{
-
-    height:45vh;
-
-}
-
-}
-
-/* =========================================
-TABLET
-========================================= */
-
-@media(max-width:768px){
-
-body{
-
-    overflow:auto;
-
-}
-
-.dashboard{
-
-    grid-template-columns:1fr 1fr;
-
-}
-
-.route-actions{
-
-    flex-direction:column;
-
-}
-
-.topbar{
-
-    width:90%;
-
-    left:5%;
-
-}
-
-.logo h1{
-
-    font-size:30px;
-
-}
-
-.card h2{
-
-    font-size:26px;
-
-}
-
-}
-
-/* =========================================
-CELULAR
-========================================= */
-
-@media(max-width:600px){
-
-.sidebar{
-
-    height:auto;
-
-}
-
-.dashboard{
-
-    grid-template-columns:1fr;
-
-}
-
-.map-container{
-
-    height:55vh;
-
-}
-
-.card{
-
-    padding:18px;
-
-}
-
-.card h2{
-
-    font-size:24px;
-
-}
-
-.logo{
-
-    padding:22px;
-
-}
-
-.logo h1{
-
-    font-size:28px;
-
-}
-
-.upload-area{
-
-    padding:0 15px 15px;
-
-}
-
-.excel-preview{
-
-    padding:0 15px 15px;
-
-}
-
-.list{
-
-    padding:15px;
-
-}
-
-.delivery{
-
-    padding:16px;
-
-}
-
-.delivery h3{
-
-    font-size:16px;
-
-}
-
-.delivery p{
-
-    font-size:13px;
-
-}
-
-.street-badge{
-
-    width:100%;
-
-    text-align:center;
-
-}
-
-.topbar{
-
-    top:10px;
-
-    left:5%;
-
-    width:90%;
-
-    padding:18px;
-
-}
-
-.topbar h2{
-
-    font-size:22px;
-
-}
-
-.topbar p{
-
-    font-size:13px;
-
-}
-
-.action-btn{
-
-    height:48px;
-
-}
-
-}
-
-/* =========================================
-CELULAR PEQUENO
-========================================= */
-
-@media(max-width:420px){
-
-.logo h1{
-
-    font-size:24px;
-
-}
-
-.card h2{
-
-    font-size:22px;
-
-}
-
-.upload-btn{
-
-    font-size:14px;
-
-}
-
-.action-btn{
-
-    font-size:13px;
-
-}
-
-}
-
-/* =========================================
-ANIMAÇÕES
-========================================= */
-
-@keyframes pulse{
-
-    0%{
-        transform:scale(1);
-    }
-
-    50%{
-        transform:scale(1.03);
-    }
-
-    100%{
-        transform:scale(1);
-    }
-
-}
-
-.card:hover h2{
-
-    animation:pulse 1s infinite;
-
-}
-
-/* =========================================
-EFEITOS
-========================================= */
-
-button,
-.card,
-.delivery,
-.upload-btn{
-
-    transition:all .3s ease;
-
-}
-
-button:active{
-
-    transform:scale(.98);
-
-}
-
-/* =========================================
-FLOAT BUTTON
+BOTÃO FLUTUANTE
 ========================================= */
 
 .floating-btn{
@@ -900,6 +644,8 @@ FLOAT BUTTON
 
     box-shadow:
         0 15px 35px rgba(37,99,235,.35);
+
+    transition:.3s ease;
 
 }
 
@@ -984,6 +730,32 @@ LOADING
 }
 
 /* =========================================
+ANIMAÇÃO CARD
+========================================= */
+
+@keyframes pulse{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.03);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+.card:hover h2{
+
+    animation:pulse 1s infinite;
+
+}
+
+/* =========================================
 FOOTER
 ========================================= */
 
@@ -1002,23 +774,191 @@ FOOTER
 }
 
 /* =========================================
-MAP CLUSTER
+RESPONSIVO TABLET
 ========================================= */
 
-.marker-cluster{
+@media(max-width:1100px){
 
-    background:#2563eb;
+.container{
 
-    border-radius:50%;
+    flex-direction:column;
 
-    color:white;
+    height:auto;
 
-    font-weight:700;
+}
 
-    display:flex;
+.sidebar{
 
-    justify-content:center;
+    width:100%;
 
-    align-items:center;
+    min-width:100%;
+
+    height:auto;
+
+}
+
+.map-container{
+
+    width:100%;
+
+    height:55vh;
+
+}
+
+}
+
+/* =========================================
+RESPONSIVO MOBILE
+========================================= */
+
+@media(max-width:768px){
+
+html,
+body{
+
+    overflow:auto;
+
+}
+
+.dashboard{
+
+    grid-template-columns:1fr;
+
+}
+
+.route-actions{
+
+    flex-direction:column;
+
+}
+
+.topbar{
+
+    width:90%;
+
+    left:5%;
+
+    top:10px;
+
+    padding:18px;
+
+}
+
+.topbar h2{
+
+    font-size:22px;
+
+}
+
+.topbar p{
+
+    font-size:13px;
+
+}
+
+.logo{
+
+    padding:22px;
+
+}
+
+.logo h1{
+
+    font-size:28px;
+
+}
+
+.card{
+
+    padding:18px;
+
+}
+
+.card h2{
+
+    font-size:24px;
+
+}
+
+.upload-area,
+.excel-preview,
+.list{
+
+    padding-left:15px;
+
+    padding-right:15px;
+
+}
+
+.map-container{
+
+    height:60vh;
+
+}
+
+.action-btn{
+
+    height:48px;
+
+}
+
+}
+
+/* =========================================
+CELULAR PEQUENO
+========================================= */
+
+@media(max-width:420px){
+
+.logo h1{
+
+    font-size:24px;
+
+}
+
+.card h2{
+
+    font-size:22px;
+
+}
+
+.upload-btn{
+
+    font-size:14px;
+
+}
+
+.action-btn{
+
+    font-size:13px;
+
+}
+
+.topbar{
+
+    width:92%;
+
+    left:4%;
+
+}
+
+}
+
+/* =========================================
+TRANSIÇÕES
+========================================= */
+
+button,
+.card,
+.delivery,
+.upload-btn{
+
+    transition:all .3s ease;
+
+}
+
+button:active{
+
+    transform:scale(.98);
 
 }
