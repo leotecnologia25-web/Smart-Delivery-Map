@@ -5,17 +5,18 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
+<meta
+name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<title>Routify - Entregas Inteligentes</title>
+<title>Routify Premium</title>
 
-<!-- GOOGLE FONTS -->
+<!-- FONT -->
 <link rel="preconnect"
 href="https://fonts.googleapis.com">
 
 <link
-href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
 rel="stylesheet">
 
 <!-- LEAFLET -->
@@ -46,9 +47,9 @@ RESET
     --primary:#2563eb;
     --primary-hover:#1d4ed8;
 
-    --success:#16a34a;
-    --warning:#eab308;
-    --danger:#dc2626;
+    --green:#16a34a;
+    --red:#dc2626;
+    --yellow:#eab308;
 
     --text:#ffffff;
     --muted:#94a3b8;
@@ -85,13 +86,13 @@ SIDEBAR
 
 .sidebar{
 
-    width:420px;
+    width:430px;
 
     background:var(--sidebar);
 
     border-right:1px solid var(--border);
 
-    overflow:auto;
+    overflow:hidden;
 
     display:flex;
 
@@ -116,6 +117,8 @@ LOGO
     font-size:34px;
 
     color:#3b82f6;
+
+    font-weight:800;
 
 }
 
@@ -216,14 +219,14 @@ UPLOAD
 }
 
 /* =========================================
-BOTÕES
+BUTTONS
 ========================================= */
 
-.route-actions{
+.buttons{
 
-    display:flex;
+    display:grid;
 
-    flex-direction:column;
+    grid-template-columns:1fr 1fr;
 
     gap:10px;
 
@@ -231,9 +234,7 @@ BOTÕES
 
 }
 
-.action-btn{
-
-    width:100%;
+.btn{
 
     height:50px;
 
@@ -241,48 +242,40 @@ BOTÕES
 
     border-radius:16px;
 
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #3b82f6
-    );
+    font-weight:700;
 
     color:white;
-
-    font-weight:700;
 
     cursor:pointer;
 
 }
 
-.action-btn.secondary{
+.blue{
+
+    background:#2563eb;
+
+}
+
+.green{
+
+    background:#16a34a;
+
+}
+
+.red{
+
+    background:#dc2626;
+
+}
+
+.gray{
 
     background:#334155;
 
 }
 
-.start-btn{
-
-    background:linear-gradient(
-        135deg,
-        #16a34a,
-        #22c55e
-    );
-
-}
-
-.stop-btn{
-
-    background:linear-gradient(
-        135deg,
-        #dc2626,
-        #ef4444
-    );
-
-}
-
 /* =========================================
-PROGRESSO
+PROGRESS
 ========================================= */
 
 .progress-box{
@@ -291,7 +284,7 @@ PROGRESSO
 
 }
 
-.progress-header{
+.progress-top{
 
     display:flex;
 
@@ -301,13 +294,13 @@ PROGRESSO
 
 }
 
-.progress-bar{
+.progress{
 
     width:100%;
 
     height:14px;
 
-    background:#0f172a;
+    background:#1e293b;
 
     border-radius:999px;
 
@@ -332,7 +325,7 @@ PROGRESSO
 }
 
 /* =========================================
-LISTA
+LIST
 ========================================= */
 
 .list{
@@ -359,6 +352,20 @@ LISTA
 
 }
 
+.delivery.active{
+
+    border:2px solid #22c55e;
+
+}
+
+.delivery.done{
+
+    border:2px solid #2563eb;
+
+    opacity:.7;
+
+}
+
 .delivery h3{
 
     font-size:18px;
@@ -377,17 +384,17 @@ LISTA
 
 .badge{
 
-    margin-top:12px;
-
     display:inline-block;
 
-    background:rgba(37,99,235,.2);
-
-    color:#60a5fa;
+    margin-top:12px;
 
     padding:8px 12px;
 
     border-radius:12px;
+
+    background:rgba(37,99,235,.2);
+
+    color:#60a5fa;
 
     font-size:12px;
 
@@ -451,17 +458,17 @@ TOPBAR
 
     z-index:999;
 
-    width:320px;
+    width:340px;
 
-    background:rgba(15,23,42,.95);
-
-    backdrop-filter:blur(10px);
-
-    border:1px solid var(--border);
+    padding:20px;
 
     border-radius:22px;
 
-    padding:20px;
+    background:rgba(15,23,42,.95);
+
+    backdrop-filter:blur(12px);
+
+    border:1px solid var(--border);
 
 }
 
@@ -525,6 +532,12 @@ body{
 
 }
 
+.buttons{
+
+    grid-template-columns:1fr;
+
+}
+
 .sidebar{
 
     height:auto;
@@ -564,8 +577,11 @@ body{
             <h1>Routify</h1>
 
             <p>
-                Sistema inteligente de entregas
-                com integração Waze
+
+                Plataforma inteligente de entregas
+                com agrupamento por ruas
+                e integração em tempo real com Waze
+
             </p>
 
         </div>
@@ -575,7 +591,7 @@ body{
 
             <div class="card">
 
-                <span>Entregas</span>
+                <span>Total Entregas</span>
 
                 <h2 id="totalDeliveries">
                     0
@@ -585,7 +601,7 @@ body{
 
             <div class="card">
 
-                <span>Agrupadas</span>
+                <span>Ruas Agrupadas</span>
 
                 <h2 id="groupedStreets">
                     0
@@ -633,37 +649,37 @@ body{
             >
 
             <!-- BOTÕES -->
-            <div class="route-actions">
+            <div class="buttons">
 
                 <button
-                    class="action-btn"
+                    class="btn blue"
                     id="loadRoutesBtn">
 
-                    🚚 Carregar Rotas
+                    🚚 Carregar
 
                 </button>
 
                 <button
-                    class="action-btn secondary"
-                    id="optimizeBtn">
+                    class="btn gray"
+                    id="groupRoutesBtn">
 
-                    📍 Agrupar Rotas
+                    📍 Agrupar
 
                 </button>
 
                 <button
-                    class="action-btn start-btn"
+                    class="btn green"
                     id="startRouteBtn">
 
-                    ▶️ Iniciar Rotas
+                    ▶️ Iniciar
 
                 </button>
 
                 <button
-                    class="action-btn stop-btn"
+                    class="btn red"
                     id="stopRouteBtn">
 
-                    ⛔ Encerrar Rotas
+                    ⛔ Parar
 
                 </button>
 
@@ -671,20 +687,20 @@ body{
 
         </div>
 
-        <!-- PROGRESSO -->
+        <!-- PROGRESS -->
         <div class="progress-box">
 
-            <div class="progress-header">
+            <div class="progress-top">
 
-                <span>Progresso da Rota</span>
+                <span>Progresso</span>
 
-                <span id="progressPercent">
+                <span id="progressText">
                     0%
                 </span>
 
             </div>
 
-            <div class="progress-bar">
+            <div class="progress">
 
                 <div
                     class="progress-fill"
@@ -695,7 +711,7 @@ body{
 
         </div>
 
-        <!-- LISTA -->
+        <!-- LIST -->
         <div
             class="list"
             id="deliveryList">
@@ -715,9 +731,10 @@ body{
 
             <p>
 
-                O Routify agrupa automaticamente
-                entregas por região e permite
-                navegação direta pelo Waze.
+                O sistema detecta automaticamente
+                múltiplas entregas na mesma rua,
+                acompanha em tempo real
+                e abre a navegação no Waze.
 
             </p>
 
@@ -745,11 +762,8 @@ src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js">
 MAPA
 ========================================= */
 
-const map =
-L.map('map').setView(
-    [-2.5307,-44.3068],
-    12
-);
+const map = L.map('map')
+.setView([-2.5307,-44.3068],12);
 
 L.tileLayer(
 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -761,7 +775,7 @@ L.tileLayer(
 ELEMENTOS
 ========================================= */
 
-const excelInput =
+const excelFile =
 document.getElementById("excelFile");
 
 const deliveryList =
@@ -773,44 +787,40 @@ document.getElementById("totalDeliveries");
 const groupedStreets =
 document.getElementById("groupedStreets");
 
-const progressFill =
-document.getElementById("progressFill");
-
-const progressPercent =
-document.getElementById("progressPercent");
+const completedRoutes =
+document.getElementById("completedRoutes");
 
 const routeRunningCount =
 document.getElementById("routeRunningCount");
 
-const completedRoutes =
-document.getElementById("completedRoutes");
+const progressFill =
+document.getElementById("progressFill");
+
+const progressText =
+document.getElementById("progressText");
 
 /* =========================================
 DADOS
 ========================================= */
 
-let importedRoutes = [];
+let routes = [];
 
 let markers = [];
 
-let currentRoute = 0;
+let routeIndex = 0;
 
-let routeInterval;
+let routeTimer = null;
 
 /* =========================================
 UPLOAD
 ========================================= */
 
-excelInput.addEventListener(
+excelFile.addEventListener(
     "change",
-    handleExcelUpload
+    uploadExcel
 );
 
-/* =========================================
-LER EXCEL
-========================================= */
-
-function handleExcelUpload(event){
+function uploadExcel(event){
 
     const file =
     event.target.files[0];
@@ -834,16 +844,15 @@ function handleExcelUpload(event){
             type:'array'
         });
 
-        const sheetName =
-        workbook.SheetNames[0];
-
         const sheet =
-        workbook.Sheets[sheetName];
+        workbook.Sheets[
+            workbook.SheetNames[0]
+        ];
 
         const json =
         XLSX.utils.sheet_to_json(sheet);
 
-        processData(json);
+        processRoutes(json);
 
     };
 
@@ -855,17 +864,17 @@ function handleExcelUpload(event){
 PROCESSAR
 ========================================= */
 
-function processData(data){
+function processRoutes(data){
 
-    importedRoutes = [];
+    routes = [];
 
     deliveryList.innerHTML = "";
 
     clearMarkers();
 
-    data.forEach(row => {
+    data.forEach((row,index)=>{
 
-        const item = {
+        const route = {
 
             atId:
             row["AT ID"] || "",
@@ -887,82 +896,106 @@ function processData(data){
             longitude:
             parseFloat(
                 row["Longitude"]
-            ) || 0
+            ) || 0,
+
+            completed:false
 
         };
 
-        importedRoutes.push(item);
-
-        createCard(item);
+        routes.push(route);
 
     });
 
     totalDeliveries.innerHTML =
-    importedRoutes.length;
+    routes.length;
+
+    renderGroupedRoutes();
 
 }
 
 /* =========================================
-CRIAR CARD
+AGRUPAR RUAS
 ========================================= */
 
-function createCard(route){
+function renderGroupedRoutes(){
 
-    const div =
-    document.createElement("div");
+    deliveryList.innerHTML = "";
 
-    div.classList.add("delivery");
+    const grouped = {};
 
-    div.innerHTML = `
+    routes.forEach(route => {
 
-        <h3>
-            🚚 ${route.atId}
-        </h3>
+        const key =
+        route.bairro +
+        "-" +
+        route.zipcode;
 
-        <p>
-            Bairro:
-            ${route.bairro}
-        </p>
+        if(!grouped[key]){
 
-        <p>
-            Cidade:
-            ${route.city}
-        </p>
+            grouped[key] = [];
 
-        <p>
-            CEP:
-            ${route.zipcode}
-        </p>
+        }
 
-        <div class="badge">
+        grouped[key].push(route);
 
-            📍 Entrega ativa
+    });
 
-        </div>
+    groupedStreets.innerHTML =
+    Object.keys(grouped).length;
 
-        <button
-            class="waze-btn"
+    Object.keys(grouped)
+    .forEach((key,index)=>{
 
-            onclick="
-                openWaze(
-                    ${route.latitude},
-                    ${route.longitude}
-                )
-            "
-        >
+        const group =
+        grouped[key];
 
-            🚗 Abrir no Waze
+        const card =
+        document.createElement("div");
 
-        </button>
+        card.classList.add("delivery");
 
-    `;
+        card.id =
+        "route-" + index;
 
-    deliveryList.appendChild(div);
+        card.innerHTML = `
+
+            <h3>
+                📍 ${group[0].bairro}
+            </h3>
+
+            <p>
+                ${group.length}
+                entregas agrupadas
+            </p>
+
+            <div class="badge">
+
+                CEP:
+                ${group[0].zipcode}
+
+            </div>
+
+            <button
+                class="waze-btn"
+                onclick="
+                    openGroupWaze(${index})
+                "
+            >
+
+                🚗 Abrir Grupo no Waze
+
+            </button>
+
+        `;
+
+        deliveryList.appendChild(card);
+
+    });
 
 }
 
 /* =========================================
-CARREGAR ROTAS
+CARREGAR MAPA
 ========================================= */
 
 document
@@ -976,7 +1009,7 @@ function loadRoutes(){
 
     clearMarkers();
 
-    importedRoutes.forEach(route => {
+    routes.forEach(route => {
 
         const marker =
         L.marker([
@@ -995,21 +1028,6 @@ function loadRoutes(){
             Bairro:
             ${route.bairro}
 
-            <br><br>
-
-            <button
-                onclick="
-                    openWaze(
-                        ${route.latitude},
-                        ${route.longitude}
-                    )
-                "
-            >
-
-                Abrir no Waze
-
-            </button>
-
         `);
 
         markers.push(marker);
@@ -1023,36 +1041,11 @@ AGRUPAR
 ========================================= */
 
 document
-.getElementById("optimizeBtn")
+.getElementById("groupRoutesBtn")
 .addEventListener(
     "click",
-    groupRoutes
+    renderGroupedRoutes
 );
-
-function groupRoutes(){
-
-    const groups = {};
-
-    importedRoutes.forEach(route => {
-
-        const key =
-        route.bairro +
-        route.zipcode;
-
-        if(!groups[key]){
-
-            groups[key] = [];
-
-        }
-
-        groups[key].push(route);
-
-    });
-
-    groupedStreets.innerHTML =
-    Object.keys(groups).length;
-
-}
 
 /* =========================================
 INICIAR ROTA
@@ -1062,17 +1055,19 @@ document
 .getElementById("startRouteBtn")
 .addEventListener(
     "click",
-    startRoute
+    startRoutes
 );
 
-function startRoute(){
+function startRoutes(){
 
-    currentRoute = 0;
+    routeIndex = 0;
+
+    completedRoutes.innerHTML = 0;
 
     routeRunningCount.innerHTML =
-    importedRoutes.length;
+    routes.length;
 
-    runRoute();
+    runRoutes();
 
 }
 
@@ -1080,94 +1075,135 @@ function startRoute(){
 EXECUTAR
 ========================================= */
 
-function runRoute(){
+function runRoutes(){
 
-    if(
-        currentRoute >=
-        importedRoutes.length
-    ){
+    if(routeIndex >= routes.length){
 
-        completedRoutes.innerHTML =
-        importedRoutes.length;
+        progressFill.style.width =
+        "100%";
+
+        progressText.innerHTML =
+        "100%";
 
         return;
 
     }
 
     const route =
-    importedRoutes[currentRoute];
+    routes[routeIndex];
 
     map.flyTo([
         route.latitude,
         route.longitude
-    ],16);
+    ],17);
 
     const progress =
     (
         (
-            currentRoute + 1
-        )
-        /
-        importedRoutes.length
+            routeIndex + 1
+        ) / routes.length
     ) * 100;
 
     progressFill.style.width =
     progress + "%";
 
-    progressPercent.innerHTML =
+    progressText.innerHTML =
     Math.round(progress) + "%";
+
+    completedRoutes.innerHTML =
+    routeIndex + 1;
 
     openWaze(
         route.latitude,
         route.longitude
     );
 
-    currentRoute++;
+    highlightRoute(routeIndex);
 
-    routeInterval =
+    routeIndex++;
+
+    routeTimer =
     setTimeout(
-        runRoute,
-        6000
+        runRoutes,
+        5000
     );
 
 }
 
 /* =========================================
-ENCERRAR
+PARAR
 ========================================= */
 
 document
 .getElementById("stopRouteBtn")
 .addEventListener(
     "click",
-    stopRoute
+    stopRoutes
 );
 
-function stopRoute(){
+function stopRoutes(){
 
-    clearTimeout(routeInterval);
-
-    progressFill.style.width =
-    "0%";
-
-    progressPercent.innerHTML =
-    "0%";
+    clearTimeout(routeTimer);
 
 }
 
 /* =========================================
-WAZE
+ABRIR WAZE
 ========================================= */
 
 function openWaze(lat,lng){
 
-    const url =
-`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
-
     window.open(
-        url,
+`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`,
         "_blank"
     );
+
+}
+
+/* =========================================
+ABRIR GRUPO
+========================================= */
+
+function openGroupWaze(index){
+
+    const route =
+    routes[index];
+
+    openWaze(
+        route.latitude,
+        route.longitude
+    );
+
+}
+
+/* =========================================
+DESTAQUE
+========================================= */
+
+function highlightRoute(index){
+
+    document
+    .querySelectorAll(".delivery")
+    .forEach(card => {
+
+        card.classList.remove(
+            "active"
+        );
+
+    });
+
+    const active =
+    document.getElementById(
+        "route-" + index
+    );
+
+    if(active){
+
+        active.classList.add(
+            "active"
+        );
+
+    }
 
 }
 
