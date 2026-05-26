@@ -1,44 +1,9 @@
 /* =========================================
-ROUTIFY PREMIUM - CSS COMPLETO
+RESPONSIVIDADE COMPLETA
+BOTÕES + MAPA MOBILE
 ========================================= */
 
-/* =========================================
-RESET
-========================================= */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Inter',sans-serif;
-}
-
-:root{
-
-    --bg:#0f172a;
-    --sidebar:#111827;
-    --card:#1e293b;
-
-    --border:#334155;
-
-    --primary:#2563eb;
-    --primary-hover:#1d4ed8;
-
-    --green:#16a34a;
-    --green-hover:#15803d;
-
-    --red:#dc2626;
-    --red-hover:#b91c1c;
-
-    --gray:#475569;
-
-    --text:#ffffff;
-    --muted:#94a3b8;
-
-    --shadow:
-    0 10px 30px rgba(0,0,0,.25);
-
-}
+@media(max-width:900px){
 
 /* =========================================
 BODY
@@ -46,56 +11,25 @@ BODY
 
 body{
 
-    background:var(--bg);
-
-    color:var(--text);
-
-    overflow:hidden;
+    overflow:auto;
 
 }
 
 /* =========================================
-SCROLLBAR
-========================================= */
-
-::-webkit-scrollbar{
-
-    width:8px;
-    height:8px;
-
-}
-
-::-webkit-scrollbar-track{
-
-    background:#0f172a;
-
-}
-
-::-webkit-scrollbar-thumb{
-
-    background:#334155;
-
-    border-radius:999px;
-
-}
-
-::-webkit-scrollbar-thumb:hover{
-
-    background:#475569;
-
-}
-
-/* =========================================
-LAYOUT
+CONTAINER
 ========================================= */
 
 .container{
 
     display:flex;
 
+    flex-direction:column;
+
     width:100%;
 
-    height:100vh;
+    height:auto;
+
+    min-height:100vh;
 
 }
 
@@ -105,17 +39,15 @@ SIDEBAR
 
 .sidebar{
 
-    width:430px;
+    width:100%;
 
-    background:var(--sidebar);
+    height:auto;
 
-    border-right:1px solid var(--border);
+    overflow:visible;
 
-    display:flex;
+    border-right:none;
 
-    flex-direction:column;
-
-    overflow:hidden;
+    border-bottom:1px solid #334155;
 
 }
 
@@ -125,35 +57,21 @@ LOGO
 
 .logo{
 
-    padding:28px;
-
-    border-bottom:1px solid var(--border);
-
-    background:rgba(255,255,255,.02);
+    padding:20px;
 
 }
 
 .logo h1{
 
-    font-size:36px;
-
-    font-weight:800;
-
-    color:#3b82f6;
-
-    letter-spacing:-1px;
+    font-size:28px;
 
 }
 
 .logo p{
 
-    margin-top:10px;
+    font-size:13px;
 
-    font-size:14px;
-
-    line-height:1.6;
-
-    color:var(--muted);
+    line-height:1.5;
 
 }
 
@@ -167,51 +85,23 @@ DASHBOARD
 
     grid-template-columns:1fr 1fr;
 
-    gap:14px;
+    gap:12px;
 
-    padding:20px;
+    padding:15px;
 
 }
 
 .card{
 
-    background:var(--card);
+    padding:18px;
 
-    border:1px solid var(--border);
-
-    border-radius:22px;
-
-    padding:20px;
-
-    transition:.3s;
-
-    box-shadow:var(--shadow);
-
-}
-
-.card:hover{
-
-    transform:translateY(-3px);
-
-    border-color:#3b82f6;
-
-}
-
-.card span{
-
-    color:var(--muted);
-
-    font-size:13px;
+    border-radius:18px;
 
 }
 
 .card h2{
 
-    margin-top:12px;
-
-    font-size:30px;
-
-    font-weight:700;
+    font-size:24px;
 
 }
 
@@ -221,69 +111,23 @@ UPLOAD
 
 .upload-area{
 
-    padding:0 20px 20px;
-
-}
-
-.upload-btn{
-
-    width:100%;
-
-    height:58px;
-
-    border-radius:18px;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #3b82f6
-    );
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.3s;
-
-    box-shadow:var(--shadow);
-
-}
-
-.upload-btn:hover{
-
-    transform:translateY(-2px);
-
-    background:linear-gradient(
-        135deg,
-        #1d4ed8,
-        #2563eb
-    );
-
-}
-
-#excelFile{
-
-    display:none;
+    padding:0 15px 15px;
 
 }
 
 /* =========================================
-BUTTONS
+BOTÕES
 ========================================= */
 
 .buttons{
 
-    display:grid;
+    display:flex;
 
-    grid-template-columns:1fr 1fr;
+    flex-direction:column;
 
-    gap:10px;
+    gap:12px;
+
+    width:100%;
 
     margin-top:15px;
 
@@ -291,123 +135,27 @@ BUTTONS
 
 .btn{
 
-    height:52px;
+    width:100%;
+
+    height:54px;
 
     border:none;
 
     border-radius:16px;
 
+    font-size:15px;
+
     font-weight:700;
-
-    color:white;
-
-    cursor:pointer;
-
-    transition:.3s;
-
-    box-shadow:var(--shadow);
-
-}
-
-.btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-.blue{
-
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #3b82f6
-    );
-
-}
-
-.green{
-
-    background:linear-gradient(
-        135deg,
-        #16a34a,
-        #22c55e
-    );
-
-}
-
-.red{
-
-    background:linear-gradient(
-        135deg,
-        #dc2626,
-        #ef4444
-    );
-
-}
-
-.gray{
-
-    background:#334155;
-
-}
-
-.gray:hover{
-
-    background:#475569;
 
 }
 
 /* =========================================
-PROGRESS
+PROGRESSO
 ========================================= */
 
 .progress-box{
 
-    padding:0 20px 20px;
-
-}
-
-.progress-top{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    margin-bottom:10px;
-
-    font-size:14px;
-
-}
-
-.progress{
-
-    width:100%;
-
-    height:14px;
-
-    background:#0f172a;
-
-    border-radius:999px;
-
-    overflow:hidden;
-
-    border:1px solid #1e293b;
-
-}
-
-.progress-fill{
-
-    width:0%;
-
-    height:100%;
-
-    background:linear-gradient(
-        90deg,
-        #22c55e,
-        #4ade80
-    );
-
-    transition:1s;
+    padding:0 15px 15px;
 
 }
 
@@ -417,107 +165,31 @@ LISTA
 
 .list{
 
-    flex:1;
+    padding:15px;
 
-    overflow:auto;
+    overflow:visible;
 
-    padding:20px;
+    max-height:none;
 
 }
-
-/* =========================================
-ENTREGAS
-========================================= */
 
 .delivery{
 
-    background:var(--card);
+    padding:18px;
 
-    border:1px solid var(--border);
-
-    border-radius:22px;
-
-    padding:20px;
-
-    margin-bottom:16px;
-
-    transition:.3s;
-
-    box-shadow:var(--shadow);
-
-}
-
-.delivery:hover{
-
-    transform:translateY(-2px);
-
-    border-color:#3b82f6;
-
-}
-
-.delivery.active{
-
-    border:2px solid #22c55e;
-
-    background:rgba(34,197,94,.08);
-
-}
-
-.delivery.done{
-
-    border:2px solid #2563eb;
-
-    opacity:.8;
+    border-radius:18px;
 
 }
 
 .delivery h3{
 
-    font-size:18px;
-
-    font-weight:700;
+    font-size:16px;
 
 }
 
 .delivery p{
 
-    margin-top:6px;
-
-    color:var(--muted);
-
-    font-size:14px;
-
-    line-height:1.5;
-
-}
-
-/* =========================================
-BADGE
-========================================= */
-
-.badge{
-
-    display:inline-flex;
-
-    align-items:center;
-
-    gap:6px;
-
-    margin-top:14px;
-
-    padding:8px 12px;
-
-    border-radius:14px;
-
-    background:rgba(37,99,235,.2);
-
-    color:#60a5fa;
-
-    border:1px solid rgba(59,130,246,.2);
-
-    font-size:12px;
-
-    font-weight:700;
+    font-size:13px;
 
 }
 
@@ -527,33 +199,9 @@ BOTÃO WAZE
 
 .waze-btn{
 
-    width:100%;
-
     height:48px;
 
-    margin-top:15px;
-
-    border:none;
-
-    border-radius:14px;
-
-    background:#33ccff;
-
-    color:#000;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.3s;
-
-}
-
-.waze-btn:hover{
-
-    transform:translateY(-2px);
-
-    opacity:.92;
+    font-size:14px;
 
 }
 
@@ -563,7 +211,11 @@ MAPA
 
 .map-container{
 
-    flex:1;
+    width:100%;
+
+    height:65vh;
+
+    min-height:420px;
 
     position:relative;
 
@@ -583,267 +235,15 @@ TOPBAR
 
 .topbar{
 
-    position:absolute;
+    width:92%;
 
-    top:20px;
-
-    left:20px;
-
-    z-index:999;
-
-    width:340px;
-
-    padding:22px;
-
-    border-radius:24px;
-
-    background:rgba(15,23,42,.95);
-
-    backdrop-filter:blur(14px);
-
-    border:1px solid rgba(255,255,255,.05);
-
-    box-shadow:var(--shadow);
-
-}
-
-.topbar h2{
-
-    font-size:26px;
-
-    font-weight:700;
-
-}
-
-.topbar p{
-
-    margin-top:12px;
-
-    line-height:1.7;
-
-    color:var(--muted);
-
-    font-size:14px;
-
-}
-
-/* =========================================
-LEAFLET
-========================================= */
-
-.leaflet-popup-content-wrapper{
-
-    background:#111827;
-
-    color:white;
-
-    border-radius:18px;
-
-}
-
-.leaflet-popup-tip{
-
-    background:#111827;
-
-}
-
-.leaflet-control-zoom{
-
-    border:none !important;
-
-}
-
-.leaflet-control-zoom a{
-
-    background:#111827 !important;
-
-    color:white !important;
-
-    border:none !important;
-
-}
-
-/* =========================================
-ANIMAÇÃO
-========================================= */
-
-@keyframes pulse{
-
-    0%{
-        transform:scale(1);
-    }
-
-    50%{
-        transform:scale(1.03);
-    }
-
-    100%{
-        transform:scale(1);
-    }
-
-}
-
-.card:hover h2{
-
-    animation:pulse 1s infinite;
-
-}
-
-/* =========================================
-RESPONSIVO
-========================================= */
-
-@media(max-width:1100px){
-
-.container{
-
-    flex-direction:column;
-
-}
-
-.sidebar{
-
-    width:100%;
-
-    height:55vh;
-
-}
-
-.map-container{
-
-    height:45vh;
-
-}
-
-}
-
-/* =========================================
-TABLET
-========================================= */
-
-@media(max-width:768px){
-
-body{
-
-    overflow:auto;
-
-}
-
-.dashboard{
-
-    grid-template-columns:1fr 1fr;
-
-}
-
-.buttons{
-
-    grid-template-columns:1fr;
-
-}
-
-.topbar{
-
-    width:90%;
-
-    left:5%;
-
-}
-
-.logo h1{
-
-    font-size:30px;
-
-}
-
-.card h2{
-
-    font-size:26px;
-
-}
-
-}
-
-/* =========================================
-CELULAR
-========================================= */
-
-@media(max-width:600px){
-
-.sidebar{
-
-    height:auto;
-
-}
-
-.dashboard{
-
-    grid-template-columns:1fr;
-
-}
-
-.map-container{
-
-    height:60vh;
-
-}
-
-.logo{
-
-    padding:22px;
-
-}
-
-.logo h1{
-
-    font-size:28px;
-
-}
-
-.upload-area{
-
-    padding:0 15px 15px;
-
-}
-
-.progress-box{
-
-    padding:0 15px 15px;
-
-}
-
-.list{
-
-    padding:15px;
-
-}
-
-.delivery{
-
-    padding:16px;
-
-}
-
-.delivery h3{
-
-    font-size:16px;
-
-}
-
-.delivery p{
-
-    font-size:13px;
-
-}
-
-.topbar{
+    left:4%;
 
     top:10px;
 
-    left:5%;
-
-    width:90%;
-
     padding:18px;
+
+    border-radius:18px;
 
 }
 
@@ -857,11 +257,7 @@ CELULAR
 
     font-size:13px;
 
-}
-
-.btn{
-
-    height:48px;
+    line-height:1.6;
 
 }
 
@@ -871,11 +267,35 @@ CELULAR
 CELULAR PEQUENO
 ========================================= */
 
-@media(max-width:420px){
+@media(max-width:480px){
+
+/* =========================================
+DASHBOARD
+========================================= */
+
+.dashboard{
+
+    grid-template-columns:1fr;
+
+}
+
+/* =========================================
+LOGO
+========================================= */
 
 .logo h1{
 
     font-size:24px;
+
+}
+
+/* =========================================
+CARDS
+========================================= */
+
+.card{
+
+    padding:16px;
 
 }
 
@@ -885,16 +305,164 @@ CELULAR PEQUENO
 
 }
 
-.upload-btn{
+/* =========================================
+BOTÕES
+========================================= */
+
+.btn{
+
+    height:52px;
 
     font-size:14px;
 
 }
 
-.btn{
+/* =========================================
+UPLOAD
+========================================= */
 
-    font-size:13px;
+.upload-btn{
+
+    height:52px;
+
+    font-size:14px;
 
 }
+
+/* =========================================
+MAPA
+========================================= */
+
+.map-container{
+
+    height:60vh;
+
+    min-height:350px;
+
+}
+
+/* =========================================
+TOPBAR
+========================================= */
+
+.topbar{
+
+    width:94%;
+
+    left:3%;
+
+    padding:15px;
+
+}
+
+.topbar h2{
+
+    font-size:20px;
+
+}
+
+.topbar p{
+
+    font-size:12px;
+
+}
+
+/* =========================================
+ENTREGAS
+========================================= */
+
+.delivery{
+
+    padding:16px;
+
+}
+
+.delivery h3{
+
+    font-size:15px;
+
+}
+
+.delivery p{
+
+    font-size:12px;
+
+}
+
+/* =========================================
+BADGE
+========================================= */
+
+.badge{
+
+    width:100%;
+
+    justify-content:center;
+
+    text-align:center;
+
+}
+
+}
+
+/* =========================================
+MELHORIA TOUCH
+========================================= */
+
+button,
+.upload-btn,
+.waze-btn{
+
+    touch-action:manipulation;
+
+    -webkit-tap-highlight-color:transparent;
+
+}
+
+/* =========================================
+CORREÇÃO LEAFLET MOBILE
+========================================= */
+
+.leaflet-control-zoom{
+
+    margin-top:70px !important;
+
+}
+
+.leaflet-touch .leaflet-bar a{
+
+    width:38px;
+
+    height:38px;
+
+    line-height:38px;
+
+    font-size:18px;
+
+}
+
+/* =========================================
+FIX IOS
+========================================= */
+
+input,
+button{
+
+    appearance:none;
+
+    -webkit-appearance:none;
+
+    border-radius:16px;
+
+}
+
+/* =========================================
+ANIMAÇÃO MOBILE
+========================================= */
+
+.btn:active,
+.waze-btn:active{
+
+    transform:scale(.97);
 
 }
