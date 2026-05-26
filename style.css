@@ -1,6 +1,6 @@
 /* =========================================
 ROUTIFY PREMIUM
-CSS COMPLETO RESPONSIVO
+STYLE.CSS COMPLETO
 ========================================= */
 
 /* =========================================
@@ -14,39 +14,39 @@ RESET
     font-family:'Inter',sans-serif;
 }
 
-html,
-body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#0f172a;
-    color:#fff;
-}
-
-/* =========================================
-ROOT
-========================================= */
-
 :root{
 
     --bg:#0f172a;
     --sidebar:#111827;
     --card:#1e293b;
 
+    --border:#334155;
+
     --primary:#2563eb;
-    --primaryHover:#1d4ed8;
+    --primary-hover:#1d4ed8;
 
     --success:#16a34a;
     --danger:#dc2626;
-    --warning:#f59e0b;
 
     --text:#ffffff;
-    --muted:#94a3b8;
-
-    --border:#334155;
+    --text-muted:#94a3b8;
 
     --shadow:
     0 10px 30px rgba(0,0,0,.25);
+
+}
+
+/* =========================================
+BODY
+========================================= */
+
+body{
+
+    background:var(--bg);
+
+    color:var(--text);
+
+    overflow:hidden;
 
 }
 
@@ -55,17 +55,23 @@ SCROLLBAR
 ========================================= */
 
 ::-webkit-scrollbar{
+
     width:8px;
-    height:8px;
+
 }
 
 ::-webkit-scrollbar-track{
+
     background:#0f172a;
+
 }
 
 ::-webkit-scrollbar-thumb{
+
     background:#334155;
+
     border-radius:999px;
+
 }
 
 /* =========================================
@@ -73,9 +79,13 @@ LAYOUT
 ========================================= */
 
 .container{
+
     display:flex;
+
     width:100%;
+
     height:100vh;
+
 }
 
 /* =========================================
@@ -104,7 +114,7 @@ LOGO
 
 .logo{
 
-    padding:24px;
+    padding:25px;
 
     border-bottom:1px solid var(--border);
 
@@ -112,11 +122,13 @@ LOGO
 
 .logo h1{
 
-    font-size:32px;
+    font-size:34px;
 
     color:#3b82f6;
 
     font-weight:700;
+
+    letter-spacing:-1px;
 
 }
 
@@ -124,9 +136,11 @@ LOGO
 
     margin-top:8px;
 
-    color:var(--muted);
+    color:var(--text-muted);
 
     font-size:14px;
+
+    line-height:1.5;
 
 }
 
@@ -142,7 +156,7 @@ DASHBOARD
 
     gap:10px;
 
-    padding:15px;
+    padding:18px;
 
 }
 
@@ -152,21 +166,19 @@ DASHBOARD
 
     border:1px solid var(--border);
 
-    border-radius:18px;
+    border-radius:20px;
 
-    padding:14px;
-
-    min-height:90px;
-
-    box-shadow:var(--shadow);
+    padding:16px;
 
     transition:.3s;
+
+    box-shadow:var(--shadow);
 
 }
 
 .card:hover{
 
-    transform:translateY(-2px);
+    transform:translateY(-3px);
 
     border-color:#3b82f6;
 
@@ -174,9 +186,9 @@ DASHBOARD
 
 .card span{
 
-    font-size:12px;
+    color:var(--text-muted);
 
-    color:var(--muted);
+    font-size:12px;
 
 }
 
@@ -184,7 +196,43 @@ DASHBOARD
 
     margin-top:10px;
 
-    font-size:24px;
+    font-size:26px;
+
+    font-weight:700;
+
+}
+
+/* =========================================
+SEARCH
+========================================= */
+
+.search-box{
+
+    padding:0 18px 18px;
+
+}
+
+.search-box input{
+
+    width:100%;
+
+    height:50px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:16px;
+
+    background:#1e293b;
+
+    border:1px solid #334155;
+
+    padding:0 18px;
+
+    color:white;
+
+    font-size:14px;
 
 }
 
@@ -194,7 +242,7 @@ UPLOAD
 
 .upload-area{
 
-    padding:0 15px 15px;
+    padding:0 18px 18px;
 
 }
 
@@ -204,12 +252,6 @@ UPLOAD
 
     height:55px;
 
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
     border-radius:16px;
 
     background:linear-gradient(
@@ -218,30 +260,30 @@ UPLOAD
         #3b82f6
     );
 
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
     cursor:pointer;
 
     font-weight:600;
 
     transition:.3s;
 
-    box-shadow:var(--shadow);
-
 }
 
 .upload-btn:hover{
-
-    background:linear-gradient(
-        135deg,
-        #1d4ed8,
-        #2563eb
-    );
 
     transform:translateY(-2px);
 
 }
 
 #excelFile{
+
     display:none;
+
 }
 
 /* =========================================
@@ -256,11 +298,11 @@ BOTÕES
 
     gap:10px;
 
-    margin-top:15px;
+    padding:0 18px 18px;
 
 }
 
-.btn{
+.action-btn{
 
     border:none;
 
@@ -270,29 +312,29 @@ BOTÕES
 
     cursor:pointer;
 
-    font-weight:700;
-
-    transition:.3s;
-
     color:white;
 
-    box-shadow:var(--shadow);
+    font-weight:600;
 
-}
-
-.btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-.primary{
+    transition:.3s;
 
     background:linear-gradient(
         135deg,
         #2563eb,
         #3b82f6
     );
+
+}
+
+.action-btn:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.secondary{
+
+    background:#334155;
 
 }
 
@@ -316,21 +358,21 @@ BOTÕES
 
 }
 
-.secondary{
-
-    background:#334155;
-
-}
-
 /* =========================================
-PROGRESSO
+PROGRESS
 ========================================= */
 
 .progress-container{
 
+    padding:0 18px 18px;
+
+}
+
+.progress-bar{
+
     width:100%;
 
-    height:18px;
+    height:14px;
 
     background:#1e293b;
 
@@ -338,13 +380,11 @@ PROGRESSO
 
     overflow:hidden;
 
-    margin-top:15px;
-
-    border:1px solid var(--border);
+    border:1px solid #334155;
 
 }
 
-.progress-fill{
+#progressFill{
 
     width:0%;
 
@@ -353,22 +393,24 @@ PROGRESSO
     background:linear-gradient(
         90deg,
         #2563eb,
-        #22c55e
+        #60a5fa
     );
 
-    transition:1s;
+    transition:.4s;
 
 }
 
-.progress-text{
+#progressText{
 
-    text-align:center;
+    display:block;
 
     margin-top:8px;
 
-    font-size:13px;
+    text-align:right;
 
-    color:var(--muted);
+    color:#94a3b8;
+
+    font-size:13px;
 
 }
 
@@ -376,13 +418,13 @@ PROGRESSO
 LISTA
 ========================================= */
 
-.list{
+.delivery-list{
 
     flex:1;
 
     overflow:auto;
 
-    padding:15px;
+    padding:18px;
 
 }
 
@@ -396,15 +438,13 @@ CARD ENTREGA
 
     border:1px solid var(--border);
 
-    border-radius:18px;
+    border-radius:20px;
 
     padding:18px;
 
-    margin-bottom:14px;
+    margin-bottom:15px;
 
     transition:.3s;
-
-    box-shadow:var(--shadow);
 
 }
 
@@ -428,13 +468,15 @@ CARD ENTREGA
 
     font-size:18px;
 
+    margin-bottom:12px;
+
 }
 
 .delivery p{
 
-    margin-top:6px;
+    color:var(--text-muted);
 
-    color:var(--muted);
+    margin-bottom:6px;
 
     font-size:14px;
 
@@ -446,19 +488,17 @@ BADGE
 
 .badge{
 
-    margin-top:14px;
+    margin-top:12px;
 
-    display:inline-flex;
-
-    align-items:center;
-
-    gap:6px;
+    display:inline-block;
 
     padding:8px 12px;
 
-    border-radius:999px;
+    border-radius:12px;
 
     background:rgba(37,99,235,.15);
+
+    border:1px solid rgba(37,99,235,.3);
 
     color:#60a5fa;
 
@@ -469,24 +509,24 @@ BADGE
 }
 
 /* =========================================
-BOTÃO WAZE
+WAZE BUTTON
 ========================================= */
 
 .waze-btn{
 
-    margin-top:15px;
-
     width:100%;
 
-    height:45px;
+    margin-top:14px;
+
+    height:44px;
 
     border:none;
 
-    border-radius:12px;
+    border-radius:14px;
 
-    background:#05c8f7;
+    background:#33ccff;
 
-    color:#fff;
+    color:#001018;
 
     font-weight:700;
 
@@ -518,7 +558,7 @@ MAPA
 
     width:100%;
 
-    height:100%;
+    height:100vh;
 
 }
 
@@ -544,9 +584,9 @@ TOPBAR
 
     background:rgba(15,23,42,.92);
 
-    border:1px solid rgba(255,255,255,.08);
-
     backdrop-filter:blur(12px);
+
+    border:1px solid rgba(255,255,255,.05);
 
     box-shadow:var(--shadow);
 
@@ -562,11 +602,56 @@ TOPBAR
 
     margin-top:10px;
 
-    color:var(--muted);
+    color:var(--text-muted);
 
     line-height:1.6;
 
     font-size:14px;
+
+}
+
+/* =========================================
+FLOAT BUTTON
+========================================= */
+
+.floating-btn{
+
+    position:absolute;
+
+    right:20px;
+
+    bottom:20px;
+
+    width:65px;
+
+    height:65px;
+
+    border:none;
+
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color:white;
+
+    font-size:26px;
+
+    cursor:pointer;
+
+    z-index:999;
+
+    box-shadow:
+    0 15px 35px rgba(37,99,235,.35);
+
+}
+
+.floating-btn:hover{
+
+    transform:scale(1.05);
 
 }
 
@@ -590,12 +675,6 @@ LEAFLET
 
 }
 
-.leaflet-control-zoom{
-
-    border:none !important;
-
-}
-
 .leaflet-control-zoom a{
 
     background:#111827 !important;
@@ -607,7 +686,25 @@ LEAFLET
 }
 
 /* =========================================
-RESPONSIVO TABLET
+FOOTER
+========================================= */
+
+.footer{
+
+    padding:18px;
+
+    text-align:center;
+
+    color:#94a3b8;
+
+    font-size:12px;
+
+    border-top:1px solid var(--border);
+
+}
+
+/* =========================================
+RESPONSIVO
 ========================================= */
 
 @media(max-width:1100px){
@@ -632,54 +729,29 @@ RESPONSIVO TABLET
 
 }
 
+#map{
+
+    height:50vh;
+
+}
+
 }
 
 /* =========================================
-RESPONSIVO MOBILE
+TABLET
 ========================================= */
 
 @media(max-width:768px){
 
-html,
 body{
 
     overflow:auto;
 
 }
 
-.sidebar{
-
-    width:100%;
-
-    height:auto;
-
-}
-
 .dashboard{
 
     grid-template-columns:1fr 1fr;
-
-    gap:8px;
-
-}
-
-.card{
-
-    min-height:75px;
-
-    padding:12px;
-
-}
-
-.card h2{
-
-    font-size:20px;
-
-}
-
-.card span{
-
-    font-size:11px;
 
 }
 
@@ -689,21 +761,147 @@ body{
 
 }
 
-.btn{
-
-    height:46px;
-
-    font-size:14px;
-
-}
-
 .topbar{
 
     width:90%;
 
     left:5%;
 
+}
+
+.sidebar{
+
+    height:auto;
+
+}
+
+.map-container{
+
+    height:55vh;
+
+}
+
+#map{
+
+    height:55vh;
+
+}
+
+}
+
+/* =========================================
+CELULAR
+========================================= */
+
+@media(max-width:600px){
+
+.logo{
+
+    padding:20px;
+
+}
+
+.logo h1{
+
+    font-size:28px;
+
+}
+
+.dashboard{
+
+    grid-template-columns:1fr 1fr;
+
+    gap:8px;
+
+    padding:14px;
+
+}
+
+.card{
+
+    padding:12px;
+
+    border-radius:16px;
+
+}
+
+.card span{
+
+    font-size:11px;
+
+}
+
+.card h2{
+
+    font-size:20px;
+
+}
+
+.search-box{
+
+    padding:0 14px 14px;
+
+}
+
+.upload-area{
+
+    padding:0 14px 14px;
+
+}
+
+.route-actions{
+
+    padding:0 14px 14px;
+
+    gap:8px;
+
+}
+
+.action-btn{
+
+    height:44px;
+
+    font-size:12px;
+
+}
+
+.progress-container{
+
+    padding:0 14px 14px;
+
+}
+
+.delivery-list{
+
+    padding:14px;
+
+}
+
+.delivery{
+
+    padding:14px;
+
+}
+
+.delivery h3{
+
+    font-size:16px;
+
+}
+
+.delivery p{
+
+    font-size:13px;
+
+}
+
+.topbar{
+
     top:10px;
+
+    left:5%;
+
+    width:90%;
 
     padding:16px;
 
@@ -721,9 +919,13 @@ body{
 
 }
 
-.map-container{
+.floating-btn{
 
-    height:55vh;
+    width:58px;
+
+    height:58px;
+
+    font-size:22px;
 
 }
 
@@ -733,37 +935,11 @@ body{
 CELULAR PEQUENO
 ========================================= */
 
-@media(max-width:480px){
-
-.logo{
-
-    padding:18px;
-
-}
-
-.logo h1{
-
-    font-size:26px;
-
-}
-
-.logo p{
-
-    font-size:12px;
-
-}
+@media(max-width:420px){
 
 .dashboard{
 
-    grid-template-columns:1fr 1fr;
-
-}
-
-.card{
-
-    padding:10px;
-
-    border-radius:14px;
+    grid-template-columns:1fr;
 
 }
 
@@ -773,163 +949,16 @@ CELULAR PEQUENO
 
 }
 
-.route-actions{
+.action-btn{
 
-    gap:8px;
-
-}
-
-.btn{
-
-    font-size:13px;
-
-    height:44px;
+    font-size:11px;
 
 }
 
-.upload-btn{
-
-    height:50px;
-
-    font-size:14px;
-
-}
-
-.delivery{
-
-    padding:15px;
-
-}
-
-.delivery h3{
-
-    font-size:16px;
-
-}
-
-.delivery p{
-
-    font-size:13px;
-
-}
-
-.badge{
-
-    width:100%;
-
-    justify-content:center;
-
-}
-
-.topbar{
-
-    width:92%;
-
-    left:4%;
-
-    padding:14px;
-
-}
-
-.topbar h2{
-
-    font-size:18px;
-
-}
-
-.topbar p{
-
-    font-size:12px;
-
-}
-
-}
-
-/* =========================================
-ANIMAÇÕES
-========================================= */
-
-@keyframes pulse{
-
-    0%{
-        transform:scale(1);
-    }
-
-    50%{
-        transform:scale(1.03);
-    }
-
-    100%{
-        transform:scale(1);
-    }
-
-}
-
-.card:hover h2{
-
-    animation:pulse 1s infinite;
-
-}
-
-/* =========================================
-FLOAT BUTTON
-========================================= */
-
-.floating-btn{
-
-    position:absolute;
-
-    bottom:20px;
-
-    right:20px;
-
-    width:60px;
-
-    height:60px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #3b82f6
-    );
-
-    color:white;
+.logo h1{
 
     font-size:24px;
 
-    cursor:pointer;
-
-    z-index:999;
-
-    box-shadow:
-    0 15px 35px rgba(37,99,235,.35);
-
 }
-
-.floating-btn:hover{
-
-    transform:scale(1.08);
-
-}
-
-/* =========================================
-FOOTER
-========================================= */
-
-.footer{
-
-    padding:15px;
-
-    text-align:center;
-
-    font-size:12px;
-
-    color:var(--muted);
-
-    border-top:1px solid var(--border);
 
 }
