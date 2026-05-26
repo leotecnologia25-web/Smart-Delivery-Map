@@ -1,14 +1,14 @@
 /* =========================================
-ROUTIFY - SISTEMA COMPLETO
+ROUTIFY - SCRIPT.JS CORRIGIDO
 ========================================= */
 
 /* =========================================
 MAPA
 ========================================= */
 
-const map = L.map('map', {
-    zoomControl: true
-}).setView([-2.5307, -44.3068], 12);
+const map = L.map('map',{
+    zoomControl:true
+}).setView([-2.5307,-44.3068],12);
 
 /* =========================================
 CAMADA MAPA
@@ -17,7 +17,7 @@ CAMADA MAPA
 L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
-    attribution: '&copy; OpenStreetMap'
+    attribution:'© OpenStreetMap'
 }).addTo(map);
 
 /* =========================================
@@ -46,6 +46,40 @@ const deliveryList =
 document.getElementById("deliveryList");
 
 /* =========================================
+ROTA TEMPO REAL
+========================================= */
+
+const startRouteBtn =
+document.getElementById("startRouteBtn");
+
+const pauseRouteBtn =
+document.getElementById("pauseRouteBtn");
+
+const stopRouteBtn =
+document.getElementById("stopRouteBtn");
+
+const routeStatusText =
+document.getElementById("routeStatusText");
+
+const progressFill =
+document.getElementById("progressFill");
+
+const progressPercent =
+document.getElementById("progressPercent");
+
+const nextDelivery =
+document.getElementById("nextDelivery");
+
+const currentDistrict =
+document.getElementById("currentDistrict");
+
+const estimatedTime =
+document.getElementById("estimatedTime");
+
+const routeIndicator =
+document.getElementById("routeIndicator");
+
+/* =========================================
 DADOS
 ========================================= */
 
@@ -54,6 +88,14 @@ let importedRoutes = [];
 let routeMarkers = [];
 
 let groupedRoutes = {};
+
+let currentRouteIndex = 0;
+
+let routeRunning = false;
+
+let routePaused = false;
+
+let routeTimeout = null;
 
 /* =========================================
 UPLOAD EXCEL
@@ -75,7 +117,7 @@ function handleExcelUpload(event){
     if(!file){
 
         showAlert(
-            "Selecione uma planilha Excel."
+            "Selecione uma planilha."
         );
 
         return;
@@ -86,24 +128,38 @@ function handleExcelUpload(event){
 
     reader.onload = function(e){
 
-        const data =
-        new Uint8Array(e.target.result);
+        try{
 
-        const workbook =
-        XLSX.read(data,{
-            type:'array'
-        });
+            const data =
+            new Uint8Array(
+                e.target.result
+            );
 
-        const sheetName =
-        workbook.SheetNames[0];
+            const workbook =
+            XLSX.read(data,{
+                type:'array'
+            });
 
-        const sheet =
-        workbook.Sheets[sheetName];
+            const sheetName =
+            workbook.SheetNames[0];
 
-        const json =
-        XLSX.utils.sheet_to_json(sheet);
+            const sheet =
+            workbook.Sheets[sheetName];
 
-        processExcelData(json);
+            const json =
+            XLSX.utils.sheet_to_json(sheet);
+
+            processExcelData(json);
+
+        }catch(error){
+
+            console.error(error);
+
+            showAlert(
+                "Erro ao importar planilha."
+            );
+
+        }
 
     };
 
@@ -121,14 +177,29 @@ function processExcelData(data){
 
     tableBody.innerHTML = "";
 
+    deliveryList.innerHTML = "";
+
     clearMarkers();
 
-    data.forEach((row,index)=>{
+    data.forEach((row)=>{
+
+        const latitude =
+        parseFloat(row["Latitude"]);
+
+        const longitude =
+        parseFloat(row["Longitude"]);
+
+        if(
+            isNaN(latitude) ||
+            isNaN(longitude)
+        ){
+            return;
+        }
 
         const item = {
 
             atId:
-                row["AT ID"] || "",
+                row["AT ID"] || "Sem ID",
 
             sequence:
                 row["Sequence"] || "",
@@ -148,15 +219,9 @@ function processExcelData(data){
             zipcode:
                 row["Zipcode/Postal code"] || "",
 
-            latitude:
-                parseFloat(
-                    row["Latitude"]
-                ) || 0,
+            latitude,
 
-            longitude:
-                parseFloat(
-                    row["Longitude"]
-                ) || 0
+            longitude
 
         };
 
@@ -169,6 +234,8 @@ function processExcelData(data){
     updateDashboard();
 
     renderDeliveryList();
+
+    focusRoutes();
 
     showAlert(
         importedRoutes.length +
@@ -252,23 +319,20 @@ function renderDeliveryList(){
             </h3>
 
             <p>
-                Bairro:
-                ${route.bairro}
+                📍 ${route.bairro}
             </p>
 
             <p>
-                Cidade:
-                ${route.city}
+                🏙️ ${route.city}
             </p>
 
             <p>
-                CEP:
-                ${route.zipcode}
+                📮 ${route.zipcode}
             </p>
 
             <div class="street-badge">
 
-                📍 Stop:
+                Stop:
                 ${route.stop}
 
             </div>
@@ -297,7 +361,7 @@ function loadRoutes(){
     if(importedRoutes.length === 0){
 
         showAlert(
-            "Importe uma planilha primeiro."
+            "Importe uma planilha."
         );
 
         return;
@@ -306,65 +370,48 @@ function loadRoutes(){
 
     importedRoutes.forEach(route => {
 
-        if(
-            route.latitude &&
+        const marker = L.marker([
+            route.latitude,
             route.longitude
-        ){
+        ]).addTo(map);
 
-            const marker = L.marker([
-                route.latitude,
-                route.longitude
-            ]).addTo(map);
+        marker.bindPopup(`
 
-            marker.bindPopup(`
+            <div style="width:220px">
 
-                <div style="width:230px">
+                <h3>
+                    🚚 ${route.atId}
+                </h3>
 
-                    <h3>
-                        🚚 ${route.atId}
-                    </h3>
+                <br>
 
-                    <br>
+                <p>
+                    Bairro:
+                    ${route.bairro}
+                </p>
 
-                    <p>
-                        Bairro:
-                        ${route.bairro}
-                    </p>
+                <p>
+                    Cidade:
+                    ${route.city}
+                </p>
 
-                    <p>
-                        Cidade:
-                        ${route.city}
-                    </p>
+                <p>
+                    CEP:
+                    ${route.zipcode}
+                </p>
 
-                    <p>
-                        CEP:
-                        ${route.zipcode}
-                    </p>
+            </div>
 
-                    <p>
-                        Stop:
-                        ${route.stop}
-                    </p>
+        `);
 
-                    <p>
-                        Sequence:
-                        ${route.sequence}
-                    </p>
-
-                </div>
-
-            `);
-
-            routeMarkers.push(marker);
-
-        }
+        routeMarkers.push(marker);
 
     });
 
     focusRoutes();
 
     showAlert(
-        "Rotas carregadas no mapa."
+        "Rotas carregadas."
     );
 
 }
@@ -379,6 +426,8 @@ optimizeBtn.addEventListener(
 );
 
 function groupRoutes(){
+
+    clearMarkers();
 
     groupedRoutes = {};
 
@@ -398,20 +447,6 @@ function groupRoutes(){
 
     });
 
-    createGroupedMarkers();
-
-    showAlert(
-        "Rotas agrupadas."
-    );
-
-}
-
-/* =========================================
-CRIAR AGRUPAMENTOS
-========================================= */
-
-function createGroupedMarkers(){
-
     Object.keys(groupedRoutes)
     .forEach(key => {
 
@@ -420,14 +455,11 @@ function createGroupedMarkers(){
 
         if(routes.length > 1){
 
-            const lat =
-            routes[0].latitude;
-
-            const lng =
-            routes[0].longitude;
-
             const marker =
-            L.circleMarker([lat,lng],{
+            L.circleMarker([
+                routes[0].latitude,
+                routes[0].longitude
+            ],{
 
                 radius:20,
 
@@ -446,9 +478,8 @@ function createGroupedMarkers(){
                 <div style="width:250px">
 
                     <h3>
-                        📍
-                        ${routes.length}
-                        entregas agrupadas
+                        📍 ${routes.length}
+                        entregas
                     </h3>
 
                     <br>
@@ -471,6 +502,10 @@ function createGroupedMarkers(){
 
     });
 
+    showAlert(
+        "Rotas agrupadas."
+    );
+
 }
 
 /* =========================================
@@ -483,23 +518,18 @@ function focusRoutes(){
 
     importedRoutes.forEach(route => {
 
-        if(
-            route.latitude &&
+        bounds.push([
+            route.latitude,
             route.longitude
-        ){
-
-            bounds.push([
-                route.latitude,
-                route.longitude
-            ]);
-
-        }
+        ]);
 
     });
 
     if(bounds.length > 0){
 
-        map.fitBounds(bounds);
+        map.fitBounds(bounds,{
+            padding:[50,50]
+        });
 
     }
 
@@ -522,67 +552,246 @@ function clearMarkers(){
 }
 
 /* =========================================
-BUSCA
+INICIAR ROTA
 ========================================= */
 
-function searchRoutes(term){
+startRouteBtn?.addEventListener(
+    "click",
+    startRoute
+);
 
-    const cards =
-    document.querySelectorAll(".delivery");
+function startRoute(){
 
-    cards.forEach(card => {
+    if(importedRoutes.length === 0){
 
-        const text =
-        card.innerText.toLowerCase();
+        showAlert(
+            "Importe uma planilha."
+        );
 
-        if(
-            text.includes(
-                term.toLowerCase()
-            )
-        ){
+        return;
 
-            card.style.display = "block";
+    }
 
-        }else{
+    if(routeRunning){
 
-            card.style.display = "none";
+        return;
 
-        }
+    }
 
-    });
+    routeRunning = true;
+
+    routePaused = false;
+
+    routeStatusText.innerHTML =
+    "Rota em andamento";
+
+    routeIndicator?.classList.add(
+        "status-active"
+    );
+
+    runRoute();
 
 }
 
 /* =========================================
-LOCALIZAÇÃO USUÁRIO
+EXECUTAR ROTA
+========================================= */
+
+function runRoute(){
+
+    if(routePaused){
+
+        return;
+
+    }
+
+    if(
+        currentRouteIndex >=
+        importedRoutes.length
+    ){
+
+        finishRoute();
+
+        return;
+
+    }
+
+    const route =
+    importedRoutes[currentRouteIndex];
+
+    nextDelivery.innerHTML =
+    route.atId;
+
+    currentDistrict.innerHTML =
+    route.bairro;
+
+    estimatedTime.innerHTML =
+    (
+        (
+            importedRoutes.length -
+            currentRouteIndex
+        ) * 4
+    ) + " min";
+
+    const progress =
+    (
+        (
+            currentRouteIndex + 1
+        )
+        /
+        importedRoutes.length
+    ) * 100;
+
+    progressFill.style.width =
+    progress + "%";
+
+    progressPercent.innerHTML =
+    Math.round(progress) + "%";
+
+    map.flyTo([
+        route.latitude,
+        route.longitude
+    ],16);
+
+    currentRouteIndex++;
+
+    routeTimeout =
+    setTimeout(() => {
+
+        runRoute();
+
+    },4000);
+
+}
+
+/* =========================================
+PAUSAR
+========================================= */
+
+pauseRouteBtn?.addEventListener(
+    "click",
+    pauseRoute
+);
+
+function pauseRoute(){
+
+    routePaused = true;
+
+    clearTimeout(routeTimeout);
+
+    routeStatusText.innerHTML =
+    "Rota pausada";
+
+}
+
+/* =========================================
+ENCERRAR
+========================================= */
+
+stopRouteBtn?.addEventListener(
+    "click",
+    stopRoute
+);
+
+function stopRoute(){
+
+    clearTimeout(routeTimeout);
+
+    routeRunning = false;
+
+    routePaused = false;
+
+    currentRouteIndex = 0;
+
+    routeStatusText.innerHTML =
+    "Rota encerrada";
+
+    progressFill.style.width =
+    "0%";
+
+    progressPercent.innerHTML =
+    "0%";
+
+    nextDelivery.innerHTML =
+    "---";
+
+    currentDistrict.innerHTML =
+    "---";
+
+    estimatedTime.innerHTML =
+    "---";
+
+    routeIndicator?.classList.remove(
+        "status-active"
+    );
+
+}
+
+/* =========================================
+FINALIZAR
+========================================= */
+
+function finishRoute(){
+
+    routeRunning = false;
+
+    routePaused = false;
+
+    currentRouteIndex = 0;
+
+    routeStatusText.innerHTML =
+    "Rota concluída";
+
+    progressFill.style.width =
+    "100%";
+
+    progressPercent.innerHTML =
+    "100%";
+
+    nextDelivery.innerHTML =
+    "Concluído";
+
+    estimatedTime.innerHTML =
+    "0 min";
+
+    routeIndicator?.classList.remove(
+        "status-active"
+    );
+
+    showAlert(
+        "Rota finalizada."
+    );
+
+}
+
+/* =========================================
+LOCALIZAÇÃO
 ========================================= */
 
 function locateUser(){
 
-    if(navigator.geolocation){
+    if(!navigator.geolocation){
 
-        navigator.geolocation
-        .getCurrentPosition(position => {
-
-            const lat =
-            position.coords.latitude;
-
-            const lng =
-            position.coords.longitude;
-
-            map.setView([lat,lng],15);
-
-            const marker =
-            L.marker([lat,lng])
-            .addTo(map);
-
-            marker.bindPopup(
-                "Sua localização"
-            ).openPopup();
-
-        });
+        return;
 
     }
+
+    navigator.geolocation
+    .getCurrentPosition(position => {
+
+        const lat =
+        position.coords.latitude;
+
+        const lng =
+        position.coords.longitude;
+
+        L.marker([lat,lng])
+        .addTo(map)
+        .bindPopup(
+            "Sua localização"
+        );
+
+    });
 
 }
 
@@ -604,18 +813,10 @@ function exportJSON(){
         type:'application/json'
     });
 
-    const url =
-    URL.createObjectURL(blob);
-
-    const a =
-    document.createElement("a");
-
-    a.href = url;
-
-    a.download =
-    "routify_entregas.json";
-
-    a.click();
+    downloadFile(
+        blob,
+        "routify.json"
+    );
 
 }
 
@@ -630,16 +831,15 @@ function exportCSV(){
 
     importedRoutes.forEach(route => {
 
-        csv += `
-${route.atId},
+        csv +=
+`${route.atId},
 ${route.sequence},
 ${route.stop},
 ${route.bairro},
 ${route.city},
 ${route.zipcode},
 ${route.latitude},
-${route.longitude}
-`;
+${route.longitude}\n`;
 
     });
 
@@ -647,6 +847,19 @@ ${route.longitude}
     new Blob([csv],{
         type:'text/csv'
     });
+
+    downloadFile(
+        blob,
+        "routify.csv"
+    );
+
+}
+
+/* =========================================
+DOWNLOAD
+========================================= */
+
+function downloadFile(blob,fileName){
 
     const url =
     URL.createObjectURL(blob);
@@ -656,10 +869,15 @@ ${route.longitude}
 
     a.href = url;
 
-    a.download =
-    "routify.csv";
+    a.download = fileName;
+
+    document.body.appendChild(a);
 
     a.click();
+
+    a.remove();
+
+    URL.revokeObjectURL(url);
 
 }
 
@@ -672,19 +890,26 @@ function showAlert(message){
     const alertBox =
     document.createElement("div");
 
+    alertBox.className =
+    "custom-alert";
+
     alertBox.innerHTML = message;
 
-    alertBox.style.position = "fixed";
-    alertBox.style.top = "20px";
-    alertBox.style.right = "20px";
-    alertBox.style.padding = "15px 20px";
-    alertBox.style.background = "#2563eb";
-    alertBox.style.color = "white";
-    alertBox.style.borderRadius = "14px";
-    alertBox.style.zIndex = "99999";
-    alertBox.style.fontWeight = "600";
-    alertBox.style.boxShadow =
-    "0 10px 25px rgba(0,0,0,.25)";
+    Object.assign(alertBox.style,{
+
+        position:"fixed",
+        top:"20px",
+        right:"20px",
+        padding:"15px 20px",
+        background:"#2563eb",
+        color:"#fff",
+        borderRadius:"14px",
+        zIndex:"99999",
+        fontWeight:"600",
+        boxShadow:
+        "0 10px 25px rgba(0,0,0,.25)"
+
+    });
 
     document.body.appendChild(alertBox);
 
@@ -692,7 +917,7 @@ function showAlert(message){
 
         alertBox.remove();
 
-    }, 3000);
+    },3000);
 
 }
 
@@ -716,10 +941,12 @@ document.addEventListener(
     "keydown",
     function(e){
 
-        if(e.key === "F5"){
+        if(
+            e.key === "F5"
+        ){
 
             console.log(
-                "Atualizando sistema..."
+                "Atualizando..."
             );
 
         }
@@ -733,10 +960,9 @@ INICIALIZAÇÃO
 
 console.log(`
 
-=========================================
-ROUTIFY
-Sistema Inteligente de Entregas
-=========================================
+=================================
+ROUTIFY ONLINE
+=================================
 
 `);
 
