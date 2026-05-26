@@ -1,30 +1,30 @@
 /* =========================================
-ROUTIFY - SCRIPT COMPLETO
+ROUTIFY PREMIUM - SCRIPT COMPLETO
 ========================================= */
 
 /* =========================================
 MAPA
 ========================================= */
 
-const map = L.map('map', {
-    zoomControl: true
-}).setView([-2.5307, -44.3068], 12);
+const map = L.map('map',{
+    zoomControl:true
+}).setView([-2.5307,-44.3068],12);
 
 /* =========================================
 CAMADA MAPA
 ========================================= */
 
 L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
-    attribution: '&copy; OpenStreetMap'
+    attribution:'© OpenStreetMap'
 }).addTo(map);
 
 /* =========================================
 ELEMENTOS
 ========================================= */
 
-const excelInput =
+const excelFile =
 document.getElementById("excelFile");
 
 const deliveryList =
@@ -36,23 +36,23 @@ document.getElementById("totalDeliveries");
 const groupedStreets =
 document.getElementById("groupedStreets");
 
-const routeRunningCount =
-document.getElementById("routeRunningCount");
-
 const completedRoutes =
 document.getElementById("completedRoutes");
+
+const routeRunningCount =
+document.getElementById("routeRunningCount");
 
 const progressFill =
 document.getElementById("progressFill");
 
-const progressPercent =
-document.getElementById("progressPercent");
+const progressText =
+document.getElementById("progressText");
 
 const loadRoutesBtn =
 document.getElementById("loadRoutesBtn");
 
-const optimizeBtn =
-document.getElementById("optimizeBtn");
+const groupRoutesBtn =
+document.getElementById("groupRoutesBtn");
 
 const startRouteBtn =
 document.getElementById("startRouteBtn");
@@ -64,23 +64,25 @@ document.getElementById("stopRouteBtn");
 DADOS
 ========================================= */
 
-let importedRoutes = [];
-
-let markers = [];
+let routes = [];
 
 let groupedRoutes = {};
 
+let markers = [];
+
 let currentRouteIndex = 0;
 
-let routeInterval = null;
+let routeTimer = null;
 
-let currentMarker = null;
+let completed = 0;
+
+let userMarker = null;
 
 /* =========================================
 UPLOAD EXCEL
 ========================================= */
 
-excelInput.addEventListener(
+excelFile.addEventListener(
     "change",
     handleExcelUpload
 );
@@ -91,24 +93,28 @@ LER EXCEL
 
 function handleExcelUpload(event){
 
-    const file = event.target.files[0];
+    const file =
+    event.target.files[0];
 
     if(!file){
 
-        showAlert(
-            "Selecione uma planilha Excel."
+        showNotification(
+            "Selecione uma planilha."
         );
 
         return;
 
     }
 
-    const reader = new FileReader();
+    const reader =
+    new FileReader();
 
     reader.onload = function(e){
 
         const data =
-        new Uint8Array(e.target.result);
+        new Uint8Array(
+            e.target.result
+        );
 
         const workbook =
         XLSX.read(data,{
@@ -133,123 +139,70 @@ function handleExcelUpload(event){
 }
 
 /* =========================================
-PROCESSAR DADOS
+PROCESSAR PLANILHA
 ========================================= */
 
 function processExcelData(data){
 
-    importedRoutes = [];
-
-    deliveryList.innerHTML = "";
+    routes = [];
 
     clearMarkers();
 
+    deliveryList.innerHTML = "";
+
     data.forEach((row,index)=>{
 
-        const item = {
+        const route = {
+
+            id:index + 1,
 
             atId:
-                row["AT ID"] || "",
+            row["AT ID"] || "",
 
             sequence:
-                row["Sequence"] || "",
+            row["Sequence"] || "",
 
             stop:
-                row["Stop"] || "",
+            row["Stop"] || "",
+
+            spx:
+            row["SPX TN"] || "",
 
             bairro:
-                row["Bairro"] || "",
+            row["Bairro"] || "",
 
             city:
-                row["City"] || "",
+            row["City"] || "",
 
             zipcode:
-                row["Zipcode/Postal code"] || "",
+            row["Zipcode/Postal code"] || "",
 
             latitude:
-                parseFloat(
-                    row["Latitude"]
-                ) || 0,
+            parseFloat(
+                row["Latitude"]
+            ) || 0,
 
             longitude:
-                parseFloat(
-                    row["Longitude"]
-                ) || 0,
+            parseFloat(
+                row["Longitude"]
+            ) || 0,
 
             completed:false
 
         };
 
-        importedRoutes.push(item);
-
-        createDeliveryCard(item,index);
+        routes.push(route);
 
     });
 
     updateDashboard();
 
-    showAlert(
-        importedRoutes.length +
+    renderGroupedRoutes();
+
+    showNotification(
+        routes.length +
         " entregas importadas."
     );
-
-}
-
-/* =========================================
-CRIAR CARD
-========================================= */
-
-function createDeliveryCard(route,index){
-
-    const card =
-    document.createElement("div");
-
-    card.classList.add("delivery");
-
-    card.id =
-    "delivery-" + index;
-
-    card.innerHTML = `
-
-        <h3>
-            🚚 ${route.atId}
-        </h3>
-
-        <p>
-            Bairro:
-            ${route.bairro}
-        </p>
-
-        <p>
-            Cidade:
-            ${route.city}
-        </p>
-
-        <p>
-            CEP:
-            ${route.zipcode}
-        </p>
-
-        <div class="badge">
-            📍 Stop:
-            ${route.stop}
-        </div>
-
-        <button
-            class="waze-btn"
-            onclick="
-                openWaze(
-                    ${route.latitude},
-                    ${route.longitude}
-                )
-            "
-        >
-            🚗 Abrir no Waze
-        </button>
-
-    `;
-
-    deliveryList.appendChild(card);
 
 }
 
@@ -260,23 +213,118 @@ ATUALIZAR DASHBOARD
 function updateDashboard(){
 
     totalDeliveries.innerHTML =
-    importedRoutes.length;
+    routes.length;
 
-    const groups = {};
+    completedRoutes.innerHTML =
+    completed;
 
-    importedRoutes.forEach(route => {
+}
+
+/* =========================================
+AGRUPAR RUAS
+========================================= */
+
+function createGroups(){
+
+    groupedRoutes = {};
+
+    routes.forEach(route => {
 
         const key =
         route.bairro +
         "-" +
         route.zipcode;
 
-        groups[key] = true;
+        if(!groupedRoutes[key]){
+
+            groupedRoutes[key] = [];
+
+        }
+
+        groupedRoutes[key]
+        .push(route);
 
     });
 
     groupedStreets.innerHTML =
-    Object.keys(groups).length;
+    Object.keys(groupedRoutes).length;
+
+}
+
+/* =========================================
+LISTAR ENTREGAS
+========================================= */
+
+function renderGroupedRoutes(){
+
+    createGroups();
+
+    deliveryList.innerHTML = "";
+
+    let groupIndex = 0;
+
+    Object.keys(groupedRoutes)
+    .forEach(key => {
+
+        const group =
+        groupedRoutes[key];
+
+        const card =
+        document.createElement("div");
+
+        card.classList.add("delivery");
+
+        card.id =
+        "delivery-" + groupIndex;
+
+        card.innerHTML = `
+
+            <h3>
+                📍 ${group[0].bairro}
+            </h3>
+
+            <p>
+                Cidade:
+                ${group[0].city}
+            </p>
+
+            <p>
+                CEP:
+                ${group[0].zipcode}
+            </p>
+
+            <p>
+                🚚 ${group.length}
+                entregas agrupadas
+            </p>
+
+            <div class="badge">
+
+                Rua Agrupada
+
+            </div>
+
+            <button
+                class="waze-btn"
+                onclick="
+                    openWaze(
+                        ${group[0].latitude},
+                        ${group[0].longitude}
+                    )
+                "
+            >
+
+                🚗 Abrir no Waze
+
+            </button>
+
+        `;
+
+        deliveryList.appendChild(card);
+
+        groupIndex++;
+
+    });
 
 }
 
@@ -293,17 +341,17 @@ function loadRoutes(){
 
     clearMarkers();
 
-    if(importedRoutes.length === 0){
+    if(routes.length === 0){
 
-        showAlert(
-            "Importe uma planilha primeiro."
+        showNotification(
+            "Importe uma planilha."
         );
 
         return;
 
     }
 
-    importedRoutes.forEach(route => {
+    routes.forEach(route => {
 
         if(
             route.latitude &&
@@ -318,7 +366,7 @@ function loadRoutes(){
 
             marker.bindPopup(`
 
-                <div style="width:230px">
+                <div style="width:220px">
 
                     <h3>
                         🚚 ${route.atId}
@@ -341,19 +389,6 @@ function loadRoutes(){
                         ${route.zipcode}
                     </p>
 
-                    <br>
-
-                    <button
-                        onclick="
-                            openWaze(
-                                ${route.latitude},
-                                ${route.longitude}
-                            )
-                        "
-                    >
-                        🚗 Abrir no Waze
-                    </button>
-
                 </div>
 
             `);
@@ -364,10 +399,10 @@ function loadRoutes(){
 
     });
 
-    focusRoutes();
+    focusMap();
 
-    showAlert(
-        "Rotas carregadas no mapa."
+    showNotification(
+        "Rotas carregadas."
     );
 
 }
@@ -376,112 +411,100 @@ function loadRoutes(){
 AGRUPAR ROTAS
 ========================================= */
 
-optimizeBtn.addEventListener(
+groupRoutesBtn.addEventListener(
     "click",
-    groupRoutes
+    function(){
+
+        renderGroupedRoutes();
+
+        createGroupedMarkers();
+
+        showNotification(
+            "Rotas agrupadas."
+        );
+
+    }
 );
 
-function groupRoutes(){
+/* =========================================
+CRIAR MARCADORES AGRUPADOS
+========================================= */
 
-    groupedRoutes = {};
+function createGroupedMarkers(){
 
-    importedRoutes.forEach(route => {
-
-        const key =
-        route.bairro +
-        "-" +
-        route.zipcode;
-
-        if(!groupedRoutes[key]){
-
-            groupedRoutes[key] = [];
-
-        }
-
-        groupedRoutes[key].push(route);
-
-    });
+    clearMarkers();
 
     Object.keys(groupedRoutes)
     .forEach(key => {
 
-        const routes =
+        const group =
         groupedRoutes[key];
 
-        if(routes.length > 1){
+        const lat =
+        group[0].latitude;
 
-            const lat =
-            routes[0].latitude;
+        const lng =
+        group[0].longitude;
 
-            const lng =
-            routes[0].longitude;
+        const marker =
+        L.circleMarker([lat,lng],{
 
-            const marker =
-            L.circleMarker([lat,lng],{
+            radius:20,
 
-                radius:18,
+            color:"#2563eb",
 
-                color:"#2563eb",
+            fillColor:"#2563eb",
 
-                fillColor:"#2563eb",
+            fillOpacity:0.8,
 
-                fillOpacity:0.8,
+            weight:2
 
-                weight:2
+        }).addTo(map);
 
-            }).addTo(map);
+        marker.bindPopup(`
 
-            marker.bindPopup(`
+            <div style="width:230px">
 
-                <div style="width:250px">
+                <h3>
+                    📦 ${group.length}
+                    entregas
+                </h3>
 
-                    <h3>
-                        📍
-                        ${routes.length}
-                        entregas agrupadas
-                    </h3>
+                <br>
 
-                    <br>
+                ${group.map(route => `
 
-                    ${routes.map(route => `
+                    <p>
+                        🚚 ${route.atId}
+                    </p>
 
-                        <p>
-                            🚚 ${route.atId}
-                        </p>
+                `).join("")}
 
-                    `).join("")}
+            </div>
 
-                </div>
+        `);
 
-            `);
-
-            markers.push(marker);
-
-        }
+        markers.push(marker);
 
     });
-
-    showAlert(
-        "Rotas agrupadas."
-    );
 
 }
 
 /* =========================================
-INICIAR ROTA
+INICIAR ROTAS
 ========================================= */
 
 startRouteBtn.addEventListener(
     "click",
-    startRoute
+    startRoutes
 );
 
-function startRoute(){
+function startRoutes(){
 
-    if(importedRoutes.length === 0){
+    if(routes.length === 0){
 
-        showAlert(
-            "Importe uma planilha."
+        showNotification(
+            "Importe as rotas."
         );
 
         return;
@@ -490,103 +513,82 @@ function startRoute(){
 
     currentRouteIndex = 0;
 
+    completed = 0;
+
     completedRoutes.innerHTML = 0;
 
     routeRunningCount.innerHTML =
-    importedRoutes.length;
+    routes.length;
 
-    runNextRoute();
+    executeNextRoute();
 
 }
 
 /* =========================================
-EXECUTAR ROTA
+EXECUTAR ROTAS
 ========================================= */
 
-function runNextRoute(){
+function executeNextRoute(){
 
     if(
         currentRouteIndex >=
-        importedRoutes.length
+        routes.length
     ){
-
-        showAlert(
-            "Todas as entregas concluídas."
-        );
 
         progressFill.style.width =
         "100%";
 
-        progressPercent.innerHTML =
+        progressText.innerHTML =
         "100%";
+
+        showNotification(
+            "Todas entregas concluídas."
+        );
 
         return;
 
     }
 
     const route =
-    importedRoutes[currentRouteIndex];
+    routes[currentRouteIndex];
 
-    if(currentMarker){
-
-        map.removeLayer(currentMarker);
-
-    }
-
-    currentMarker =
-    L.marker([
-        route.latitude,
-        route.longitude
-    ],{
-        draggable:false
-    }).addTo(map);
-
-    currentMarker.bindPopup(`
-
-        <h3>
-            🚚 ${route.atId}
-        </h3>
-
-        <p>
-            Bairro:
-            ${route.bairro}
-        </p>
-
-        <p>
-            Cidade:
-            ${route.city}
-        </p>
-
-    `).openPopup();
+    highlightDelivery(
+        currentRouteIndex
+    );
 
     map.flyTo([
         route.latitude,
         route.longitude
-    ],16,{
-        animate:true,
-        duration:2
-    });
-
-    highlightCard(currentRouteIndex);
-
-    updateProgress();
+    ],17);
 
     openWaze(
         route.latitude,
         route.longitude
     );
 
-    route.completed = true;
+    completed++;
 
     completedRoutes.innerHTML =
-    currentRouteIndex + 1;
+    completed;
+
+    const progress =
+    (
+        completed /
+        routes.length
+    ) * 100;
+
+    progressFill.style.width =
+    progress + "%";
+
+    progressText.innerHTML =
+    Math.round(progress) + "%";
 
     currentRouteIndex++;
 
-    routeInterval =
+    routeTimer =
     setTimeout(
-        runNextRoute,
-        6000
+        executeNextRoute,
+        5000
     );
 
 }
@@ -602,46 +604,27 @@ stopRouteBtn.addEventListener(
 
 function stopRoutes(){
 
-    clearTimeout(routeInterval);
+    clearTimeout(routeTimer);
 
-    showAlert(
+    showNotification(
         "Rotas pausadas."
     );
 
 }
 
 /* =========================================
-ATUALIZAR PROGRESSO
+DESTACAR ENTREGA
 ========================================= */
 
-function updateProgress(){
-
-    const progress =
-    (
-        currentRouteIndex /
-        importedRoutes.length
-    ) * 100;
-
-    progressFill.style.width =
-    progress + "%";
-
-    progressPercent.innerHTML =
-    Math.round(progress) + "%";
-
-}
-
-/* =========================================
-DESTACAR CARD
-========================================= */
-
-function highlightCard(index){
+function highlightDelivery(index){
 
     document
     .querySelectorAll(".delivery")
     .forEach(card => {
 
-        card.style.border =
-        "1px solid #334155";
+        card.classList.remove(
+            "active"
+        );
 
     });
 
@@ -652,12 +635,16 @@ function highlightCard(index){
 
     if(activeCard){
 
-        activeCard.style.border =
-        "2px solid #22c55e";
+        activeCard.classList.add(
+            "active"
+        );
 
         activeCard.scrollIntoView({
+
             behavior:"smooth",
+
             block:"center"
+
         });
 
     }
@@ -665,14 +652,87 @@ function highlightCard(index){
 }
 
 /* =========================================
-FOCAR ROTAS
+ABRIR WAZE
 ========================================= */
 
-function focusRoutes(){
+function openWaze(lat,lng){
+
+    const url =
+`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+
+    window.open(
+        url,
+        "_blank"
+    );
+
+}
+
+/* =========================================
+LOCALIZAÇÃO TEMPO REAL
+========================================= */
+
+function trackUserLocation(){
+
+    if(
+        navigator.geolocation
+    ){
+
+        navigator.geolocation.watchPosition(
+            position => {
+
+                const lat =
+                position.coords.latitude;
+
+                const lng =
+                position.coords.longitude;
+
+                if(userMarker){
+
+                    userMarker.setLatLng([
+                        lat,
+                        lng
+                    ]);
+
+                }else{
+
+                    userMarker =
+                    L.marker([lat,lng],{
+
+                        title:
+                        "Sua localização"
+
+                    }).addTo(map);
+
+                }
+
+            },
+            error => {
+
+                console.log(
+                    error
+                );
+
+            },
+            {
+                enableHighAccuracy:true,
+                maximumAge:0,
+                timeout:5000
+            }
+        );
+
+    }
+
+}
+
+/* =========================================
+FOCAR MAPA
+========================================= */
+
+function focusMap(){
 
     const bounds = [];
 
-    importedRoutes.forEach(route => {
+    routes.forEach(route => {
 
         if(
             route.latitude &&
@@ -697,23 +757,7 @@ function focusRoutes(){
 }
 
 /* =========================================
-ABRIR WAZE
-========================================= */
-
-function openWaze(lat,lng){
-
-    const url =
-`https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
-
-    window.open(
-        url,
-        "_blank"
-    );
-
-}
-
-/* =========================================
-LIMPAR MARKERS
+LIMPAR MARCADORES
 ========================================= */
 
 function clearMarkers(){
@@ -729,42 +773,56 @@ function clearMarkers(){
 }
 
 /* =========================================
-LOCALIZAÇÃO
+NOTIFICAÇÃO
 ========================================= */
 
-function locateUser(){
+function showNotification(message){
 
-    if(navigator.geolocation){
+    const notification =
+    document.createElement("div");
 
-        navigator.geolocation
-        .getCurrentPosition(position => {
+    notification.innerHTML =
+    message;
 
-            const lat =
-            position.coords.latitude;
+    notification.style.position =
+    "fixed";
 
-            const lng =
-            position.coords.longitude;
+    notification.style.top =
+    "20px";
 
-            const marker =
-            L.circleMarker([lat,lng],{
+    notification.style.right =
+    "20px";
 
-                radius:10,
+    notification.style.background =
+    "#2563eb";
 
-                color:"#22c55e",
+    notification.style.color =
+    "#fff";
 
-                fillColor:"#22c55e",
+    notification.style.padding =
+    "15px 20px";
 
-                fillOpacity:1
+    notification.style.borderRadius =
+    "14px";
 
-            }).addTo(map);
+    notification.style.zIndex =
+    "99999";
 
-            marker.bindPopup(
-                "📍 Sua localização"
-            );
+    notification.style.fontWeight =
+    "700";
 
-        });
+    notification.style.boxShadow =
+    "0 10px 30px rgba(0,0,0,.25)";
 
-    }
+    document.body.appendChild(
+        notification
+    );
+
+    setTimeout(()=>{
+
+        notification.remove();
+
+    },3000);
 
 }
 
@@ -772,15 +830,18 @@ function locateUser(){
 BUSCA
 ========================================= */
 
-function searchRoutes(term){
+function searchDeliveries(term){
 
     const cards =
-    document.querySelectorAll(".delivery");
+    document.querySelectorAll(
+        ".delivery"
+    );
 
     cards.forEach(card => {
 
         const text =
-        card.innerText.toLowerCase();
+        card.innerText
+        .toLowerCase();
 
         if(
             text.includes(
@@ -810,7 +871,7 @@ function exportJSON(){
 
     const data =
     JSON.stringify(
-        importedRoutes,
+        routes,
         null,
         2
     );
@@ -829,7 +890,7 @@ function exportJSON(){
     a.href = url;
 
     a.download =
-    "routify_entregas.json";
+    "routify_rotas.json";
 
     a.click();
 
@@ -842,9 +903,9 @@ EXPORTAR CSV
 function exportCSV(){
 
     let csv =
-"AT ID,Sequence,Stop,Bairro,City,CEP,Latitude,Longitude\n";
+`AT ID,Sequence,Stop,Bairro,City,CEP,Latitude,Longitude\n`;
 
-    importedRoutes.forEach(route => {
+    routes.forEach(route => {
 
         csv +=
 `${route.atId},
@@ -879,71 +940,6 @@ ${route.longitude}\n`;
 }
 
 /* =========================================
-ALERTA
-========================================= */
-
-function showAlert(message){
-
-    const alertBox =
-    document.createElement("div");
-
-    alertBox.innerHTML = message;
-
-    alertBox.style.position =
-    "fixed";
-
-    alertBox.style.top =
-    "20px";
-
-    alertBox.style.right =
-    "20px";
-
-    alertBox.style.padding =
-    "15px 20px";
-
-    alertBox.style.background =
-    "#2563eb";
-
-    alertBox.style.color =
-    "white";
-
-    alertBox.style.borderRadius =
-    "14px";
-
-    alertBox.style.zIndex =
-    "99999";
-
-    alertBox.style.fontWeight =
-    "600";
-
-    alertBox.style.boxShadow =
-    "0 10px 25px rgba(0,0,0,.25)";
-
-    document.body.appendChild(
-        alertBox
-    );
-
-    setTimeout(() => {
-
-        alertBox.remove();
-
-    },3000);
-
-}
-
-/* =========================================
-AUTO REFRESH
-========================================= */
-
-setInterval(()=>{
-
-    console.log(
-        "Routify Online"
-    );
-
-},30000);
-
-/* =========================================
 ATALHOS
 ========================================= */
 
@@ -951,11 +947,14 @@ document.addEventListener(
     "keydown",
     function(e){
 
-        if(e.key === "F5"){
+        if(
+            e.ctrlKey &&
+            e.key === "s"
+        ){
 
-            console.log(
-                "Atualizando..."
-            );
+            e.preventDefault();
+
+            exportJSON();
 
         }
 
@@ -963,16 +962,16 @@ document.addEventListener(
 );
 
 /* =========================================
-INICIALIZAÇÃO
+INICIAR
 ========================================= */
+
+trackUserLocation();
 
 console.log(`
 
-=================================
-ROUTIFY ONLINE
+=========================================
+ROUTIFY PREMIUM
 Sistema Inteligente de Entregas
-=================================
+=========================================
 
 `);
-
-locateUser();
