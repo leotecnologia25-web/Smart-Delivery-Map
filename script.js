@@ -1,6 +1,7 @@
 /* =========================================
 ROUTIFY PREMIUM
-SCRIPT.JS COMPLETO FINAL
+SCRIPT.JS COMPLETO
+AGRUPAMENTO INTELIGENTE DE BAIRROS
 ========================================= */
 
 /* =========================================
@@ -12,7 +13,7 @@ const map = L.map('map',{
 }).setView([-2.5307,-44.3068],12);
 
 /* =========================================
-CAMADA MAPA
+TEMA MAPA
 ========================================= */
 
 L.tileLayer(
@@ -188,7 +189,6 @@ function processExcelData(data){
 
     });
 
-    /* ORDENAR */
     sortRoutesAlphabetically();
 
     updateDashboard();
@@ -221,17 +221,6 @@ function sortRoutesAlphabetically(){
         if(bairroA < bairroB) return -1;
         if(bairroA > bairroB) return 1;
 
-        const stopA =
-        (a.stop || "")
-        .toLowerCase();
-
-        const stopB =
-        (b.stop || "")
-        .toLowerCase();
-
-        if(stopA < stopB) return -1;
-        if(stopA > stopB) return 1;
-
         return 0;
 
     });
@@ -263,7 +252,7 @@ function updateDashboard(){
 }
 
 /* =========================================
-LISTA
+LISTA ENTREGAS
 ========================================= */
 
 function renderDeliveryList(){
@@ -305,13 +294,6 @@ function renderDeliveryList(){
                 📮 CEP:
                 ${route.zipcode}
             </p>
-
-            <div class="badge">
-
-                Sequence:
-                ${route.sequence}
-
-            </div>
 
             <button
                 class="waze-btn"
@@ -400,10 +382,10 @@ function loadRoutes(){
 }
 
 /* =========================================
-NORMALIZAR BAIRRO
+NORMALIZAR TEXTO
 ========================================= */
 
-function normalizeBairro(text){
+function normalizeText(text){
 
     if(!text) return "";
 
@@ -414,6 +396,8 @@ function normalizeBairro(text){
 
     .replace(/[\u0300-\u036f]/g,"")
 
+    .replace(/[^a-z0-9\s]/g,"")
+
     .replace(/\s+/g," ")
 
     .trim();
@@ -421,15 +405,50 @@ function normalizeBairro(text){
 }
 
 /* =========================================
-AGRUPAR BAIRROS
+VERIFICAR BAIRROS PARECIDOS
+========================================= */
+
+function isSimilarBairro(a,b){
+
+    a = normalizeText(a);
+    b = normalizeText(b);
+
+    if(a === b){
+        return true;
+    }
+
+    if(a.includes(b)){
+        return true;
+    }
+
+    if(b.includes(a)){
+        return true;
+    }
+
+    const firstA =
+    a.split(" ")[0];
+
+    const firstB =
+    b.split(" ")[0];
+
+    if(firstA === firstB){
+        return true;
+    }
+
+    return false;
+
+}
+
+/* =========================================
+AGRUPAR BAIRROS PARECIDOS
 ========================================= */
 
 groupRoutesBtn.addEventListener(
     "click",
-    groupRoutesByBairro
+    groupRoutesBySimilarBairro
 );
 
-function groupRoutesByBairro(){
+function groupRoutesBySimilarBairro(){
 
     clearMarkers();
 
@@ -437,38 +456,61 @@ function groupRoutesByBairro(){
 
     importedRoutes.forEach(route => {
 
-        const bairro =
-        normalizeBairro(
-            route.bairro
-        );
+        let matchedGroup = null;
 
-        if(!bairro) return;
+        Object.keys(groupedRoutes)
+        .forEach(groupName => {
 
-        if(!groupedRoutes[bairro]){
+            if(
+                isSimilarBairro(
+                    route.bairro,
+                    groupName
+                )
+            ){
 
-            groupedRoutes[bairro] = [];
+                matchedGroup =
+                groupName;
+
+            }
+
+        });
+
+        if(matchedGroup){
+
+            groupedRoutes[
+                matchedGroup
+            ].push(route);
 
         }
+        else{
 
-        groupedRoutes[bairro].push(route);
+            groupedRoutes[
+                route.bairro
+            ] = [route];
+
+        }
 
     });
 
     createGroupedMarkers();
 
+    showAlert(
+        "Bairros semelhantes agrupados."
+    );
+
 }
 
 /* =========================================
-CRIAR MARCADORES
+CRIAR AGRUPAMENTOS
 ========================================= */
 
 function createGroupedMarkers(){
 
     Object.keys(groupedRoutes)
-    .forEach(bairro => {
+    .forEach(group => {
 
         const routes =
-        groupedRoutes[bairro];
+        groupedRoutes[group];
 
         const lat =
         routes[0].latitude;
@@ -496,7 +538,7 @@ function createGroupedMarkers(){
             <div style="width:250px">
 
                 <h3>
-                    📍 ${bairro.toUpperCase()}
+                    📍 ${group.toUpperCase()}
                 </h3>
 
                 <br>
@@ -523,10 +565,6 @@ function createGroupedMarkers(){
         routeMarkers.push(marker);
 
     });
-
-    showAlert(
-        "Bairros agrupados."
-    );
 
 }
 
@@ -564,9 +602,6 @@ function startRoute(){
     routeRunning = true;
 
     currentRouteIndex = 0;
-
-    inRoute.innerHTML =
-    importedRoutes.length;
 
     routeInterval = setInterval(()=>{
 
@@ -606,29 +641,22 @@ function updateCurrentRoute(index){
     const route =
     importedRoutes[index];
 
-    if(
-        route.latitude &&
+    map.setView([
+        route.latitude,
         route.longitude
-    ){
+    ],16);
 
-        map.setView([
-            route.latitude,
-            route.longitude
-        ],16);
+    const marker =
+    L.marker([
+        route.latitude,
+        route.longitude
+    ]).addTo(map);
 
-        const marker =
-        L.marker([
-            route.latitude,
-            route.longitude
-        ]).addTo(map);
+    marker.bindPopup(
+        "🚚 Entrega Atual"
+    ).openPopup();
 
-        marker.bindPopup(
-            "🚚 Entrega Atual"
-        ).openPopup();
-
-        routeMarkers.push(marker);
-
-    }
+    routeMarkers.push(marker);
 
     const cards =
     document.querySelectorAll(".delivery");
@@ -776,7 +804,8 @@ searchInput.addEventListener(
                 card.style.display =
                 "block";
 
-            }else{
+            }
+            else{
 
                 card.style.display =
                 "none";
@@ -802,7 +831,7 @@ function openWaze(lat,lng){
 }
 
 /* =========================================
-ALERTA
+ALERTAS
 ========================================= */
 
 function showAlert(message){
@@ -812,19 +841,36 @@ function showAlert(message){
 
     alert.innerHTML = message;
 
-    alert.style.position = "fixed";
-    alert.style.top = "20px";
-    alert.style.right = "20px";
-    alert.style.padding = "14px 18px";
-    alert.style.background = "#2563eb";
-    alert.style.color = "#fff";
-    alert.style.borderRadius = "14px";
-    alert.style.zIndex = "99999";
-    alert.style.fontWeight = "700";
-    alert.style.boxShadow =
-    "0 10px 25px rgba(0,0,0,.25)";
+    alert.style.position =
+    "fixed";
 
-    document.body.appendChild(alert);
+    alert.style.top =
+    "20px";
+
+    alert.style.right =
+    "20px";
+
+    alert.style.padding =
+    "14px 18px";
+
+    alert.style.background =
+    "#2563eb";
+
+    alert.style.color =
+    "#fff";
+
+    alert.style.borderRadius =
+    "14px";
+
+    alert.style.zIndex =
+    "99999";
+
+    alert.style.fontWeight =
+    "700";
+
+    document.body.appendChild(
+        alert
+    );
 
     setTimeout(()=>{
 
@@ -851,11 +897,10 @@ function locateUser(){
             const lng =
             position.coords.longitude;
 
-            const marker =
             L.marker([lat,lng])
-            .addTo(map);
+            .addTo(map)
 
-            marker.bindPopup(
+            .bindPopup(
                 "📍 Sua localização"
             );
 
@@ -866,7 +911,7 @@ function locateUser(){
 }
 
 /* =========================================
-INICIAR
+INICIAR SISTEMA
 ========================================= */
 
 locateUser();
