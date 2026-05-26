@@ -1,14 +1,14 @@
 /* =========================================
-ROUTIFY - SCRIPT.JS CORRIGIDO
+ROUTIFY - SCRIPT COMPLETO
 ========================================= */
 
 /* =========================================
 MAPA
 ========================================= */
 
-const map = L.map('map',{
-    zoomControl:true
-}).setView([-2.5307,-44.3068],12);
+const map = L.map('map', {
+    zoomControl: true
+}).setView([-2.5307, -44.3068], 12);
 
 /* =========================================
 CAMADA MAPA
@@ -17,7 +17,7 @@ CAMADA MAPA
 L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
-    attribution:'© OpenStreetMap'
+    attribution:'&copy; OpenStreetMap'
 }).addTo(map);
 
 /* =========================================
@@ -35,6 +35,12 @@ document.getElementById("totalDeliveries");
 
 const groupedStreets =
 document.getElementById("groupedStreets");
+
+const routeRunningCount =
+document.getElementById("routeRunningCount");
+
+const completedRoutes =
+document.getElementById("completedRoutes");
 
 const loadRoutesBtn =
 document.getElementById("loadRoutesBtn");
@@ -58,8 +64,11 @@ document.getElementById("pauseRouteBtn");
 const stopRouteBtn =
 document.getElementById("stopRouteBtn");
 
-const routeStatusText =
-document.getElementById("routeStatusText");
+const liveDot =
+document.getElementById("liveDot");
+
+const liveStatusText =
+document.getElementById("liveStatusText");
 
 const progressFill =
 document.getElementById("progressFill");
@@ -76,9 +85,6 @@ document.getElementById("currentDistrict");
 const estimatedTime =
 document.getElementById("estimatedTime");
 
-const routeIndicator =
-document.getElementById("routeIndicator");
-
 /* =========================================
 DADOS
 ========================================= */
@@ -89,13 +95,15 @@ let routeMarkers = [];
 
 let groupedRoutes = {};
 
-let currentRouteIndex = 0;
+let liveRouteRunning = false;
 
-let routeRunning = false;
+let liveRoutePaused = false;
 
-let routePaused = false;
+let currentDelivery = 0;
 
-let routeTimeout = null;
+let liveInterval;
+
+let movingMarker = null;
 
 /* =========================================
 UPLOAD EXCEL
@@ -128,38 +136,24 @@ function handleExcelUpload(event){
 
     reader.onload = function(e){
 
-        try{
+        const data =
+        new Uint8Array(e.target.result);
 
-            const data =
-            new Uint8Array(
-                e.target.result
-            );
+        const workbook =
+        XLSX.read(data,{
+            type:'array'
+        });
 
-            const workbook =
-            XLSX.read(data,{
-                type:'array'
-            });
+        const sheetName =
+        workbook.SheetNames[0];
 
-            const sheetName =
-            workbook.SheetNames[0];
+        const sheet =
+        workbook.Sheets[sheetName];
 
-            const sheet =
-            workbook.Sheets[sheetName];
+        const json =
+        XLSX.utils.sheet_to_json(sheet);
 
-            const json =
-            XLSX.utils.sheet_to_json(sheet);
-
-            processExcelData(json);
-
-        }catch(error){
-
-            console.error(error);
-
-            showAlert(
-                "Erro ao importar planilha."
-            );
-
-        }
+        processExcelData(json);
 
     };
 
@@ -177,29 +171,14 @@ function processExcelData(data){
 
     tableBody.innerHTML = "";
 
-    deliveryList.innerHTML = "";
-
     clearMarkers();
 
-    data.forEach((row)=>{
-
-        const latitude =
-        parseFloat(row["Latitude"]);
-
-        const longitude =
-        parseFloat(row["Longitude"]);
-
-        if(
-            isNaN(latitude) ||
-            isNaN(longitude)
-        ){
-            return;
-        }
+    data.forEach(row => {
 
         const item = {
 
             atId:
-                row["AT ID"] || "Sem ID",
+                row["AT ID"] || "",
 
             sequence:
                 row["Sequence"] || "",
@@ -219,9 +198,15 @@ function processExcelData(data){
             zipcode:
                 row["Zipcode/Postal code"] || "",
 
-            latitude,
+            latitude:
+                parseFloat(
+                    row["Latitude"]
+                ) || 0,
 
-            longitude
+            longitude:
+                parseFloat(
+                    row["Longitude"]
+                ) || 0
 
         };
 
@@ -234,8 +219,6 @@ function processExcelData(data){
     updateDashboard();
 
     renderDeliveryList();
-
-    focusRoutes();
 
     showAlert(
         importedRoutes.length +
@@ -319,20 +302,23 @@ function renderDeliveryList(){
             </h3>
 
             <p>
-                📍 ${route.bairro}
+                Bairro:
+                ${route.bairro}
             </p>
 
             <p>
-                🏙️ ${route.city}
+                Cidade:
+                ${route.city}
             </p>
 
             <p>
-                📮 ${route.zipcode}
+                CEP:
+                ${route.zipcode}
             </p>
 
             <div class="street-badge">
 
-                Stop:
+                📍 Stop:
                 ${route.stop}
 
             </div>
@@ -361,7 +347,7 @@ function loadRoutes(){
     if(importedRoutes.length === 0){
 
         showAlert(
-            "Importe uma planilha."
+            "Importe uma planilha primeiro."
         );
 
         return;
@@ -370,41 +356,49 @@ function loadRoutes(){
 
     importedRoutes.forEach(route => {
 
-        const marker = L.marker([
-            route.latitude,
+        if(
+            route.latitude &&
             route.longitude
-        ]).addTo(map);
+        ){
 
-        marker.bindPopup(`
+            const marker =
+            L.marker([
+                route.latitude,
+                route.longitude
+            ]).addTo(map);
 
-            <div style="width:220px">
+            marker.bindPopup(`
 
-                <h3>
-                    🚚 ${route.atId}
-                </h3>
+                <div style="width:230px">
 
-                <br>
+                    <h3>
+                        🚚 ${route.atId}
+                    </h3>
 
-                <p>
-                    Bairro:
-                    ${route.bairro}
-                </p>
+                    <br>
 
-                <p>
-                    Cidade:
-                    ${route.city}
-                </p>
+                    <p>
+                        Bairro:
+                        ${route.bairro}
+                    </p>
 
-                <p>
-                    CEP:
-                    ${route.zipcode}
-                </p>
+                    <p>
+                        Cidade:
+                        ${route.city}
+                    </p>
 
-            </div>
+                    <p>
+                        CEP:
+                        ${route.zipcode}
+                    </p>
 
-        `);
+                </div>
 
-        routeMarkers.push(marker);
+            `);
+
+            routeMarkers.push(marker);
+
+        }
 
     });
 
@@ -427,8 +421,6 @@ optimizeBtn.addEventListener(
 
 function groupRoutes(){
 
-    clearMarkers();
-
     groupedRoutes = {};
 
     importedRoutes.forEach(route => {
@@ -447,6 +439,20 @@ function groupRoutes(){
 
     });
 
+    createGroupedMarkers();
+
+    showAlert(
+        "Rotas agrupadas."
+    );
+
+}
+
+/* =========================================
+CRIAR AGRUPAMENTOS
+========================================= */
+
+function createGroupedMarkers(){
+
     Object.keys(groupedRoutes)
     .forEach(key => {
 
@@ -455,11 +461,14 @@ function groupRoutes(){
 
         if(routes.length > 1){
 
+            const lat =
+            routes[0].latitude;
+
+            const lng =
+            routes[0].longitude;
+
             const marker =
-            L.circleMarker([
-                routes[0].latitude,
-                routes[0].longitude
-            ],{
+            L.circleMarker([lat,lng],{
 
                 radius:20,
 
@@ -478,19 +487,10 @@ function groupRoutes(){
                 <div style="width:250px">
 
                     <h3>
-                        📍 ${routes.length}
-                        entregas
+                        📍
+                        ${routes.length}
+                        entregas agrupadas
                     </h3>
-
-                    <br>
-
-                    ${routes.map(route => `
-
-                        <p>
-                            🚚 ${route.atId}
-                        </p>
-
-                    `).join("")}
 
                 </div>
 
@@ -501,10 +501,6 @@ function groupRoutes(){
         }
 
     });
-
-    showAlert(
-        "Rotas agrupadas."
-    );
 
 }
 
@@ -518,18 +514,23 @@ function focusRoutes(){
 
     importedRoutes.forEach(route => {
 
-        bounds.push([
-            route.latitude,
+        if(
+            route.latitude &&
             route.longitude
-        ]);
+        ){
+
+            bounds.push([
+                route.latitude,
+                route.longitude
+            ]);
+
+        }
 
     });
 
     if(bounds.length > 0){
 
-        map.fitBounds(bounds,{
-            padding:[50,50]
-        });
+        map.fitBounds(bounds);
 
     }
 
@@ -552,44 +553,93 @@ function clearMarkers(){
 }
 
 /* =========================================
+LOCALIZAÇÃO
+========================================= */
+
+function locateUser(){
+
+    if(navigator.geolocation){
+
+        navigator.geolocation
+        .getCurrentPosition(position => {
+
+            const lat =
+            position.coords.latitude;
+
+            const lng =
+            position.coords.longitude;
+
+            map.setView([lat,lng],15);
+
+            L.marker([lat,lng])
+            .addTo(map)
+            .bindPopup(
+                "Sua localização"
+            )
+            .openPopup();
+
+        });
+
+    }
+
+}
+
+/* =========================================
+ROTA TEMPO REAL
+========================================= */
+
+startRouteBtn.addEventListener(
+    "click",
+    startLiveRoute
+);
+
+pauseRouteBtn.addEventListener(
+    "click",
+    pauseLiveRoute
+);
+
+stopRouteBtn.addEventListener(
+    "click",
+    stopLiveRoute
+);
+
+/* =========================================
 INICIAR ROTA
 ========================================= */
 
-startRouteBtn?.addEventListener(
-    "click",
-    startRoute
-);
-
-function startRoute(){
+function startLiveRoute(){
 
     if(importedRoutes.length === 0){
 
         showAlert(
-            "Importe uma planilha."
+            "Importe uma planilha primeiro."
         );
 
         return;
 
     }
 
-    if(routeRunning){
+    if(liveRouteRunning){
 
         return;
 
     }
 
-    routeRunning = true;
+    liveRouteRunning = true;
 
-    routePaused = false;
+    liveRoutePaused = false;
 
-    routeStatusText.innerHTML =
-    "Rota em andamento";
-
-    routeIndicator?.classList.add(
-        "status-active"
+    liveDot.classList.add(
+        "live-active"
     );
 
-    runRoute();
+    liveStatusText.innerHTML =
+    "Rota em andamento";
+
+    routeRunningCount.innerHTML =
+    importedRoutes.length;
+
+    runLiveTracking();
 
 }
 
@@ -597,27 +647,27 @@ function startRoute(){
 EXECUTAR ROTA
 ========================================= */
 
-function runRoute(){
+function runLiveTracking(){
 
-    if(routePaused){
+    if(liveRoutePaused){
 
         return;
 
     }
 
     if(
-        currentRouteIndex >=
+        currentDelivery >=
         importedRoutes.length
     ){
 
-        finishRoute();
+        finishLiveRoute();
 
         return;
 
     }
 
     const route =
-    importedRoutes[currentRouteIndex];
+    importedRoutes[currentDelivery];
 
     nextDelivery.innerHTML =
     route.atId;
@@ -629,14 +679,14 @@ function runRoute(){
     (
         (
             importedRoutes.length -
-            currentRouteIndex
-        ) * 4
+            currentDelivery
+        ) * 3
     ) + " min";
 
     const progress =
     (
         (
-            currentRouteIndex + 1
+            currentDelivery + 1
         )
         /
         importedRoutes.length
@@ -653,12 +703,42 @@ function runRoute(){
         route.longitude
     ],16);
 
-    currentRouteIndex++;
+    if(movingMarker){
 
-    routeTimeout =
-    setTimeout(() => {
+        map.removeLayer(movingMarker);
 
-        runRoute();
+    }
+
+    movingMarker =
+    L.marker([
+        route.latitude,
+        route.longitude
+    ]).addTo(map);
+
+    movingMarker.bindPopup(`
+
+        <b>
+            🚚 ${route.atId}
+        </b>
+
+        <br><br>
+
+        Bairro:
+        ${route.bairro}
+
+        <br>
+
+        Cidade:
+        ${route.city}
+
+    `).openPopup();
+
+    currentDelivery++;
+
+    liveInterval =
+    setTimeout(()=>{
+
+        runLiveTracking();
 
     },4000);
 
@@ -668,18 +748,13 @@ function runRoute(){
 PAUSAR
 ========================================= */
 
-pauseRouteBtn?.addEventListener(
-    "click",
-    pauseRoute
-);
+function pauseLiveRoute(){
 
-function pauseRoute(){
+    liveRoutePaused = true;
 
-    routePaused = true;
+    clearTimeout(liveInterval);
 
-    clearTimeout(routeTimeout);
-
-    routeStatusText.innerHTML =
+    liveStatusText.innerHTML =
     "Rota pausada";
 
 }
@@ -688,22 +763,23 @@ function pauseRoute(){
 ENCERRAR
 ========================================= */
 
-stopRouteBtn?.addEventListener(
-    "click",
-    stopRoute
-);
+function stopLiveRoute(){
 
-function stopRoute(){
+    clearTimeout(liveInterval);
 
-    clearTimeout(routeTimeout);
+    liveRouteRunning = false;
 
-    routeRunning = false;
+    liveRoutePaused = false;
 
-    routePaused = false;
+    currentDelivery = 0;
 
-    currentRouteIndex = 0;
+    routeRunningCount.innerHTML = 0;
 
-    routeStatusText.innerHTML =
+    liveDot.classList.remove(
+        "live-active"
+    );
+
+    liveStatusText.innerHTML =
     "Rota encerrada";
 
     progressFill.style.width =
@@ -712,35 +788,31 @@ function stopRoute(){
     progressPercent.innerHTML =
     "0%";
 
-    nextDelivery.innerHTML =
-    "---";
-
-    currentDistrict.innerHTML =
-    "---";
-
-    estimatedTime.innerHTML =
-    "---";
-
-    routeIndicator?.classList.remove(
-        "status-active"
-    );
-
 }
 
 /* =========================================
 FINALIZAR
 ========================================= */
 
-function finishRoute(){
+function finishLiveRoute(){
 
-    routeRunning = false;
+    liveRouteRunning = false;
 
-    routePaused = false;
+    liveRoutePaused = false;
 
-    currentRouteIndex = 0;
+    currentDelivery = 0;
 
-    routeStatusText.innerHTML =
-    "Rota concluída";
+    routeRunningCount.innerHTML = 0;
+
+    completedRoutes.innerHTML =
+    importedRoutes.length;
+
+    liveDot.classList.remove(
+        "live-active"
+    );
+
+    liveStatusText.innerHTML =
+    "Rota finalizada";
 
     progressFill.style.width =
     "100%";
@@ -748,48 +820,39 @@ function finishRoute(){
     progressPercent.innerHTML =
     "100%";
 
-    nextDelivery.innerHTML =
-    "Concluído";
-
-    estimatedTime.innerHTML =
-    "0 min";
-
-    routeIndicator?.classList.remove(
-        "status-active"
-    );
-
     showAlert(
-        "Rota finalizada."
+        "Todas entregas concluídas."
     );
 
 }
 
 /* =========================================
-LOCALIZAÇÃO
+BUSCA
 ========================================= */
 
-function locateUser(){
+function searchRoutes(term){
 
-    if(!navigator.geolocation){
+    const cards =
+    document.querySelectorAll(".delivery");
 
-        return;
+    cards.forEach(card => {
 
-    }
+        const text =
+        card.innerText.toLowerCase();
 
-    navigator.geolocation
-    .getCurrentPosition(position => {
+        if(
+            text.includes(
+                term.toLowerCase()
+            )
+        ){
 
-        const lat =
-        position.coords.latitude;
+            card.style.display = "block";
 
-        const lng =
-        position.coords.longitude;
+        }else{
 
-        L.marker([lat,lng])
-        .addTo(map)
-        .bindPopup(
-            "Sua localização"
-        );
+            card.style.display = "none";
+
+        }
 
     });
 
@@ -813,10 +876,18 @@ function exportJSON(){
         type:'application/json'
     });
 
-    downloadFile(
-        blob,
-        "routify.json"
-    );
+    const url =
+    URL.createObjectURL(blob);
+
+    const a =
+    document.createElement("a");
+
+    a.href = url;
+
+    a.download =
+    "routify_entregas.json";
+
+    a.click();
 
 }
 
@@ -848,19 +919,6 @@ ${route.longitude}\n`;
         type:'text/csv'
     });
 
-    downloadFile(
-        blob,
-        "routify.csv"
-    );
-
-}
-
-/* =========================================
-DOWNLOAD
-========================================= */
-
-function downloadFile(blob,fileName){
-
     const url =
     URL.createObjectURL(blob);
 
@@ -869,15 +927,10 @@ function downloadFile(blob,fileName){
 
     a.href = url;
 
-    a.download = fileName;
-
-    document.body.appendChild(a);
+    a.download =
+    "routify.csv";
 
     a.click();
-
-    a.remove();
-
-    URL.revokeObjectURL(url);
 
 }
 
@@ -890,30 +943,43 @@ function showAlert(message){
     const alertBox =
     document.createElement("div");
 
-    alertBox.className =
-    "custom-alert";
-
     alertBox.innerHTML = message;
 
-    Object.assign(alertBox.style,{
+    alertBox.style.position =
+    "fixed";
 
-        position:"fixed",
-        top:"20px",
-        right:"20px",
-        padding:"15px 20px",
-        background:"#2563eb",
-        color:"#fff",
-        borderRadius:"14px",
-        zIndex:"99999",
-        fontWeight:"600",
-        boxShadow:
-        "0 10px 25px rgba(0,0,0,.25)"
+    alertBox.style.top =
+    "20px";
 
-    });
+    alertBox.style.right =
+    "20px";
 
-    document.body.appendChild(alertBox);
+    alertBox.style.padding =
+    "15px 20px";
 
-    setTimeout(() => {
+    alertBox.style.background =
+    "#2563eb";
+
+    alertBox.style.color =
+    "white";
+
+    alertBox.style.borderRadius =
+    "14px";
+
+    alertBox.style.zIndex =
+    "99999";
+
+    alertBox.style.fontWeight =
+    "600";
+
+    alertBox.style.boxShadow =
+    "0 10px 25px rgba(0,0,0,.25)";
+
+    document.body.appendChild(
+        alertBox
+    );
+
+    setTimeout(()=>{
 
         alertBox.remove();
 
@@ -934,35 +1000,15 @@ setInterval(()=>{
 },30000);
 
 /* =========================================
-ATALHOS
-========================================= */
-
-document.addEventListener(
-    "keydown",
-    function(e){
-
-        if(
-            e.key === "F5"
-        ){
-
-            console.log(
-                "Atualizando..."
-            );
-
-        }
-
-    }
-);
-
-/* =========================================
 INICIALIZAÇÃO
 ========================================= */
 
 console.log(`
 
-=================================
+=========================================
 ROUTIFY ONLINE
-=================================
+Sistema Inteligente de Entregas
+=========================================
 
 `);
 
