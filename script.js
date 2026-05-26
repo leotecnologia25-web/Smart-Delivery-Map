@@ -1,208 +1,275 @@
 /* =========================================
-   ROUTIFY - SCRIPT COMPLETO
+ROUTIFY - SISTEMA COMPLETO
 ========================================= */
 
 /* =========================================
-   MAPA
+MAPA
 ========================================= */
 
 const map = L.map('map', {
     zoomControl: true
-}).setView([-2.5307, -44.3068], 13);
+}).setView([-2.5307, -44.3068], 12);
 
 /* =========================================
-   OPEN STREET MAP
+CAMADA MAPA
 ========================================= */
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
+L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+    attribution: '&copy; OpenStreetMap'
 }).addTo(map);
 
 /* =========================================
-   DADOS INICIAIS
+ELEMENTOS
 ========================================= */
 
-let deliveries = [
-    {
-        id: 1,
-        client: "João Silva",
-        street: "Rua da Paz",
-        number: "120",
-        district: "Centro",
-        city: "São Luís",
-        lat: -2.5307,
-        lng: -44.3068,
-        status: "pending"
-    },
+const excelInput =
+document.getElementById("excelFile");
 
-    {
-        id: 2,
-        client: "Maria Souza",
-        street: "Rua da Paz",
-        number: "150",
-        district: "Centro",
-        city: "São Luís",
-        lat: -2.5312,
-        lng: -44.3070,
-        status: "route"
-    },
+const tableBody =
+document.querySelector("#excelTable tbody");
 
-    {
-        id: 3,
-        client: "Carlos Lima",
-        street: "Rua Verde",
-        number: "55",
-        district: "Renascença",
-        city: "São Luís",
-        lat: -2.5400,
-        lng: -44.3000,
-        status: "done"
+const totalDeliveries =
+document.getElementById("totalDeliveries");
+
+const groupedStreets =
+document.getElementById("groupedStreets");
+
+const loadRoutesBtn =
+document.getElementById("loadRoutesBtn");
+
+const optimizeBtn =
+document.getElementById("optimizeBtn");
+
+const deliveryList =
+document.getElementById("deliveryList");
+
+/* =========================================
+DADOS
+========================================= */
+
+let importedRoutes = [];
+
+let routeMarkers = [];
+
+let groupedRoutes = {};
+
+/* =========================================
+UPLOAD EXCEL
+========================================= */
+
+excelInput.addEventListener(
+    "change",
+    handleExcelUpload
+);
+
+/* =========================================
+LER EXCEL
+========================================= */
+
+function handleExcelUpload(event){
+
+    const file = event.target.files[0];
+
+    if(!file){
+
+        showAlert(
+            "Selecione uma planilha Excel."
+        );
+
+        return;
+
     }
-];
 
-/* =========================================
-   ELEMENTOS
-========================================= */
+    const reader = new FileReader();
 
-const deliveryList = document.getElementById("deliveryList");
+    reader.onload = function(e){
 
-const totalDeliveries = document.getElementById("totalDeliveries");
+        const data =
+        new Uint8Array(e.target.result);
 
-const groupedStreets = document.getElementById("groupedStreets");
+        const workbook =
+        XLSX.read(data,{
+            type:'array'
+        });
 
-/* =========================================
-   MARKERS
-========================================= */
+        const sheetName =
+        workbook.SheetNames[0];
 
-let markers = [];
+        const sheet =
+        workbook.Sheets[sheetName];
 
-/* =========================================
-   INICIALIZAR
-========================================= */
+        const json =
+        XLSX.utils.sheet_to_json(sheet);
 
-initialize();
+        processExcelData(json);
 
-/* =========================================
-   FUNÇÃO PRINCIPAL
-========================================= */
+    };
 
-function initialize() {
-
-    renderDashboard();
-
-    renderDeliveries();
-
-    renderMap();
+    reader.readAsArrayBuffer(file);
 
 }
 
 /* =========================================
-   DASHBOARD
+PROCESSAR PLANILHA
 ========================================= */
 
-function renderDashboard() {
+function processExcelData(data){
 
-    totalDeliveries.innerHTML = deliveries.length;
+    importedRoutes = [];
+
+    tableBody.innerHTML = "";
+
+    clearMarkers();
+
+    data.forEach((row,index)=>{
+
+        const item = {
+
+            atId:
+                row["AT ID"] || "",
+
+            sequence:
+                row["Sequence"] || "",
+
+            stop:
+                row["Stop"] || "",
+
+            spx:
+                row["SPX TN"] || "",
+
+            bairro:
+                row["Bairro"] || "",
+
+            city:
+                row["City"] || "",
+
+            zipcode:
+                row["Zipcode/Postal code"] || "",
+
+            latitude:
+                parseFloat(
+                    row["Latitude"]
+                ) || 0,
+
+            longitude:
+                parseFloat(
+                    row["Longitude"]
+                ) || 0
+
+        };
+
+        importedRoutes.push(item);
+
+        createTableRow(item);
+
+    });
+
+    updateDashboard();
+
+    renderDeliveryList();
+
+    showAlert(
+        importedRoutes.length +
+        " entregas importadas."
+    );
+
+}
+
+/* =========================================
+CRIAR TABELA
+========================================= */
+
+function createTableRow(item){
+
+    const tr =
+    document.createElement("tr");
+
+    tr.innerHTML = `
+
+        <td>${item.atId}</td>
+        <td>${item.sequence}</td>
+        <td>${item.stop}</td>
+        <td>${item.spx}</td>
+        <td>${item.bairro}</td>
+        <td>${item.city}</td>
+        <td>${item.zipcode}</td>
+        <td>${item.latitude}</td>
+        <td>${item.longitude}</td>
+
+    `;
+
+    tableBody.appendChild(tr);
+
+}
+
+/* =========================================
+ATUALIZAR DASHBOARD
+========================================= */
+
+function updateDashboard(){
+
+    totalDeliveries.innerHTML =
+    importedRoutes.length;
 
     const streets = {};
 
-    deliveries.forEach(item => {
+    importedRoutes.forEach(route => {
 
-        if (!streets[item.street]) {
-            streets[item.street] = 0;
-        }
+        const key =
+        route.bairro + "-" +
+        route.zipcode;
 
-        streets[item.street]++;
+        streets[key] = true;
 
     });
 
-    groupedStreets.innerHTML = Object.keys(streets).length;
+    groupedStreets.innerHTML =
+    Object.keys(streets).length;
 
 }
 
 /* =========================================
-   AGRUPAR RUAS
+LISTA ENTREGAS
 ========================================= */
 
-function groupByStreet() {
-
-    const grouped = {};
-
-    deliveries.forEach(item => {
-
-        if (!grouped[item.street]) {
-            grouped[item.street] = [];
-        }
-
-        grouped[item.street].push(item);
-
-    });
-
-    return grouped;
-
-}
-
-/* =========================================
-   RENDERIZAR LISTA
-========================================= */
-
-function renderDeliveries() {
+function renderDeliveryList(){
 
     deliveryList.innerHTML = "";
 
-    const grouped = groupByStreet();
+    importedRoutes.forEach(route => {
 
-    deliveries.forEach(item => {
-
-        let statusClass = "";
-
-        let statusText = "";
-
-        switch(item.status){
-
-            case "pending":
-                statusClass = "pending";
-                statusText = "Pendente";
-            break;
-
-            case "route":
-                statusClass = "route";
-                statusText = "Em Rota";
-            break;
-
-            case "done":
-                statusClass = "done";
-                statusText = "Entregue";
-            break;
-
-        }
-
-        const card = document.createElement("div");
+        const card =
+        document.createElement("div");
 
         card.classList.add("delivery");
 
         card.innerHTML = `
 
-            <h3>${item.client}</h3>
+            <h3>
+                🚚 ${route.atId}
+            </h3>
 
-            <p>${item.street}, ${item.number}</p>
+            <p>
+                Bairro:
+                ${route.bairro}
+            </p>
 
-            <p>${item.district} - ${item.city}</p>
+            <p>
+                Cidade:
+                ${route.city}
+            </p>
+
+            <p>
+                CEP:
+                ${route.zipcode}
+            </p>
 
             <div class="street-badge">
-                📍 ${grouped[item.street].length} entregas nesta rua
-            </div>
 
-            <div class="status">
-
-                <div class="tag ${statusClass}">
-                    ${statusText}
-                </div>
-
-                <button class="route-btn"
-                    onclick="focusDelivery(${item.lat}, ${item.lng})">
-                    Ver rota
-                </button>
+                📍 Stop:
+                ${route.stop}
 
             </div>
 
@@ -215,248 +282,264 @@ function renderDeliveries() {
 }
 
 /* =========================================
-   MAPA
+CARREGAR ROTAS
 ========================================= */
 
-function renderMap() {
+loadRoutesBtn.addEventListener(
+    "click",
+    loadRoutes
+);
+
+function loadRoutes(){
 
     clearMarkers();
 
-    const grouped = groupByStreet();
+    if(importedRoutes.length === 0){
 
-    deliveries.forEach(item => {
-
-        let color = "#dc2626";
-
-        if(item.status === "route"){
-            color = "#eab308";
-        }
-
-        if(item.status === "done"){
-            color = "#16a34a";
-        }
-
-        const marker = L.circleMarker([item.lat, item.lng], {
-
-            radius: 12,
-            color: color,
-            fillColor: color,
-            fillOpacity: 0.8,
-            weight: 2
-
-        }).addTo(map);
-
-        marker.bindPopup(`
-
-            <div style="width:220px">
-
-                <h3 style="margin-bottom:10px">
-                    ${item.client}
-                </h3>
-
-                <p>
-                    ${item.street}, ${item.number}
-                </p>
-
-                <p>
-                    ${item.district}
-                </p>
-
-                <br>
-
-                <strong>
-                    📦 ${grouped[item.street].length} entregas nesta rua
-                </strong>
-
-            </div>
-
-        `);
-
-        markers.push(marker);
-
-    });
-
-}
-
-/* =========================================
-   LIMPAR MARKERS
-========================================= */
-
-function clearMarkers(){
-
-    markers.forEach(marker => {
-
-        map.removeLayer(marker);
-
-    });
-
-    markers = [];
-
-}
-
-/* =========================================
-   FOCAR ENTREGA
-========================================= */
-
-function focusDelivery(lat, lng){
-
-    map.setView([lat, lng], 17);
-
-}
-
-/* =========================================
-   IMPORTAÇÃO EXCEL
-========================================= */
-
-document.getElementById('excelFile')
-.addEventListener('change', handleExcelUpload);
-
-/* =========================================
-   PROCESSAR EXCEL
-========================================= */
-
-function handleExcelUpload(event){
-
-    const file = event.target.files[0];
-
-    if(!file){
-
-        alert("Selecione um arquivo.");
+        showAlert(
+            "Importe uma planilha primeiro."
+        );
 
         return;
 
     }
 
-    const reader = new FileReader();
+    importedRoutes.forEach(route => {
 
-    reader.onload = function(e){
+        if(
+            route.latitude &&
+            route.longitude
+        ){
 
-        const data = new Uint8Array(e.target.result);
+            const marker = L.marker([
+                route.latitude,
+                route.longitude
+            ]).addTo(map);
 
-        const workbook = XLSX.read(data, {
-            type: 'array'
-        });
+            marker.bindPopup(`
 
-        const sheetName = workbook.SheetNames[0];
+                <div style="width:230px">
 
-        const sheet = workbook.Sheets[sheetName];
+                    <h3>
+                        🚚 ${route.atId}
+                    </h3>
 
-        const json = XLSX.utils.sheet_to_json(sheet);
+                    <br>
 
-        importDeliveries(json);
+                    <p>
+                        Bairro:
+                        ${route.bairro}
+                    </p>
 
-    };
+                    <p>
+                        Cidade:
+                        ${route.city}
+                    </p>
 
-    reader.readAsArrayBuffer(file);
+                    <p>
+                        CEP:
+                        ${route.zipcode}
+                    </p>
 
-}
+                    <p>
+                        Stop:
+                        ${route.stop}
+                    </p>
 
-/* =========================================
-   IMPORTAR ENTREGAS
-========================================= */
+                    <p>
+                        Sequence:
+                        ${route.sequence}
+                    </p>
 
-async function importDeliveries(data){
+                </div>
 
-    for(const item of data){
+            `);
 
-        try{
-
-            const address = `
-                ${item.rua || ""}
-                ${item.numero || ""}
-                ${item.bairro || ""}
-                ${item.cidade || "São Luís"}
-            `;
-
-            const coords = await geocodeAddress(address);
-
-            deliveries.push({
-
-                id: Date.now() + Math.random(),
-
-                client: item.cliente || "Cliente",
-
-                street: item.rua || "Rua",
-
-                number: item.numero || "0",
-
-                district: item.bairro || "Centro",
-
-                city: item.cidade || "São Luís",
-
-                lat: coords.lat,
-
-                lng: coords.lng,
-
-                status: "pending"
-
-            });
-
-        }catch(error){
-
-            console.error("Erro:", error);
+            routeMarkers.push(marker);
 
         }
 
-    }
+    });
 
-    renderDashboard();
+    focusRoutes();
 
-    renderDeliveries();
-
-    renderMap();
-
-    alert("Entregas importadas com sucesso!");
+    showAlert(
+        "Rotas carregadas no mapa."
+    );
 
 }
 
 /* =========================================
-   GEOLOCALIZAÇÃO
+AGRUPAR ROTAS
 ========================================= */
 
-async function geocodeAddress(address){
+optimizeBtn.addEventListener(
+    "click",
+    groupRoutes
+);
 
-    const url = `
-https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}
-    `;
+function groupRoutes(){
 
-    const response = await fetch(url);
+    groupedRoutes = {};
 
-    const data = await response.json();
+    importedRoutes.forEach(route => {
 
-    if(data.length === 0){
+        const key =
+        route.bairro + "-" +
+        route.zipcode;
 
-        return {
+        if(!groupedRoutes[key]){
 
-            lat: -2.5307,
-            lng: -44.3068
+            groupedRoutes[key] = [];
 
-        };
+        }
 
-    }
+        groupedRoutes[key].push(route);
 
-    return {
+    });
 
-        lat: parseFloat(data[0].lat),
-        lng: parseFloat(data[0].lon)
+    createGroupedMarkers();
 
-    };
+    showAlert(
+        "Rotas agrupadas."
+    );
 
 }
 
 /* =========================================
-   BUSCA
+CRIAR AGRUPAMENTOS
 ========================================= */
 
-function searchStreet(term){
+function createGroupedMarkers(){
 
-    const cards = document.querySelectorAll(".delivery");
+    Object.keys(groupedRoutes)
+    .forEach(key => {
+
+        const routes =
+        groupedRoutes[key];
+
+        if(routes.length > 1){
+
+            const lat =
+            routes[0].latitude;
+
+            const lng =
+            routes[0].longitude;
+
+            const marker =
+            L.circleMarker([lat,lng],{
+
+                radius:20,
+
+                color:"#2563eb",
+
+                fillColor:"#2563eb",
+
+                fillOpacity:0.8,
+
+                weight:2
+
+            }).addTo(map);
+
+            marker.bindPopup(`
+
+                <div style="width:250px">
+
+                    <h3>
+                        📍
+                        ${routes.length}
+                        entregas agrupadas
+                    </h3>
+
+                    <br>
+
+                    ${routes.map(route => `
+
+                        <p>
+                            🚚 ${route.atId}
+                        </p>
+
+                    `).join("")}
+
+                </div>
+
+            `);
+
+            routeMarkers.push(marker);
+
+        }
+
+    });
+
+}
+
+/* =========================================
+FOCAR ROTAS
+========================================= */
+
+function focusRoutes(){
+
+    const bounds = [];
+
+    importedRoutes.forEach(route => {
+
+        if(
+            route.latitude &&
+            route.longitude
+        ){
+
+            bounds.push([
+                route.latitude,
+                route.longitude
+            ]);
+
+        }
+
+    });
+
+    if(bounds.length > 0){
+
+        map.fitBounds(bounds);
+
+    }
+
+}
+
+/* =========================================
+LIMPAR MARKERS
+========================================= */
+
+function clearMarkers(){
+
+    routeMarkers.forEach(marker => {
+
+        map.removeLayer(marker);
+
+    });
+
+    routeMarkers = [];
+
+}
+
+/* =========================================
+BUSCA
+========================================= */
+
+function searchRoutes(term){
+
+    const cards =
+    document.querySelectorAll(".delivery");
 
     cards.forEach(card => {
 
-        const text = card.innerText.toLowerCase();
+        const text =
+        card.innerText.toLowerCase();
 
-        if(text.includes(term.toLowerCase())){
+        if(
+            text.includes(
+                term.toLowerCase()
+            )
+        ){
 
             card.style.display = "block";
 
@@ -471,25 +554,31 @@ function searchStreet(term){
 }
 
 /* =========================================
-   GEOLOCALIZAÇÃO USUÁRIO
+LOCALIZAÇÃO USUÁRIO
 ========================================= */
 
 function locateUser(){
 
     if(navigator.geolocation){
 
-        navigator.geolocation.getCurrentPosition(position => {
+        navigator.geolocation
+        .getCurrentPosition(position => {
 
-            const lat = position.coords.latitude;
+            const lat =
+            position.coords.latitude;
 
-            const lng = position.coords.longitude;
+            const lng =
+            position.coords.longitude;
 
-            map.setView([lat, lng], 15);
+            map.setView([lat,lng],15);
 
-            L.marker([lat, lng])
-            .addTo(map)
-            .bindPopup("Sua localização")
-            .openPopup();
+            const marker =
+            L.marker([lat,lng])
+            .addTo(map);
+
+            marker.bindPopup(
+                "Sua localização"
+            ).openPopup();
 
         });
 
@@ -498,134 +587,157 @@ function locateUser(){
 }
 
 /* =========================================
-   FILTRAR STATUS
+EXPORTAR JSON
 ========================================= */
 
-function filterStatus(status){
+function exportJSON(){
 
-    const cards = document.querySelectorAll(".delivery");
-
-    cards.forEach((card, index) => {
-
-        if(status === "all"){
-
-            card.style.display = "block";
-
-            return;
-
-        }
-
-        if(deliveries[index].status === status){
-
-            card.style.display = "block";
-
-        }else{
-
-            card.style.display = "none";
-
-        }
-
-    });
-
-}
-
-/* =========================================
-   CALCULAR DISTÂNCIA
-========================================= */
-
-function calculateDistance(lat1, lon1, lat2, lon2){
-
-    const R = 6371;
-
-    const dLat = deg2rad(lat2-lat1);
-
-    const dLon = deg2rad(lon2-lon1);
-
-    const a =
-
-        Math.sin(dLat/2) *
-        Math.sin(dLat/2) +
-
-        Math.cos(deg2rad(lat1)) *
-        Math.cos(deg2rad(lat2)) *
-
-        Math.sin(dLon/2) *
-        Math.sin(dLon/2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-    return R * c;
-
-}
-
-function deg2rad(deg){
-
-    return deg * (Math.PI/180);
-
-}
-
-/* =========================================
-   OTIMIZAR ROTAS
-========================================= */
-
-function optimizeRoutes(){
-
-    deliveries.sort((a,b) => {
-
-        return a.street.localeCompare(b.street);
-
-    });
-
-    renderDeliveries();
-
-}
-
-/* =========================================
-   EXPORTAR JSON
-========================================= */
-
-function exportData(){
-
-    const dataStr =
-        "data:text/json;charset=utf-8," +
-        encodeURIComponent(JSON.stringify(deliveries));
-
-    const downloadAnchorNode =
-        document.createElement('a');
-
-    downloadAnchorNode.setAttribute("href", dataStr);
-
-    downloadAnchorNode.setAttribute(
-        "download",
-        "routify_entregas.json"
+    const data =
+    JSON.stringify(
+        importedRoutes,
+        null,
+        2
     );
 
-    document.body.appendChild(downloadAnchorNode);
+    const blob =
+    new Blob([data],{
+        type:'application/json'
+    });
 
-    downloadAnchorNode.click();
+    const url =
+    URL.createObjectURL(blob);
 
-    downloadAnchorNode.remove();
+    const a =
+    document.createElement("a");
+
+    a.href = url;
+
+    a.download =
+    "routify_entregas.json";
+
+    a.click();
 
 }
 
 /* =========================================
-   AUTO REFRESH
+EXPORTAR CSV
 ========================================= */
 
-setInterval(() => {
+function exportCSV(){
 
-    console.log("Sistema Routify ativo");
+    let csv =
+    "AT ID,Sequence,Stop,Bairro,City,CEP,Latitude,Longitude\n";
 
-}, 30000);
+    importedRoutes.forEach(route => {
+
+        csv += `
+${route.atId},
+${route.sequence},
+${route.stop},
+${route.bairro},
+${route.city},
+${route.zipcode},
+${route.latitude},
+${route.longitude}
+`;
+
+    });
+
+    const blob =
+    new Blob([csv],{
+        type:'text/csv'
+    });
+
+    const url =
+    URL.createObjectURL(blob);
+
+    const a =
+    document.createElement("a");
+
+    a.href = url;
+
+    a.download =
+    "routify.csv";
+
+    a.click();
+
+}
 
 /* =========================================
-   DARK MODE MAPA
+ALERTA
+========================================= */
+
+function showAlert(message){
+
+    const alertBox =
+    document.createElement("div");
+
+    alertBox.innerHTML = message;
+
+    alertBox.style.position = "fixed";
+    alertBox.style.top = "20px";
+    alertBox.style.right = "20px";
+    alertBox.style.padding = "15px 20px";
+    alertBox.style.background = "#2563eb";
+    alertBox.style.color = "white";
+    alertBox.style.borderRadius = "14px";
+    alertBox.style.zIndex = "99999";
+    alertBox.style.fontWeight = "600";
+    alertBox.style.boxShadow =
+    "0 10px 25px rgba(0,0,0,.25)";
+
+    document.body.appendChild(alertBox);
+
+    setTimeout(() => {
+
+        alertBox.remove();
+
+    }, 3000);
+
+}
+
+/* =========================================
+AUTO REFRESH
+========================================= */
+
+setInterval(()=>{
+
+    console.log(
+        "Routify Online"
+    );
+
+},30000);
+
+/* =========================================
+ATALHOS
+========================================= */
+
+document.addEventListener(
+    "keydown",
+    function(e){
+
+        if(e.key === "F5"){
+
+            console.log(
+                "Atualizando sistema..."
+            );
+
+        }
+
+    }
+);
+
+/* =========================================
+INICIALIZAÇÃO
 ========================================= */
 
 console.log(`
+
 =========================================
 ROUTIFY
 Sistema Inteligente de Entregas
 =========================================
+
 `);
 
+locateUser();
