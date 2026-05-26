@@ -1,964 +1,398 @@
 /* =========================================
 ROUTIFY PREMIUM
-STYLE.CSS COMPLETO
+STYLE.CSS COMPLETO (OTIMIZADO PARA CELULAR)
 ========================================= */
 
 /* =========================================
-RESET
+RESET & VARIÁVEIS
 ========================================= */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Inter',sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    -webkit-tap-highlight-color: transparent; /* Remove flash azul ao tocar na tela no celular */
 }
 
-:root{
-
-    --bg:#0f172a;
-    --sidebar:#111827;
-    --card:#1e293b;
-
-    --border:#334155;
-
-    --primary:#2563eb;
-    --primary-hover:#1d4ed8;
-
-    --success:#16a34a;
-    --danger:#dc2626;
-
-    --text:#ffffff;
-    --text-muted:#94a3b8;
-
-    --shadow:
-    0 10px 30px rgba(0,0,0,.25);
-
+:root {
+    --bg: #0f172a;
+    --sidebar: #111827;
+    --card: #1e293b;
+    --border: #334155;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --text: #ffffff;
+    --text-muted: #94a3b8;
+    --shadow: 0 10px 30px rgba(0, 0, 0, .25);
 }
 
 /* =========================================
-BODY
+BODY & SCROLLBAR
 ========================================= */
+body {
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    overflow-y: auto; /* Permite rolagem natural no mobile */
+}
 
-body{
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
 
-    background:var(--bg);
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
 
-    color:var(--text);
-
-    overflow:hidden;
-
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 999px;
 }
 
 /* =========================================
-SCROLLBAR
+LAYOUT PADRÃO (MOBILE-FIRST)
 ========================================= */
-
-::-webkit-scrollbar{
-
-    width:8px;
-
-}
-
-::-webkit-scrollbar-track{
-
-    background:#0f172a;
-
-}
-
-::-webkit-scrollbar-thumb{
-
-    background:#334155;
-
-    border-radius:999px;
-
+.container {
+    display: flex;
+    flex-direction: column; /* Mapa e dados empilhados no celular */
+    width: 100%;
+    min-height: 100vh;
 }
 
 /* =========================================
-LAYOUT
+MAPA CONTAINER (FICA NO TOPO NO MOBILE)
 ========================================= */
+.map-container {
+    width: 100%;
+    height: 45vh; /* Altura ideal para visualização em smartphones */
+    position: relative;
+    order: 1; /* Força o mapa a ficar em primeiro no topo */
+}
 
-.container{
+#map {
+    width: 100%;
+    height: 100%;
+}
 
-    display:flex;
+/* TOPBAR DO MAPA */
+.topbar {
+    position: absolute;
+    top: 12px;
+    left: 5%;
+    z-index: 999;
+    width: 90%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, .05);
+    box-shadow: var(--shadow);
+}
 
-    width:100%;
+.topbar h2 {
+    font-size: 16px;
+    font-weight: 700;
+}
 
-    height:100vh;
+.topbar p {
+    display: none; /* Esconde o texto longo no celular para poupar espaço */
+}
 
+/* FLOATING BUTTON (LOCALIZAÇÃO) */
+.floating-btn {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, .35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* =========================================
-SIDEBAR
+SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
 ========================================= */
+.sidebar {
+    width: 100%;
+    background: var(--sidebar);
+    display: flex;
+    flex-direction: column;
+    order: 2;
+    border-top: 1px solid var(--border);
+}
 
-.sidebar{
+/* LOGO */
+.logo {
+    padding: 20px 16px;
+    text-align: center;
+}
 
-    width:420px;
+.logo h1 {
+    font-size: 28px;
+    color: #3b82f6;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
 
-    background:var(--sidebar);
+.logo p {
+    margin-top: 4px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
 
-    border-right:1px solid var(--border);
+/* DASHBOARD GRID */
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 16px;
+}
 
-    display:flex;
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: var(--shadow);
+}
 
-    flex-direction:column;
+.card span {
+    color: var(--text-muted);
+    font-size: 11px;
+    display: block;
+}
 
-    overflow:hidden;
+.card h2 {
+    margin-top: 6px;
+    font-size: 22px;
+    font-weight: 700;
+}
 
+/* CAIXA DE BUSCA E UPLOAD */
+.search-box, .upload-area {
+    padding: 0 16px 12px;
+}
+
+.search-box input {
+    width: 100%;
+    height: 48px;
+    outline: none;
+    border-radius: 14px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    padding: 0 16px;
+    color: white;
+    font-size: 14px;
+}
+
+.upload-btn {
+    width: 100%;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* BOTÕES DE AÇÃO */
+.route-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Mantém em duas colunas organizadas */
+    gap: 10px;
+    padding: 0 16px 12px;
+}
+
+.action-btn {
+    border: none;
+    height: 46px;
+    border-radius: 12px;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.secondary { background: #334155; }
+.success { background: linear-gradient(135deg, #16a34a, #22c55e); }
+.danger { background: linear-gradient(135deg, #dc2626, #ef4444); }
+
+/* PROGRESSO */
+.progress-container {
+    padding: 0 16px 16px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #1e293b;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid #334155;
+}
+
+#progressFill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #2563eb, #60a5fa);
+    transition: width .4s ease;
+}
+
+#progressText {
+    display: block;
+    margin-top: 6px;
+    text-align: right;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+/* LISTA DE CARDS DE ENTREGA */
+.delivery-list {
+    padding: 16px;
+}
+
+.delivery {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.delivery.active {
+    border: 2px solid #22c55e;
+    background: rgba(34, 197, 94, .06);
+}
+
+.delivery h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.delivery p {
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+
+.waze-btn {
+    width: 100%;
+    margin-top: 10px;
+    height: 42px;
+    border: none;
+    border-radius: 12px;
+    background: #33ccff;
+    color: #001018;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* POPUPS DO LEAFLET CONFIGURADOS */
+.leaflet-popup-content-wrapper {
+    background: #111827;
+    color: white;
+    border-radius: 14px;
+    font-size: 13px;
+}
+.leaflet-popup-tip { background: #111827; }
+
+/* FOOTER */
+.footer {
+    padding: 16px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 11px;
+    border-top: 1px solid var(--border);
+}
+
+
+/* =========================================
+LAYOUT PARA TELAS GRANDES (DESKTOP / NOTEBOOK)
+========================================= */
+@media (min-width: 992px) {
+    body {
+        overflow: hidden; /* Trava o scroll global no PC */
+    }
+
+    .container {
+        flex-direction: row; /* Coloca o mapa ao lado da barra lateral */
+        height: 100vh;
+    }
+
+    .sidebar {
+        width: 420px; /* Largura fixa clássica lateral */
+        height: 100vh;
+        order: 1;
+        border-right: 1px solid var(--border);
+        border-top: none;
+    }
+
+    .map-container {
+        flex: 1;
+        height: 100vh;
+        order: 2;
+    }
+
+    .delivery-list {
+        flex: 1;
+        overflow-y: auto; /* Scroll apenas na listagem de cards */
+    }
+
+    .topbar {
+        top: 20px;
+        left: 20px;
+        width: 340px;
+        padding: 20px;
+    }
+
+    .topbar p {
+        display: block; /* Reexibe o resumo da aplicação no PC */
+    }
+
+    .floating-btn {
+        right: 24px;
+        bottom: 24px;
+        width: 60px;
+        height: 60px;
+    }
+
+    /* Efeitos de Hover exclusivos para Computadores */
+    .card:hover {
+        transform: translateY(-2px);
+        border-color: #3b82f6;
+    }
+    .upload-btn:hover, .action-btn:hover, .waze-btn:hover {
+        filter: brightness(1.1);
+        transform: translateY(-1px);
+    }
 }
 
 /* =========================================
-LOGO
+AJUSTE ADICIONAL PARA CELULARES MUITO PEQUENOS
 ========================================= */
-
-.logo{
-
-    padding:25px;
-
-    border-bottom:1px solid var(--border);
-
-}
-
-.logo h1{
-
-    font-size:34px;
-
-    color:#3b82f6;
-
-    font-weight:700;
-
-    letter-spacing:-1px;
-
-}
-
-.logo p{
-
-    margin-top:8px;
-
-    color:var(--text-muted);
-
-    font-size:14px;
-
-    line-height:1.5;
-
-}
-
-/* =========================================
-DASHBOARD
-========================================= */
-
-.dashboard{
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:10px;
-
-    padding:18px;
-
-}
-
-.card{
-
-    background:var(--card);
-
-    border:1px solid var(--border);
-
-    border-radius:20px;
-
-    padding:16px;
-
-    transition:.3s;
-
-    box-shadow:var(--shadow);
-
-}
-
-.card:hover{
-
-    transform:translateY(-3px);
-
-    border-color:#3b82f6;
-
-}
-
-.card span{
-
-    color:var(--text-muted);
-
-    font-size:12px;
-
-}
-
-.card h2{
-
-    margin-top:10px;
-
-    font-size:26px;
-
-    font-weight:700;
-
-}
-
-/* =========================================
-SEARCH
-========================================= */
-
-.search-box{
-
-    padding:0 18px 18px;
-
-}
-
-.search-box input{
-
-    width:100%;
-
-    height:50px;
-
-    border:none;
-
-    outline:none;
-
-    border-radius:16px;
-
-    background:#1e293b;
-
-    border:1px solid #334155;
-
-    padding:0 18px;
-
-    color:white;
-
-    font-size:14px;
-
-}
-
-/* =========================================
-UPLOAD
-========================================= */
-
-.upload-area{
-
-    padding:0 18px 18px;
-
-}
-
-.upload-btn{
-
-    width:100%;
-
-    height:55px;
-
-    border-radius:16px;
-
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #3b82f6
-    );
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    cursor:pointer;
-
-    font-weight:600;
-
-    transition:.3s;
-
-}
-
-.upload-btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-#excelFile{
-
-    display:none;
-
-}
-
-/* =========================================
-BOTÕES
-========================================= */
-
-.route-actions{
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:10px;
-
-    padding:0 18px 18px;
-
-}
-
-.action-btn{
-
-    border:none;
-
-    height:48px;
-
-    border-radius:14px;
-
-    cursor:pointer;
-
-    color:white;
-
-    font-weight:600;
-
-    transition:.3s;
-
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #3b82f6
-    );
-
-}
-
-.action-btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-.secondary{
-
-    background:#334155;
-
-}
-
-.success{
-
-    background:linear-gradient(
-        135deg,
-        #16a34a,
-        #22c55e
-    );
-
-}
-
-.danger{
-
-    background:linear-gradient(
-        135deg,
-        #dc2626,
-        #ef4444
-    );
-
-}
-
-/* =========================================
-PROGRESS
-========================================= */
-
-.progress-container{
-
-    padding:0 18px 18px;
-
-}
-
-.progress-bar{
-
-    width:100%;
-
-    height:14px;
-
-    background:#1e293b;
-
-    border-radius:999px;
-
-    overflow:hidden;
-
-    border:1px solid #334155;
-
-}
-
-#progressFill{
-
-    width:0%;
-
-    height:100%;
-
-    background:linear-gradient(
-        90deg,
-        #2563eb,
-        #60a5fa
-    );
-
-    transition:.4s;
-
-}
-
-#progressText{
-
-    display:block;
-
-    margin-top:8px;
-
-    text-align:right;
-
-    color:#94a3b8;
-
-    font-size:13px;
-
-}
-
-/* =========================================
-LISTA
-========================================= */
-
-.delivery-list{
-
-    flex:1;
-
-    overflow:auto;
-
-    padding:18px;
-
-}
-
-/* =========================================
-CARD ENTREGA
-========================================= */
-
-.delivery{
-
-    background:var(--card);
-
-    border:1px solid var(--border);
-
-    border-radius:20px;
-
-    padding:18px;
-
-    margin-bottom:15px;
-
-    transition:.3s;
-
-}
-
-.delivery:hover{
-
-    border-color:#3b82f6;
-
-    transform:translateY(-2px);
-
-}
-
-.delivery.active{
-
-    border:2px solid #22c55e;
-
-    background:rgba(34,197,94,.08);
-
-}
-
-.delivery h3{
-
-    font-size:18px;
-
-    margin-bottom:12px;
-
-}
-
-.delivery p{
-
-    color:var(--text-muted);
-
-    margin-bottom:6px;
-
-    font-size:14px;
-
-}
-
-/* =========================================
-BADGE
-========================================= */
-
-.badge{
-
-    margin-top:12px;
-
-    display:inline-block;
-
-    padding:8px 12px;
-
-    border-radius:12px;
-
-    background:rgba(37,99,235,.15);
-
-    border:1px solid rgba(37,99,235,.3);
-
-    color:#60a5fa;
-
-    font-size:12px;
-
-    font-weight:700;
-
-}
-
-/* =========================================
-WAZE BUTTON
-========================================= */
-
-.waze-btn{
-
-    width:100%;
-
-    margin-top:14px;
-
-    height:44px;
-
-    border:none;
-
-    border-radius:14px;
-
-    background:#33ccff;
-
-    color:#001018;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.3s;
-
-}
-
-.waze-btn:hover{
-
-    transform:translateY(-2px);
-
-}
-
-/* =========================================
-MAPA
-========================================= */
-
-.map-container{
-
-    flex:1;
-
-    position:relative;
-
-}
-
-#map{
-
-    width:100%;
-
-    height:100vh;
-
-}
-
-/* =========================================
-TOPBAR
-========================================= */
-
-.topbar{
-
-    position:absolute;
-
-    top:20px;
-
-    left:20px;
-
-    z-index:999;
-
-    width:320px;
-
-    padding:20px;
-
-    border-radius:22px;
-
-    background:rgba(15,23,42,.92);
-
-    backdrop-filter:blur(12px);
-
-    border:1px solid rgba(255,255,255,.05);
-
-    box-shadow:var(--shadow);
-
-}
-
-.topbar h2{
-
-    font-size:24px;
-
-}
-
-.topbar p{
-
-    margin-top:10px;
-
-    color:var(--text-muted);
-
-    line-height:1.6;
-
-    font-size:14px;
-
-}
-
-/* =========================================
-FLOAT BUTTON
-========================================= */
-
-.floating-btn{
-
-    position:absolute;
-
-    right:20px;
-
-    bottom:20px;
-
-    width:65px;
-
-    height:65px;
-
-    border:none;
-
-    border-radius:50%;
-
-    background:linear-gradient(
-        135deg,
-        #2563eb,
-        #3b82f6
-    );
-
-    color:white;
-
-    font-size:26px;
-
-    cursor:pointer;
-
-    z-index:999;
-
-    box-shadow:
-    0 15px 35px rgba(37,99,235,.35);
-
-}
-
-.floating-btn:hover{
-
-    transform:scale(1.05);
-
-}
-
-/* =========================================
-LEAFLET
-========================================= */
-
-.leaflet-popup-content-wrapper{
-
-    background:#111827;
-
-    color:white;
-
-    border-radius:18px;
-
-}
-
-.leaflet-popup-tip{
-
-    background:#111827;
-
-}
-
-.leaflet-control-zoom a{
-
-    background:#111827 !important;
-
-    color:white !important;
-
-    border:none !important;
-
-}
-
-/* =========================================
-FOOTER
-========================================= */
-
-.footer{
-
-    padding:18px;
-
-    text-align:center;
-
-    color:#94a3b8;
-
-    font-size:12px;
-
-    border-top:1px solid var(--border);
-
-}
-
-/* =========================================
-RESPONSIVO
-========================================= */
-
-@media(max-width:1100px){
-
-.container{
-
-    flex-direction:column;
-
-}
-
-.sidebar{
-
-    width:100%;
-
-    height:50vh;
-
-}
-
-.map-container{
-
-    height:50vh;
-
-}
-
-#map{
-
-    height:50vh;
-
-}
-
-}
-
-/* =========================================
-TABLET
-========================================= */
-
-@media(max-width:768px){
-
-body{
-
-    overflow:auto;
-
-}
-
-.dashboard{
-
-    grid-template-columns:1fr 1fr;
-
-}
-
-.route-actions{
-
-    grid-template-columns:1fr;
-
-}
-
-.topbar{
-
-    width:90%;
-
-    left:5%;
-
-}
-
-.sidebar{
-
-    height:auto;
-
-}
-
-.map-container{
-
-    height:55vh;
-
-}
-
-#map{
-
-    height:55vh;
-
-}
-
-}
-
-/* =========================================
-CELULAR
-========================================= */
-
-@media(max-width:600px){
-
-.logo{
-
-    padding:20px;
-
-}
-
-.logo h1{
-
-    font-size:28px;
-
-}
-
-.dashboard{
-
-    grid-template-columns:1fr 1fr;
-
-    gap:8px;
-
-    padding:14px;
-
-}
-
-.card{
-
-    padding:12px;
-
-    border-radius:16px;
-
-}
-
-.card span{
-
-    font-size:11px;
-
-}
-
-.card h2{
-
-    font-size:20px;
-
-}
-
-.search-box{
-
-    padding:0 14px 14px;
-
-}
-
-.upload-area{
-
-    padding:0 14px 14px;
-
-}
-
-.route-actions{
-
-    padding:0 14px 14px;
-
-    gap:8px;
-
-}
-
-.action-btn{
-
-    height:44px;
-
-    font-size:12px;
-
-}
-
-.progress-container{
-
-    padding:0 14px 14px;
-
-}
-
-.delivery-list{
-
-    padding:14px;
-
-}
-
-.delivery{
-
-    padding:14px;
-
-}
-
-.delivery h3{
-
-    font-size:16px;
-
-}
-
-.delivery p{
-
-    font-size:13px;
-
-}
-
-.topbar{
-
-    top:10px;
-
-    left:5%;
-
-    width:90%;
-
-    padding:16px;
-
-}
-
-.topbar h2{
-
-    font-size:20px;
-
-}
-
-.topbar p{
-
-    font-size:13px;
-
-}
-
-.floating-btn{
-
-    width:58px;
-
-    height:58px;
-
-    font-size:22px;
-
-}
-
-}
-
-/* =========================================
-CELULAR PEQUENO
-========================================= */
-
-@media(max-width:420px){
-
-.dashboard{
-
-    grid-template-columns:1fr;
-
-}
-
-.card h2{
-
-    font-size:18px;
-
-}
-
-.action-btn{
-
-    font-size:11px;
-
-}
-
-.logo h1{
-
-    font-size:24px;
-
-}
-
+@media (max-width: 380px) {
+    .dashboard {
+        grid-template-columns: 1fr; /* Transforma o dashboard em 1 coluna se a tela for minúscula */
+    }
+    .route-actions {
+        grid-template-columns: 1fr; /* Ações em 1 coluna para telas minúsculas */
+    }
 }
