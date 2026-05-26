@@ -1,6 +1,6 @@
 /* =========================================
 ROUTIFY PREMIUM
-STYLE.CSS COMPLETO (OTIMIZADO PARA CELULAR)
+STYLE.CSS COMPLETO (OTIMIZADO)
 ========================================= */
 
 /* =========================================
@@ -35,9 +35,10 @@ body {
     background: var(--bg);
     color: var(--text);
     overflow-x: hidden;
-    overflow-y: auto; /* Permite rolagem natural no mobile */
+    overflow-y: auto; /* Permite rolagem fluida e natural no mobile */
 }
 
+/* Customização fina da barra de rolagem */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -57,7 +58,7 @@ LAYOUT PADRÃO (MOBILE-FIRST)
 ========================================= */
 .container {
     display: flex;
-    flex-direction: column; /* Mapa e dados empilhados no celular */
+    flex-direction: column; /* Elementos empilhados verticalmente no celular */
     width: 100%;
     min-height: 100vh;
 }
@@ -67,17 +68,18 @@ MAPA CONTAINER (FICA NO TOPO NO MOBILE)
 ========================================= */
 .map-container {
     width: 100%;
-    height: 45vh; /* Altura ideal para visualização em smartphones */
+    height: 45vh; /* Altura ideal em smartphones para ver o mapa e a lista juntos */
     position: relative;
-    order: 1; /* Força o mapa a ficar em primeiro no topo */
+    order: 1; /* Força o mapa a ficar no topo da tela */
 }
 
 #map {
     width: 100%;
     height: 100%;
+    z-index: 1;
 }
 
-/* TOPBAR DO MAPA */
+/* OVERLAY DO MAPA (TOPBAR) */
 .topbar {
     position: absolute;
     top: 12px;
@@ -99,10 +101,10 @@ MAPA CONTAINER (FICA NO TOPO NO MOBILE)
 }
 
 .topbar p {
-    display: none; /* Esconde o texto longo no celular para poupar espaço */
+    display: none; /* Ocultado no celular para economizar espaço de tela */
 }
 
-/* FLOATING BUTTON (LOCALIZAÇÃO) */
+/* BOTÃO FLUTUANTE DO GPS */
 .floating-btn {
     position: absolute;
     right: 16px;
@@ -120,17 +122,18 @@ MAPA CONTAINER (FICA NO TOPO NO MOBILE)
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.2s;
 }
 
 /* =========================================
-SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
+SIDEBAR (PAINEL DE CONTROLE NO MOBILE)
 ========================================= */
 .sidebar {
     width: 100%;
     background: var(--sidebar);
     display: flex;
     flex-direction: column;
-    order: 2;
+    order: 2; /* Fica abaixo do mapa no celular */
     border-top: 1px solid var(--border);
 }
 
@@ -153,7 +156,7 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
     font-size: 13px;
 }
 
-/* DASHBOARD GRID */
+/* DASHBOARD */
 .dashboard {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -167,6 +170,7 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
     border-radius: 16px;
     padding: 14px;
     box-shadow: var(--shadow);
+    transition: border-color 0.3s;
 }
 
 .card span {
@@ -181,7 +185,7 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
     font-weight: 700;
 }
 
-/* CAIXA DE BUSCA E UPLOAD */
+/* BUSCA E UPLOAD AREAS */
 .search-box, .upload-area {
     padding: 0 16px 12px;
 }
@@ -189,6 +193,7 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
 .search-box input {
     width: 100%;
     height: 48px;
+    border: none;
     outline: none;
     border-radius: 14px;
     background: #1e293b;
@@ -196,6 +201,11 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
     padding: 0 16px;
     color: white;
     font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.search-box input:focus {
+    border-color: var(--primary);
 }
 
 .upload-btn {
@@ -209,12 +219,13 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
     cursor: pointer;
     font-weight: 600;
     font-size: 14px;
+    box-shadow: var(--shadow);
 }
 
-/* BOTÕES DE AÇÃO */
+/* BOTÕES DE AÇÃO COLETIVA */
 .route-actions {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Mantém em duas colunas organizadas */
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     padding: 0 16px 12px;
 }
@@ -228,6 +239,7 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
     font-weight: 600;
     font-size: 13px;
     background: linear-gradient(135deg, #2563eb, #3b82f6);
+    box-shadow: var(--shadow);
 }
 
 .secondary { background: #334155; }
@@ -263,7 +275,7 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
     font-size: 12px;
 }
 
-/* LISTA DE CARDS DE ENTREGA */
+/* LISTA DE ENTREGAS */
 .delivery-list {
     padding: 16px;
 }
@@ -274,8 +286,10 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
     border-radius: 16px;
     padding: 16px;
     margin-bottom: 12px;
+    box-shadow: var(--shadow);
 }
 
+/* CARD ATIVO (ENTREGA DA VEZ) */
 .delivery.active {
     border: 2px solid #22c55e;
     background: rgba(34, 197, 94, .06);
@@ -284,6 +298,7 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
 .delivery h3 {
     font-size: 16px;
     margin-bottom: 8px;
+    color: #f8fafc;
 }
 
 .delivery p {
@@ -292,27 +307,50 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
     font-size: 13px;
 }
 
+/* BADGE */
+.badge {
+    margin-top: 8px;
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: rgba(37, 99, 235, .15);
+    border: 1px solid rgba(37, 99, 235, .3);
+    color: #60a5fa;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* BOTÃO INTEGRADO DO WAZE */
 .waze-btn {
     width: 100%;
-    margin-top: 10px;
+    margin-top: 12px;
     height: 42px;
     border: none;
     border-radius: 12px;
     background: #33ccff;
     color: #001018;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(51, 204, 255, 0.2);
 }
 
-/* POPUPS DO LEAFLET CONFIGURADOS */
+/* POPUPS CUSTOMIZADOS DO LEAFLET MAPS */
 .leaflet-popup-content-wrapper {
-    background: #111827;
-    color: white;
-    border-radius: 14px;
+    background: #111827 !important;
+    color: #ffffff !important;
+    border-radius: 14px !important;
     font-size: 13px;
+    border: 1px solid #334155;
 }
-.leaflet-popup-tip { background: #111827; }
+.leaflet-popup-tip { 
+    background: #111827 !important; 
+}
+.leaflet-control-zoom a {
+    background: #111827 !important;
+    color: white !important;
+    border: 1px solid #334155 !important;
+}
 
 /* FOOTER */
 .footer {
@@ -325,22 +363,22 @@ SIDEBAR (PAINEL DE CONTROLE ABAIXO DO MAPA)
 
 
 /* =========================================
-LAYOUT PARA TELAS GRANDES (DESKTOP / NOTEBOOK)
+LAYOUT MONITOR/DESKTOP (TELAS DE ALTA RESOLUÇÃO)
 ========================================= */
 @media (min-width: 992px) {
     body {
-        overflow: hidden; /* Trava o scroll global no PC */
+        overflow: hidden; /* No PC trava o scroll do corpo inteiro */
     }
 
     .container {
-        flex-direction: row; /* Coloca o mapa ao lado da barra lateral */
+        flex-direction: row; /* Posiciona um ao lado do outro */
         height: 100vh;
     }
 
     .sidebar {
-        width: 420px; /* Largura fixa clássica lateral */
+        width: 420px; /* Mantém a proporção clássica da barra lateral */
         height: 100vh;
-        order: 1;
+        order: 1; /* Painel volta para a esquerda */
         border-right: 1px solid var(--border);
         border-top: none;
     }
@@ -348,12 +386,12 @@ LAYOUT PARA TELAS GRANDES (DESKTOP / NOTEBOOK)
     .map-container {
         flex: 1;
         height: 100vh;
-        order: 2;
+        order: 2; /* Mapa volta para a direita */
     }
 
     .delivery-list {
         flex: 1;
-        overflow-y: auto; /* Scroll apenas na listagem de cards */
+        overflow-y: auto; /* O scroll passa a existir apenas dentro da lista */
     }
 
     .topbar {
@@ -364,7 +402,11 @@ LAYOUT PARA TELAS GRANDES (DESKTOP / NOTEBOOK)
     }
 
     .topbar p {
-        display: block; /* Reexibe o resumo da aplicação no PC */
+        display: block; /* Mostra a descrição do sistema no computador */
+        margin-top: 10px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        font-size: 14px;
     }
 
     .floating-btn {
@@ -374,7 +416,7 @@ LAYOUT PARA TELAS GRANDES (DESKTOP / NOTEBOOK)
         height: 60px;
     }
 
-    /* Efeitos de Hover exclusivos para Computadores */
+    /* Animações e Hover apenas no computador (Preserva performance no mobile) */
     .card:hover {
         transform: translateY(-2px);
         border-color: #3b82f6;
@@ -382,17 +424,21 @@ LAYOUT PARA TELAS GRANDES (DESKTOP / NOTEBOOK)
     .upload-btn:hover, .action-btn:hover, .waze-btn:hover {
         filter: brightness(1.1);
         transform: translateY(-1px);
+        transition: transform 0.2s, filter 0.2s;
+    }
+    .floating-btn:hover {
+        transform: scale(1.05);
     }
 }
 
 /* =========================================
-AJUSTE ADICIONAL PARA CELULARES MUITO PEQUENOS
+CELULARES PEQUENOS (PROPORÇÕES ESPECÍFICAS)
 ========================================= */
 @media (max-width: 380px) {
     .dashboard {
-        grid-template-columns: 1fr; /* Transforma o dashboard em 1 coluna se a tela for minúscula */
+        grid-template-columns: 1fr; /* Força uma coluna no painel de números em telas muito estreitas */
     }
     .route-actions {
-        grid-template-columns: 1fr; /* Ações em 1 coluna para telas minúsculas */
+        grid-template-columns: 1fr; /* Botões de ação empilhados */
     }
 }
