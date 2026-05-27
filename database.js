@@ -1,143 +1,105 @@
-// =============================================================================
-// ROUTIFY PREMIUM - IndexedDB CORRIGIDO E OTIMIZADO
-// =============================================================================
+/* =========================================
+   ROUTIFY PREMIUM - DATABASE.JS
+   GERENCIAMENTO DE PERSISTÊNCIA LOCAL (IndexedDB)
+   ========================================= */
 
-const DB_NAME = 'RoutifyPremiumDB';
+const DB_NAME = "RoutifyDB";
 const DB_VERSION = 1;
-const STORE_NAME = 'entregas';
-
+const STORE_NAME = "entregas";
 let dbInstance = null;
 
 /**
- * Abre conexão única com o IndexedDB (evita múltiplas conexões)
+ * Inicializa o banco de dados IndexedDB
+ * @return {Promise} Garante que o banco está pronto antes de usar
  */
-function inicializarBanco() {
-    if (dbInstance) return Promise.resolve(dbInstance);
-
+function initDatabase() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-        request.onupgradeneeded = function (event) {
+        request.onupgradeneeded = function(event) {
             const db = event.target.result;
-
             if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                console.log(`[Database] Store '${STORE_NAME}' criada.`);
+                db.createObjectStore(STORE_NAME, { keyPath: "data" });
+                console.log(`Tabela '${STORE_NAME}' criada com sucesso.`);
             }
         };
 
-        request.onsuccess = function (event) {
+        request.onsuccess = function(event) {
             dbInstance = event.target.result;
-
-            // evita problemas de conexão fechada
-            dbInstance.onversionchange = () => {
-                dbInstance.close();
-                dbInstance = null;
-            };
-
+            console.log("Banco de dados IndexedDB conectado via database.js!");
             resolve(dbInstance);
         };
 
-        request.onerror = function (event) {
+        request.onerror = function(event) {
+            console.error("Erro ao abrir IndexedDB:", event.target.error);
             reject(event.target.error);
         };
     });
 }
 
 /**
- * Salva lista completa (substitui dados antigos)
+ * Retorna a data de hoje formatada em AAAA-MM-DD
  */
-async function salvarDadosLocal(listaEntregas) {
-    try {
-        const db = await inicializarBanco();
-
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([STORE_NAME], 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
-
-            store.clear();
-
-            transaction.oncomplete = function () {
-                const tx2 = db.transaction([STORE_NAME], 'readwrite');
-                const store2 = tx2.objectStore(STORE_NAME);
-
-                listaEntregas.forEach(entrega => {
-                    store2.put(entrega);
-                });
-
-                tx2.oncomplete = () => {
-                    console.log(`[Database] ${listaEntregas.length} entregas salvas.`);
-                    resolve(true);
-                };
-
-                tx2.onerror = (err) => reject(err);
-            };
-
-            transaction.onerror = (err) => reject(err);
-        });
-
-    } catch (error) {
-        console.error('[Database] Erro ao salvar:', error);
-    }
+function getTodayDateString() {
+    const today = new Date();
+    const offset = today.getTimezoneOffset();
+    const localDate = new Date(today.getTime() - (offset * 60 * 1000));
+    return localDate.toISOString().split('T')[0];
 }
 
 /**
- * Carrega todas as entregas
+ * Salva ou atualiza a lista de rotas do dia atual
+ * @param {Array} routesList - Lista de objetos de entregas
  */
-async function carregarDadosLocal() {
-    try {
-        const db = await inicializarBanco();
-
-        return new Promise((resolve) => {
-            const transaction = db.transaction([STORE_NAME], 'readonly');
-            const store = transaction.objectStore(STORE_NAME);
-            const request = store.getAll();
-
-            request.onsuccess = () => resolve(request.result || []);
-            request.onerror = () => resolve([]);
-        });
-
-    } catch (error) {
-        console.error('[Database] Erro ao carregar:', error);
-        return [];
+function saveRoutesToDB(routesList) {
+    if (!dbInstance) {
+        console.warn("Banco de dados não inicializado ainda.");
+        return;
     }
+
+    const todayStr = getTodayDateString();
+    const transaction = dbInstance.transaction([STORE_NAME], "readwrite");
+    const store = transaction.objectStore(STORE_NAME);
+
+    const dataToSave = {
+        data: todayStr,
+        routes: routesList,
+        updatedAt: new Date().toISOString()
+    };
+
+    const request = store.put(dataToSave);
+
+    request.onsuccess = function() {
+        console.log(`Dados salvos/atualizados para o dia: ${todayStr}`);
+    };
+
+    request.onerror = function() {
+        console.error("Erro ao salvar rotas no banco:", request.error);
+    };
 }
 
 /**
- * Atualiza ou insere uma entrega específica
+ * Busca as rotas salvas do dia atual
+ * @param {Function} callback - Função para processar os dados encontrados
  */
-async function atualizarEntregaUnica(entrega) {
-    try {
-        const db = await inicializarBanco();
+function loadRoutesFromDB(callback) {
+    if (!dbInstance) return;
 
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction([STORE_NAME], 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
+    const todayStr = getTodayDateString();
+    const transaction = dbInstance.transaction([STORE_NAME], "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.get(todayStr);
 
-            const request = store.put(entrega);
+    request.onsuccess = function(event) {
+        const result = event.target.result;
+        if (result && result.routes) {
+            callback(result.routes);
+        } else {
+            console.log(`Nenhuma rota encontrada no banco para o dia ${todayStr}.`);
+        }
+    };
 
-            request.onsuccess = () => resolve(true);
-            request.onerror = (err) => reject(err);
-        });
-
-    } catch (error) {
-        console.error('[Database] Erro ao atualizar entrega:', error);
-    }
-}
-
-/**
- * Remove banco completo
- */
-function deletarBancoDeDados() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.deleteDatabase(DB_NAME);
-
-        request.onsuccess = () => {
-            dbInstance = null;
-            console.log("[Database] Banco deletado.");
-            resolve(true);
-        };
-
-        request.onerror = (err) => reject(err);
-    });
+    request.onerror = function() {
+        console.error("Erro ao buscar rotas no banco:", request.error);
+    };
 }
