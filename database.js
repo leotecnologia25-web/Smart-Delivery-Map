@@ -1,131 +1,143 @@
 // =============================================================================
-// ROUTIFY PREMIUM - GERENCIAMENTO DE BANCO DE DADOS LOCAL (database.js)
+// ROUTIFY PREMIUM - IndexedDB CORRIGIDO E OTIMIZADO
 // =============================================================================
 
 const DB_NAME = 'RoutifyPremiumDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'entregas';
 
+let dbInstance = null;
+
 /**
- * Inicializa o Banco de Dados IndexedDB de forma assíncrona.
- * Cria a estrutura de tabelas (Object Stores) caso não existam.
+ * Abre conexão única com o IndexedDB (evita múltiplas conexões)
  */
 function inicializarBanco() {
+    if (dbInstance) return Promise.resolve(dbInstance);
+
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-        // Executado se for a primeira vez abrindo o app ou se a versão mudar
-        request.onupgradeneeded = function(event) {
+        request.onupgradeneeded = function (event) {
             const db = event.target.result;
+
             if (!db.objectStoreNames.contains(STORE_NAME)) {
-                // Cria a tabela de entregas usando o 'id' como chave primária
                 db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-                console.log(`[Database] Tabela '${STORE_NAME}' criada com sucesso.`);
+                console.log(`[Database] Store '${STORE_NAME}' criada.`);
             }
         };
 
-        request.onsuccess = function(event) {
-            resolve(event.target.result);
+        request.onsuccess = function (event) {
+            dbInstance = event.target.result;
+
+            // evita problemas de conexão fechada
+            dbInstance.onversionchange = () => {
+                dbInstance.close();
+                dbInstance = null;
+            };
+
+            resolve(dbInstance);
         };
 
-        request.onerror = function(event) {
-            console.error('[Database] Erro ao abrir o banco de dados:', event.target.error);
+        request.onerror = function (event) {
             reject(event.target.error);
         };
     });
 }
 
 /**
- * Limpa os registros antigos e salva a nova lista de entregas de uma vez.
- * @param {Array} listaEntregas - Array de objetos de entregas vindos do script.js
+ * Salva lista completa (substitui dados antigos)
  */
 async function salvarDadosLocal(listaEntregas) {
     try {
         const db = await inicializarBanco();
-        
-        // Abre uma transação de leitura e escrita
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
 
-        // 1. Limpa o banco anterior para evitar duplicidade de planilhas antigas
-        store.clear();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
 
-        // 2. Salva item por item da nova lista
-        listaEntregas.forEach(entrega => {
-            store.put(entrega);
+            store.clear();
+
+            transaction.oncomplete = function () {
+                const tx2 = db.transaction([STORE_NAME], 'readwrite');
+                const store2 = tx2.objectStore(STORE_NAME);
+
+                listaEntregas.forEach(entrega => {
+                    store2.put(entrega);
+                });
+
+                tx2.oncomplete = () => {
+                    console.log(`[Database] ${listaEntregas.length} entregas salvas.`);
+                    resolve(true);
+                };
+
+                tx2.onerror = (err) => reject(err);
+            };
+
+            transaction.onerror = (err) => reject(err);
         });
 
-        transaction.oncomplete = function() {
-            console.log(`[Database] ${listaEntregas.length} entregas sincronizadas no banco local.`);
-        };
-
-        transaction.onerror = function(event) {
-            console.error('[Database] Erro na transação de salvamento:', event.target.error);
-        };
-
     } catch (error) {
-        console.error('[Database] Falha ao executar salvamento:', error);
+        console.error('[Database] Erro ao salvar:', error);
     }
 }
 
 /**
- * Recupera todas as entregas armazenadas no banco local.
- * @returns {Promise<Array>} Retorna uma promessa com a lista de entregas.
+ * Carrega todas as entregas
  */
-function carregarDadosLocal() {
-    return new Promise(async (resolve) => {
-        try {
-            const db = await inicializarBanco();
+async function carregarDadosLocal() {
+    try {
+        const db = await inicializarBanco();
+
+        return new Promise((resolve) => {
             const transaction = db.transaction([STORE_NAME], 'readonly');
             const store = transaction.objectStore(STORE_NAME);
-            const request = store.getAll(); // Puxa todos os registros de uma vez
+            const request = store.getAll();
 
-            request.onsuccess = function(event) {
-                const resultado = event.target.result || [];
-                console.log(`[Database] ${resultado.length} registros carregados do armazenamento local.`);
-                resolve(resultado);
-            };
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => resolve([]);
+        });
 
-            request.onerror = function(event) {
-                console.error('[Database] Erro ao buscar registros:', event.target.error);
-                resolve([]);
-            };
-
-        } catch (error) {
-            console.error('[Database] Falha ao carregar dados:', error);
-            resolve([]);
-        }
-    });
+    } catch (error) {
+        console.error('[Database] Erro ao carregar:', error);
+        return [];
+    }
 }
 
 /**
- * Atualiza apenas uma entrega específica (Útil para marcar como concluído rapidamente)
- * @param {Object} entrega - Objeto da entrega modificado
+ * Atualiza ou insere uma entrega específica
  */
 async function atualizarEntregaUnica(entrega) {
     try {
         const db = await inicializarBanco();
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        
-        store.put(entrega); 
-        
+
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+
+            const request = store.put(entrega);
+
+            request.onsuccess = () => resolve(true);
+            request.onerror = (err) => reject(err);
+        });
+
     } catch (error) {
-        console.error('[Database] Erro ao atualizar entrega individual:', error);
+        console.error('[Database] Erro ao atualizar entrega:', error);
     }
 }
 
 /**
- * Deleta todo o banco de dados (Útil para funções de 'Reset' ou 'Limpar Dados')
+ * Remove banco completo
  */
 function deletarBancoDeDados() {
-    const request = indexedDB.deleteDatabase(DB_NAME);
-    
-    request.onsuccess = function() {
-        console.log("[Database] Banco de dados deletado com sucesso.");
-    };
-    
-    request.onerror = function() {
-        console.error("[Database] Erro ao deletar banco de dados.");
-    };
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.deleteDatabase(DB_NAME);
+
+        request.onsuccess = () => {
+            dbInstance = null;
+            console.log("[Database] Banco deletado.");
+            resolve(true);
+        };
+
+        request.onerror = (err) => reject(err);
+    });
 }
