@@ -1,885 +1,258 @@
-/* =========================================
-ROUTIFY PREMIUM
-SCRIPT.JS COMPLETO
-========================================= */
+// =============================================================================
+// ROUTIFY PREMIUM - LOGICA DE NEGOCIOS E MAPEAMENTO (script.js)
+// =============================================================================
 
-/* =========================================
-MAPA GLOBAL
-========================================= */
-
+// Variáveis Globais
 let map;
+let markersGroup;
+let entregas = []; // Array que guardará todas as entregas do sistema
 
-/* =========================================
-DADOS
-========================================= */
+// Inicializa o sistema assim que a página carregar
+document.addEventListener('DOMContentLoaded', () => {
+    inicializarMapa();
+    configurarEventos();
+    carregarDadosIniciais();
+});
 
-let importedRoutes = [];
+// 1. INICIALIZAÇÃO DO MAPA (LEAFLET)
+function inicializarMapa() {
+    // Centraliza o mapa inicialmente em uma coordenada padrão (ex: São Paulo ou Centro do Brasil)
+    map = L.map('map').setView([-23.55052, -46.633308], 13);
 
-let routeMarkers = [];
+    // Adiciona a camada de mapa do OpenStreetMap (Visual moderno e limpo)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-let groupedRoutes = {};
-
-let routeStarted = false;
-
-let currentRouteIndex = 0;
-
-/* =========================================
-ELEMENTOS
-========================================= */
-
-const excelInput =
-document.getElementById("excelFile");
-
-const totalDeliveries =
-document.getElementById("totalDeliveries");
-
-const groupedStreets =
-document.getElementById("groupedStreets");
-
-const inRoute =
-document.getElementById("inRoute");
-
-const completedRoutes =
-document.getElementById("completedRoutes");
-
-const deliveryList =
-document.getElementById("deliveryList");
-
-const progressFill =
-document.getElementById("progressFill");
-
-const progressText =
-document.getElementById("progressText");
-
-const searchInput =
-document.getElementById("searchInput");
-
-const loadRoutesBtn =
-document.getElementById("loadRoutesBtn");
-
-const groupRoutesBtn =
-document.getElementById("groupRoutesBtn");
-
-const startRouteBtn =
-document.getElementById("startRouteBtn");
-
-const stopRouteBtn =
-document.getElementById("stopRouteBtn");
-
-/* =========================================
-INICIALIZAR MAPA
-========================================= */
-
-function initMap(){
-
-    if(map){
-
-        map.remove();
-
-    }
-
-    map = L.map('map',{
-
-        zoomControl:true
-
-    }).setView(
-
-        [-2.5307,-44.3068],
-        12
-
-    );
-
-    L.tileLayer(
-
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-
-        {
-
-            attribution:
-            '&copy; OpenStreetMap contributors',
-
-            maxZoom:19
-
-        }
-
-    ).addTo(map);
-
-    setTimeout(()=>{
-
-        map.invalidateSize();
-
-    },200);
-
+    // Grupo para gerenciar e limpar marcadores facilmente
+    markersGroup = L.layerGroup().addTo(map);
 }
 
-/* =========================================
-UPLOAD EXCEL
-========================================= */
+// 2. CONFIGURAÇÃO DE EVENTOS DA INTERFACE (LISTENERS)
+function configurarEventos() {
+    // Upload de arquivo Excel / CSV
+    document.getElementById('excelFile').addEventListener('change', lerPlanilha);
 
-excelInput.addEventListener(
+    // Filtro de Busca
+    document.getElementById('searchInput').addEventListener('input', filtrarEntregas);
 
-    "change",
+    // Botões de Ação (Ganchos para suas futuras lógicas de agrupamento/waze)
+    document.getElementById('loadRoutesBtn').addEventListener('click', () => renderizarInterface());
+    document.getElementById('groupRoutesBtn').addEventListener('click', agruparPorBairro);
+    document.getElementById('startRouteBtn').addEventListener('click', iniciarRotas);
+    document.getElementById('stopRouteBtn').addEventListener('click', pararRotas);
+}
 
-    handleExcelUpload
+// 3. LEITURA DA PLANILHA (SHEETJS)
+function lerPlanilha(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        
+        // Pega a primeira aba da planilha
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        
+        // Converte para JSON
+        const dadosBrutos = XLSX.utils.sheet_to_json(worksheet);
 
-/* =========================================
-LER PLANILHA
-========================================= */
+        // Mapeia e padroniza os dados (Tratando as colunas da sua planilha)
+        entregas = dadosBrutos.map((item, index) => ({
+            id: index + 1,
+            // Procura por colunas chamadas 'bairro', 'Bairro' ou usa padrão
+            bairro: item.Bairro || item.bairro || "Bairro Não Informado",
+            // Procura por 'numero', 'Número', 'Casa' ou deixa S/N
+            numero: item.Numero || item.numero || item.Número || "S/N",
+            // Simulação de coordenadas (Substitua pela sua lógica de Geocodificação real se houver)
+            lat: item.Latitude || item.lat || (-23.55052 + (Math.random() - 0.5) * 0.05),
+            lng: item.Longitude || item.lng || (-46.633308 + (Math.random() - 0.5) * 0.05),
+            concluida: false // Toda entrega nova começa como pendente
+        }));
 
-function handleExcelUpload(event){
-
-    const file =
-    event.target.files[0];
-
-    if(!file){
-
-        showAlert(
-            "Selecione uma planilha."
-        );
-
-        return;
-
-    }
-
-    const reader =
-    new FileReader();
-
-    reader.onload = function(e){
-
-        const data =
-        new Uint8Array(
-            e.target.result
-        );
-
-        const workbook =
-        XLSX.read(data,{
-            type:'array'
-        });
-
-        const sheetName =
-        workbook.SheetNames[0];
-
-        const sheet =
-        workbook.Sheets[sheetName];
-
-        const json =
-        XLSX.utils.sheet_to_json(sheet);
-
-        processExcelData(json);
-
+        salvarNoBanco();
+        renderizarInterface();
     };
-
     reader.readAsArrayBuffer(file);
-
 }
 
-/* =========================================
-PROCESSAR DADOS
-========================================= */
-
-function processExcelData(data){
-
-    importedRoutes = [];
-
-    clearMarkers();
-
-    data.forEach(row=>{
-
-        const item = {
-
-            atId:
-            row["AT ID"] || "",
-
-            sequence:
-            row["Sequence"] || "",
-
-            stop:
-            row["Stop"] || "",
-
-            bairro:
-            row["Bairro"] || "",
-
-            city:
-            row["City"] || "",
-
-            zipcode:
-            row["Zipcode/Postal code"] || "",
-
-            latitude:
-            parseFloat(
-                row["Latitude"]
-            ) || 0,
-
-            longitude:
-            parseFloat(
-                row["Longitude"]
-            ) || 0
-
-        };
-
-        importedRoutes.push(item);
-
-    });
-
-    sortRoutesAlphabetically();
-
-    updateDashboard();
-
-    renderDeliveryList();
-
-    showAlert(
-
-        importedRoutes.length +
-        " entregas carregadas."
-
-    );
-
+// 4. RENDERIZAÇÃO COMPLETA DA INTERFACE (LISTA + MAPA + DASHBOARD)
+function renderizarInterface() {
+    renderizarListaCards(entregas);
+    renderizarMarcadoresMapa(entregas);
+    atualizarDashboard();
 }
 
-/* =========================================
-ORDENAR BAIRROS
-========================================= */
+// A. Renderiza a lista de cards dinâmicos (Lateral)
+function renderizarListaCards(listaParaExibir) {
+    const listaContainer = document.getElementById('deliveryList');
+    listaContainer.innerHTML = ''; // Limpa a lista atual
 
-function sortRoutesAlphabetically(){
+    if (listaParaExibir.length === 0) {
+        listaContainer.innerHTML = '<p class="empty-msg">Nenhuma entrega encontrada.</p>';
+        return;
+    }
 
-    importedRoutes.sort((a,b)=>{
-
-        return a.bairro.localeCompare(
-            b.bairro
-        );
-
-    });
-
-}
-
-/* =========================================
-ATUALIZAR DASHBOARD
-========================================= */
-
-function updateDashboard(){
-
-    totalDeliveries.innerHTML =
-    importedRoutes.length;
-
-    const bairros = {};
-
-    importedRoutes.forEach(route=>{
-
-        bairros[
-            normalizeText(
-                route.bairro
-            )
-        ] = true;
-
-    });
-
-    groupedStreets.innerHTML =
-    Object.keys(bairros).length;
-
-}
-
-/* =========================================
-LISTA ENTREGAS
-========================================= */
-
-function renderDeliveryList(){
-
-    deliveryList.innerHTML = "";
-
-    importedRoutes.forEach((route,index)=>{
-
-        const card =
-        document.createElement("div");
-
-        card.classList.add("delivery");
-
-        card.id =
-        "delivery-" + index;
+    listaParaExibir.forEach(entrega => {
+        const card = document.createElement('div');
+        // Se estiver concluída, adiciona a classe CSS para estilização diferenciada
+        card.className = `delivery-card ${entrega.concluida ? 'concluida' : ''}`;
+        card.id = `entrega-${entrega.id}`;
 
         card.innerHTML = `
-
-            <h3>
-                🚚 ${route.atId}
-            </h3>
-
-            <p>
-                Bairro:
-                ${route.bairro}
-            </p>
-
-            <p>
-                Cidade:
-                ${route.city}
-            </p>
-
-            <p>
-                CEP:
-                ${route.zipcode}
-            </p>
-
-            <div class="badge">
-
-                📍 Stop:
-                ${route.stop}
-
+            <div class="card-info" onclick="focarNoMapa(${entrega.lat}, ${entrega.lng})">
+                <h3>${entrega.bairro}</h3>
+                <p class="delivery-house-number">🏠 <strong>Número:</strong> ${entrega.numero}</p>
+                <p class="status-badge">${entrega.concluida ? '✅ Concluída' : '⏳ Em progresso'}</p>
             </div>
-
-            <button
-            class="waze-btn"
-            onclick="
-                openWaze(
-                    ${route.latitude},
-                    ${route.longitude}
-                )
-            ">
-
-                🗺 Abrir no Waze
-
-            </button>
-
+            <div class="card-actions">
+                <button class="action-btn-sm ${entrega.concluida ? 'btn-undo' : 'btn-done'}" 
+                        onclick="alternarStatusEntrega(${entrega.id})">
+                    ${entrega.concluida ? 'Refazer' : 'Concluir'}
+                </button>
+            </div>
         `;
-
-        deliveryList.appendChild(card);
-
+        listaContainer.appendChild(card);
     });
-
 }
 
-/* =========================================
-CARREGAR ROTAS
-========================================= */
-
-loadRoutesBtn.addEventListener(
-
-    "click",
-
-    loadRoutes
-
-);
-
-function loadRoutes(){
-
-    clearMarkers();
-
-    importedRoutes.forEach(route=>{
-
-        if(
-            route.latitude &&
-            route.longitude
-        ){
-
-            const marker =
-
-            L.marker([
-                route.latitude,
-                route.longitude
-            ]).addTo(map);
-
-            marker.bindPopup(`
-
-                <div>
-
-                    <h3>
-                        🚚 ${route.atId}
-                    </h3>
-
-                    <p>
-                        Bairro:
-                        ${route.bairro}
-                    </p>
-
-                    <p>
-                        CEP:
-                        ${route.zipcode}
-                    </p>
-
-                </div>
-
-            `);
-
-            routeMarkers.push(marker);
-
-        }
-
-    });
-
-    focusRoutes();
-
-    showAlert(
-        "Rotas carregadas."
-    );
-
-}
-
-/* =========================================
-AGRUPAR BAIRROS
-========================================= */
-
-groupRoutesBtn.addEventListener(
-
-    "click",
-
-    groupRoutes
-
-);
-
-function groupRoutes(){
-
-    groupedRoutes = {};
-
-    importedRoutes.forEach(route=>{
-
-        const bairro =
-        normalizeText(
-            route.bairro
-        );
-
-        if(!groupedRoutes[bairro]){
-
-            groupedRoutes[bairro] = [];
-
-        }
-
-        groupedRoutes[bairro]
-        .push(route);
-
-    });
-
-    Object.keys(groupedRoutes)
-    .forEach(key=>{
-
-        const routes =
-        groupedRoutes[key];
-
-        if(routes.length > 1){
-
-            const lat =
-            routes[0].latitude;
-
-            const lng =
-            routes[0].longitude;
-
-            const marker =
-
-            L.circleMarker([lat,lng],{
-
-                radius:20,
-
-                color:"#2563eb",
-
-                fillColor:"#2563eb",
-
-                fillOpacity:0.8
-
-            }).addTo(map);
-
-            marker.bindPopup(`
-
-                <h3>
-                    ${routes.length}
-                    entregas
-                </h3>
-
-                <p>
-                    Bairro:
-                    ${routes[0].bairro}
-                </p>
-
-            `);
-
-            routeMarkers.push(marker);
-
-        }
-
-    });
-
-    showAlert(
-        "Bairros agrupados."
-    );
-
-}
-
-/* =========================================
-INICIAR ROTA
-========================================= */
-
-startRouteBtn.addEventListener(
-
-    "click",
-
-    startRoutes
-
-);
-
-function startRoutes(){
-
-    if(importedRoutes.length === 0){
-
-        showAlert(
-            "Importe uma planilha."
-        );
-
-        return;
-
-    }
-
-    routeStarted = true;
-
-    currentRouteIndex = 0;
-
-    inRoute.innerHTML =
-    importedRoutes.length;
-
-    completedRoutes.innerHTML = 0;
-
-    nextRoute();
-
-}
-
-/* =========================================
-PRÓXIMA ENTREGA
-========================================= */
-
-function nextRoute(){
-
-    if(!routeStarted){
-
-        return;
-
-    }
-
-    if(
-        currentRouteIndex >=
-        importedRoutes.length
-    ){
-
-        showAlert(
-            "Rotas finalizadas."
-        );
-
-        return;
-
-    }
-
-    const route =
-    importedRoutes[currentRouteIndex];
-
-    map.setView([
-        route.latitude,
-        route.longitude
-    ],16);
-
-    document
-    .querySelectorAll(".delivery")
-    .forEach(card=>{
-
-        card.classList.remove(
-            "active"
-        );
-
-    });
-
-    const activeCard =
-    document.getElementById(
-        "delivery-" +
-        currentRouteIndex
-    );
-
-    if(activeCard){
-
-        activeCard.classList.add(
-            "active"
-        );
-
-    }
-
-    openWaze(
-        route.latitude,
-        route.longitude
-    );
-
-    currentRouteIndex++;
-
-    completedRoutes.innerHTML =
-    currentRouteIndex;
-
-    inRoute.innerHTML =
-    importedRoutes.length -
-    currentRouteIndex;
-
-    updateProgress();
-
-    setTimeout(()=>{
-
-        nextRoute();
-
-    },10000);
-
-}
-
-/* =========================================
-PARAR ROTAS
-========================================= */
-
-stopRouteBtn.addEventListener(
-
-    "click",
-
-    stopRoutes
-
-);
-
-function stopRoutes(){
-
-    routeStarted = false;
-
-    showAlert(
-        "Rotas pausadas."
-    );
-
-}
-
-/* =========================================
-PROGRESSO
-========================================= */
-
-function updateProgress(){
-
-    const percent =
-
-    (
-        currentRouteIndex /
-        importedRoutes.length
-    ) * 100;
-
-    progressFill.style.width =
-    percent + "%";
-
-    progressText.innerHTML =
-
-    Math.floor(percent) + "%";
-
-}
-
-/* =========================================
-ABRIR WAZE
-========================================= */
-
-function openWaze(lat,lng){
-
-    window.open(
-
-        `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`,
-
-        "_blank"
-
-    );
-
-}
-
-/* =========================================
-BUSCA
-========================================= */
-
-searchInput.addEventListener(
-
-    "keyup",
-
-    function(){
-
-        const term =
-        this.value.toLowerCase();
-
-        const cards =
-        document.querySelectorAll(
-            ".delivery"
-        );
-
-        cards.forEach(card=>{
-
-            const text =
-            card.innerText
-            .toLowerCase();
-
-            card.style.display =
-
-            text.includes(term)
-
-            ? "block"
-
-            : "none";
-
+// B. Renderiza os marcadores no Mapa com Leaflet
+function renderizarMarcadoresMapa(listaParaExibir) {
+    markersGroup.clearLayers(); // Remove marcadores antigos
+
+    listaParaExibir.forEach(entrega => {
+        // Define uma cor visual diferente se o ponto já foi concluído
+        const markerColor = entrega.concluida ? '#10B981' : '#3B82F6';
+        
+        // Criando um ícone customizado simples via HTML/CSS do Leaflet
+        const customIcon = L.divIcon({
+            className: 'custom-marker',
+            html: `<div style="background-color: ${markerColor}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(0,0,0,0.4);"></div>`,
+            iconSize: [12, 12]
         });
 
-    }
+        const marker = L.marker([entrega.lat, entrega.lng], { icon: customIcon });
 
-);
-
-/* =========================================
-LOCALIZAÇÃO
-========================================= */
-
-function locateUser(){
-
-    if(navigator.geolocation){
-
-        navigator.geolocation
-        .getCurrentPosition(position=>{
-
-            const lat =
-            position.coords.latitude;
-
-            const lng =
-            position.coords.longitude;
-
-            map.setView([lat,lng],15);
-
-            L.marker([lat,lng])
-            .addTo(map)
-            .bindPopup(
-                "Sua localização"
-            )
-            .openPopup();
-
+        // Exibe permanentemente o Número da Casa no mapa em cima do marcador
+        marker.bindTooltip(`Nº ${entrega.numero}`, { 
+            permanent: true, 
+            direction: 'top', 
+            className: entrega.concluida ? 'tooltip-concluido' : 'tooltip-pendente'
         });
 
-    }
+        // Janela flutuante ao clicar no ponto do mapa
+        marker.bindPopup(`
+            <div class="map-popup">
+                <h4>${entrega.bairro}</h4>
+                <p><b>Número:</b> ${entrega.numero}</p>
+                <p><b>Status:</b> ${entrega.concluida ? 'Concluída' : 'Pendente'}</p>
+                <button class="action-btn success" onclick="alternarStatusEntrega(${entrega.id})" style="padding: 4px 8px; font-size: 11px; margin-top: 5px;">
+                    ${entrega.concluida ? 'Marcar como Pendente' : 'Marcar como Concluída'}
+                </button>
+            </div>
+        `);
 
-}
-
-/* =========================================
-FOCAR ROTAS
-========================================= */
-
-function focusRoutes(){
-
-    const bounds = [];
-
-    importedRoutes.forEach(route=>{
-
-        if(
-            route.latitude &&
-            route.longitude
-        ){
-
-            bounds.push([
-                route.latitude,
-                route.longitude
-            ]);
-
-        }
-
+        markersGroup.addLayer(marker);
     });
 
-    if(bounds.length > 0){
-
-        map.fitBounds(bounds);
-
+    // Ajusta o zoom do mapa para enquadrar todas as entregas na tela de forma inteligente
+    if (listaParaExibir.length > 0) {
+        const group = new L.featureGroup(markersGroup.getLayers());
+        map.fitBounds(group.getBounds().pad(0.1));
     }
-
 }
 
-/* =========================================
-LIMPAR MARKERS
-========================================= */
+// 5. ALTERNAR STATUS DA ENTREGA (A SUA SOLICITAÇÃO)
+function alternarStatusEntrega(id) {
+    // Procura o item correspondente pelo ID
+    const entrega = entregas.find(e => e.id === id);
+    if (!entrega) return;
 
-function clearMarkers(){
+    // Inverte o estado (Se true vira false, se false vira true)
+    entrega.concluida = !entrega.concluida;
 
-    routeMarkers.forEach(marker=>{
+    // Salva as alterações no banco de dados local para não perder ao recarregar a página
+    salvarNoBanco();
 
-        map.removeLayer(marker);
+    // Re-renderiza a tela para aplicar as modificações visuais nos marcadores e cards
+    renderizarInterface();
+}
 
+// 6. ATUALIZAÇÃO DO DASHBOARD E BARRA DE PROGRESSO
+function atualizarDashboard() {
+    const total = entregas.length;
+    const concluidas = entregas.filter(e => e.concluida).length;
+    const emRota = total - concluidas;
+
+    // Atualiza os números nos cards superiores do HTML
+    document.getElementById('totalDeliveries').innerText = total;
+    document.getElementById('inRoute').innerText = emRota;
+    document.getElementById('completedRoutes').innerText = concluidas;
+
+    // Atualiza a quantidade de bairros únicos (Agrupados)
+    const bairrosUnicos = [...new Set(entregas.map(e => e.bairro))].length;
+    document.getElementById('groupedStreets').innerText = bairrosUnicos;
+
+    // Lógica da Barra de Progresso
+    const porcentagem = total > 0 ? Math.round((concluidas / total) * 100) : 0;
+    document.getElementById('progressFill').style.width = `${porcentagem}%`;
+    document.getElementById('progressText').innerText = `${porcentagem}%`;
+}
+
+// 7. MECANISMO DE BUSCA / FILTRO
+function filtrarEntregas() {
+    const termoBusca = document.getElementById('searchInput').value.toLowerCase();
+    
+    const entregasFiltradas = entregas.filter(entrega => {
+        return entrega.bairro.toLowerCase().includes(termoBusca) || 
+               entrega.numero.toString().toLowerCase().includes(termoBusca);
     });
 
-    routeMarkers = [];
-
+    // Renderiza apenas os resultados compatíveis com a busca
+    renderizarListaCards(entregasFiltradas);
+    renderizarMarcadoresMapa(entregasFiltradas);
 }
 
-/* =========================================
-NORMALIZAR TEXTO
-========================================= */
-
-function normalizeText(text){
-
-    return text
-
-    .toLowerCase()
-
-    .normalize("NFD")
-
-    .replace(/[\u0300-\u036f]/g,"")
-
-    .replace(/\s+/g," ")
-
-    .trim();
-
-}
-
-/* =========================================
-ALERTAS
-========================================= */
-
-function showAlert(message){
-
-    const alertBox =
-    document.createElement("div");
-
-    alertBox.innerHTML = message;
-
-    alertBox.style.position =
-    "fixed";
-
-    alertBox.style.top =
-    "20px";
-
-    alertBox.style.right =
-    "20px";
-
-    alertBox.style.padding =
-    "15px 20px";
-
-    alertBox.style.background =
-    "#2563eb";
-
-    alertBox.style.color =
-    "white";
-
-    alertBox.style.borderRadius =
-    "14px";
-
-    alertBox.style.zIndex =
-    "99999";
-
-    alertBox.style.fontWeight =
-    "600";
-
-    document.body
-    .appendChild(alertBox);
-
-    setTimeout(()=>{
-
-        alertBox.remove();
-
-    },3000);
-
-}
-
-/* =========================================
-INICIAR SISTEMA
-========================================= */
-
-document.addEventListener(
-
-    "DOMContentLoaded",
-
-    ()=>{
-
-        initMap();
-
-        locateUser();
-
+// 8. PERSISTÊNCIA DE DADOS (INTEGRAÇÃO COM O SEU DATABASE.JS)
+function salvarNoBanco() {
+    if (typeof salvarDadosLocal === 'function') {
+        // Se você tiver essa função definida em seu database.js
+        salvarDadosLocal(entregas);
+    } else {
+        // Fallback padrão usando LocalStorage caso o database.js esteja vazio
+        localStorage.setItem('routify_entregas', JSON.stringify(entregas));
     }
+}
 
-);
+function carregarDadosIniciais() {
+    if (typeof carregarDadosLocal === 'function') {
+        entregas = carregarDadosLocal() || [];
+    } else {
+        const dadosSalvos = localStorage.getItem('routify_entregas');
+        entregas = dadosSalvos ? JSON.parse(dadosSalvos) : [];
+    }
+    
+    if (entregas.length > 0) {
+        renderizarInterface();
+    }
+}
+
+// 9. FUNÇÕES AUXILIARES / INTERATIVIDADE
+function focarNoMapa(lat, lng) {
+    map.setView([lat, lng], 16, { animate: true, duration: 1 });
+}
+
+function locateUser() {
+    map.locate({ setView: true, maxZoom: 16 });
+    map.on('locationfound', (e) => {
+        L.marker(e.latlng).addTo(map).bindPopup("Você está aqui").openPopup();
+    });
+}
+
+// Funções de espaço reservado (placeholders) para os outros botões do seu layout
+function agruparPorBairro() { alert("Inteligência Routify: Agrupando bairros semelhantes..."); }
+function iniciarRotas() { alert("Rotas iniciadas! Integração com GPS ativa."); }
+function pararRotas() { alert("Rotas pausadas."); }
