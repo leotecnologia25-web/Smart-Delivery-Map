@@ -1,151 +1,48 @@
-// =============================================================================
-// ROUTIFY PREMIUM - SCRIPT PRINCIPAL (script.js)
-// =============================================================================
+package com.routify.premium;
 
-// Lista em memória (estado da aplicação)
-let entregas = [];
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import androidx.appcompat.app.AppCompatActivity;
 
-/**
- * Inicialização do sistema
- */
-async function initApp() {
-    entregas = await carregarDadosLocal();
-    renderizarEntregas();
-    console.log("[App] Sistema iniciado com sucesso.");
+public class MainActivity extends AppCompatActivity {
+
+    private WebView webView;
+
+    @SuppressLint("SetJavaScriptEnabled")
+    @Override
+    protected void Bundle) {
+        super.onCreate(savedInstanceState);
+        
+        // Cria a WebView nativa ocupando a tela inteira
+        webView = new WebView(this);
+        setContentView(webView);
+
+        // Configurações críticas de performance e compatibilidade
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true); // Permite o script.js rodar
+        webSettings.setDomStorageEnabled(true);  // Permite o Leaflet guardar cache do mapa
+        webSettings.setAllowFileAccess(true);    // Permite abrir o HTML localmente
+        webSettings.setAllowContentAccess(true);
+        
+        // Garante que links (como o do Waze) não abram o navegador externo por padrão, 
+        // a menos que disparados pelo JS
+        webView.setWebViewClient(new WebViewClient());
+
+        // Carrega os seus arquivos locais guardados na pasta 'assets' do projeto Android
+        webView.loadUrl("file:///android_asset/index.html");
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Se o usuário clicar em voltar no celular, ele navega no app em vez de fechar
+        if (webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+        }
+    }
 }
 
-/**
- * Gera ID único simples
- */
-function gerarId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
-/**
- * ADICIONAR NOVA ENTREGA
- */
-async function adicionarEntrega(nome, endereco, status = "pendente") {
-    const novaEntrega = {
-        id: gerarId(),
-        nome,
-        endereco,
-        status,
-        dataCriacao: new Date().toISOString()
-    };
-
-    entregas.push(novaEntrega);
-
-    await salvarDadosLocal(entregas);
-    renderizarEntregas();
-}
-
-/**
- * ATUALIZAR ENTREGA COMPLETA
- */
-async function atualizarEntrega(id, novosDados) {
-    const index = entregas.findIndex(e => e.id === id);
-
-    if (index === -1) return;
-
-    entregas[index] = {
-        ...entregas[index],
-        ...novosDados
-    };
-
-    await atualizarEntregaUnica(entregas[index]);
-    renderizarEntregas();
-}
-
-/**
- * MARCAR COMO CONCLUÍDA
- */
-async function concluirEntrega(id) {
-    await atualizarEntrega(id, { status: "concluida" });
-}
-
-/**
- * REMOVER ENTREGA
- */
-async function removerEntrega(id) {
-    entregas = entregas.filter(e => e.id !== id);
-
-    await salvarDadosLocal(entregas);
-    renderizarEntregas();
-}
-
-/**
- * LIMPAR TUDO (RESET)
- */
-async function resetSistema() {
-    await deletarBancoDeDados();
-    entregas = [];
-    renderizarEntregas();
-}
-
-/**
- * RENDERIZAÇÃO SIMPLES (UI BÁSICA)
- */
-function renderizarEntregas() {
-    const container = document.getElementById("listaEntregas");
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    entregas.forEach(entrega => {
-        const div = document.createElement("div");
-
-        div.style.padding = "10px";
-        div.style.margin = "5px";
-        div.style.border = "1px solid #ccc";
-
-        div.innerHTML = `
-            <strong>${entrega.nome}</strong><br>
-            ${entrega.endereco}<br>
-            Status: ${entrega.status}<br><br>
-
-            <button onclick="concluirEntrega('${entrega.id}')">Concluir</button>
-            <button onclick="removerEntrega('${entrega.id}')">Excluir</button>
-        `;
-
-        container.appendChild(div);
-    });
-}
-
-/**
- * EXEMPLO DE SUBMIT (FORM)
- */
-async function handleFormSubmit(event) {
-    event.preventDefault();
-
-    const nome = document.getElementById("nome").value;
-    const endereco = document.getElementById("endereco").value;
-
-    await adicionarEntrega(nome, endereco);
-
-    document.getElementById("nome").value = "";
-    document.getElementById("endereco").value = "";
-}
-
-/**
- * BUSCA SIMPLES
- */
-function buscarEntregas(termo) {
-    const resultado = entregas.filter(e =>
-        e.nome.toLowerCase().includes(termo.toLowerCase()) ||
-        e.endereco.toLowerCase().includes(termo.toLowerCase())
-    );
-
-    return resultado;
-}
-
-/**
- * FILTRO POR STATUS
- */
-function filtrarPorStatus(status) {
-    return entregas.filter(e => e.status === status);
-}
-
-// =============================================================================
-// EVENTO INICIAL
-// =============================================================================
-window.addEventListener("load", initApp);
