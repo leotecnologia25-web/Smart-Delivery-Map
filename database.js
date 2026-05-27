@@ -25,7 +25,6 @@ function inicializarBanco() {
         };
 
         request.onsuccess = function(event) {
-            console.log('[Database] Conexão com o IndexedDB estabelecida.');
             resolve(event.target.result);
         };
 
@@ -37,7 +36,7 @@ function inicializarBanco() {
 }
 
 /**
- * Limpa todos os registros antigos e salva a nova lista de entregas.
+ * Limpa os registros antigos e salva a nova lista de entregas de uma vez.
  * @param {Array} listaEntregas - Array de objetos de entregas vindos do script.js
  */
 async function salvarDadosLocal(listaEntregas) {
@@ -109,7 +108,7 @@ async function atualizarEntregaUnica(entrega) {
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
         
-        store.put(entrega); // O 'put' atualiza se o ID já existir ou insere se for novo
+        store.put(entrega); 
         
     } catch (error) {
         console.error('[Database] Erro ao atualizar entrega individual:', error);
