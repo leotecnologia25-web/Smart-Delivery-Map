@@ -58,7 +58,7 @@ function initAuth() {
 
         // Credenciais padrão de acesso (Altere conforme necessário)
         const USUARIO_VALIDO = "admin";
-        const SENHA_VALIDA = "123456@";
+        const SENHA_VALIDA = "123456#";
 
         if (usernameInput === USUARIO_VALIDO && passwordInput === SENHA_VALIDA) {
             localStorage.setItem("routify_authenticated", "true");
