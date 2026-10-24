@@ -14,15 +14,161 @@
     <!-- GOOGLE FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- LEAFLET CSS (Mapas confiáveis e leves) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <!-- SEU CSS CUSTOMIZADO (Otimizado para Celular e Computador) -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- ESTILOS EXCLUSIVOS DA TELA DE LOGIN (Responsiva e Moderna) -->
+    <style>
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #0d1117;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-overlay.hidden {
+            display: none !important;
+        }
+
+        .login-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            color: #f0f6fc;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .login-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #38bdf8;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .login-header p {
+            font-size: 0.875rem;
+            color: #8b949e;
+            margin-top: 6px;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #c9d1d9;
+        }
+
+        .input-group input {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 12px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: #38bdf8;
+        }
+
+        .login-error {
+            color: #f85149;
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid rgba(248, 81, 73, 0.4);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .login-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .login-footer {
+            margin-top: 24px;
+            font-size: 0.75rem;
+            color: #6e7681;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+
+<!-- =====================================
+TELA DE LOGIN (MODAL / OVERLAY)
+====================================== -->
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+        <div class="login-header">
+            <h1>ROUTIFY</h1>
+            <p>Acesse com suas credenciais de entregador/gestor</p>
+        </div>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Usuário / E-mail</label>
+                <input type="text" id="username" placeholder="Digite seu usuário" required autocomplete="username">
+            </div>
+
+            <div class="input-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" placeholder="Digite sua senha" required autocomplete="current-password">
+            </div>
+
+            <div id="loginError" class="login-error" style="display: none;">
+                ⚠️ Usuário ou senha incorretos! (Teste: admin / 123456)
+            </div>
+
+            <button type="submit" class="login-btn">Entrar no Sistema</button>
+        </form>
+
+        <footer class="login-footer">
+            Routify Premium © 2026 • Acesso Restrito
+        </footer>
+    </div>
+</div>
 
 <div class="container">
 
@@ -152,7 +298,46 @@ DEPENDÊNCIAS E SCRIPTS (ORDEM CRÍTICA)
 <!-- 4. Lógica de Negócios e Interface Mapas (Carrega por último consumindo as funções acima) -->
 <script src="script.js"></script>
 
-<!-- 5. Registro do Service Worker (Ativa o funcionamento PWA Offline / Instalação) -->
+<!-- 5. Script de Controle de Acesso e Login -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+
+        // Verifica se já está autenticado anteriormente via localStorage
+        if (localStorage.getItem('routify_authenticated') === 'true') {
+            loginOverlay.classList.add('hidden');
+        }
+
+        // Validação das credenciais
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const userVal = document.getElementById('username').value.trim();
+            const passVal = document.getElementById('password').value.trim();
+
+            // Credenciais de exemplo (altere conforme sua preferência)
+            const USUARIO_CORRETO = "admin";
+            const SENHA_CORRETA = "123456";
+
+            if (userVal === USUARIO_CORRETO && passVal === SENHA_CORRETA) {
+                localStorage.setItem('routify_authenticated', 'true');
+                loginOverlay.classList.add('hidden');
+                loginError.style.display = 'none';
+
+                // Redimensiona o mapa Leaflet caso fique oculto inicialmente
+                if (typeof map !== 'undefined' && map.invalidateSize) {
+                    setTimeout(() => map.invalidateSize(), 300);
+                }
+            } else {
+                loginError.style.display = 'block';
+            }
+        });
+    });
+</script>
+
+<!-- 6. Registro do Service Worker (Ativa o funcionamento PWA Offline / Instalação) -->
 <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
