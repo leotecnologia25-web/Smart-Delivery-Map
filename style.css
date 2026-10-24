@@ -442,3 +442,141 @@ CELULARES PEQUENOS (PROPORÇÕES ESPECÍFICAS)
         grid-template-columns: 1fr; /* Botões de ação empilhados */
     }
 }
+
+
+/* =========================================
+ESTILOS DA TELA DE LOGIN (MODAL / OVERLAY)
+========================================= */
+.login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0f172a; /* Cor de fundo padrão (--bg) */
+    z-index: 99999; /* Sobrepõe absolutamente tudo na tela */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Classe acionada pelo JavaScript para ocultar a tela após o login */
+.login-overlay.hidden {
+    display: none !important;
+}
+
+.login-card {
+    background-color: var(--sidebar);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 24px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow);
+    color: var(--text);
+    text-align: center;
+    animation: loginFadeIn 0.3s ease-out;
+}
+
+@keyframes loginFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.login-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #3b82f6; /* Azul primário do Routify */
+    letter-spacing: -1px;
+    margin: 0;
+}
+
+.login-header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    margin-bottom: 28px;
+}
+
+.login-card .input-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.login-card .input-group label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.login-card .input-group input {
+    width: 100%;
+    height: 48px;
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0 16px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-card .input-group input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.login-error {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-bottom: 16px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.login-btn {
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: filter 0.2s, transform 0.2s;
+}
+
+.login-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.login-footer {
+    margin-top: 24px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+}
